@@ -4,9 +4,7 @@ from oemof import solph
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import pylab
-import seaborn as sns
-
+import datetime as dt
 
 ##################################################
 number_of_time_steps = 24 * 7
@@ -14,18 +12,23 @@ current_folder = os.getcwd()
 demands_power = pd.read_excel(os.path.join(current_folder,'demands_power.xlsx'))
 tech_fix = pd.read_excel(os.path.join(current_folder,"Tech_Fix.xlsx"))
 tech_max = pd.read_excel(os.path.join(current_folder,"Tech_max.xlsx"))
-date_time_index = pd.date_range("06/11/2035",periods=number_of_time_steps,freq="H")
-energysystem = solph.EnergySystem(timeindex=date_time_index)
+
 ##################################################
 
 
 # Period options
 ###################################################
-summer_week_slice = slice(3768,3936)
+summer_case = slice(3768,3936),dt.datetime(2035,6,11)
+winter_case = slice(408,576),dt.datetime(2035,1,15)
 
-demands_power = demands_power[summer_week_slice].reset_index(drop=True)
-tech_fix = tech_fix[summer_week_slice].reset_index(drop=True)
-tech_max = tech_max[summer_week_slice].reset_index(drop=True)
+# current_slice,current_start_date = summer_case
+current_slice,current_start_date = winter_case
+ 
+date_time_index = pd.date_range(current_start_date,periods=number_of_time_steps,freq="H")
+energysystem = solph.EnergySystem(timeindex=date_time_index)
+demands_power = demands_power[current_slice].reset_index(drop=True)
+tech_fix = tech_fix[current_slice].reset_index(drop=True)
+tech_max = tech_max[current_slice].reset_index(drop=True)
 ###################################################
 
 
@@ -63,7 +66,7 @@ energysystem.add(A_Bel_NPP)
 B_New_NPP_TOI = solph.Source(
     label="B_New_NPP_TOI",
     outputs={b_el:solph.Flow(fix=NEW_NPP_Toi ,
-    nominal_value=1200,variable_costs=0)}
+    nominal_value=1255,variable_costs=0)}
     )
 energysystem.add(B_New_NPP_TOI)
 
@@ -89,7 +92,7 @@ energysystem.add(D_CHP_Steam)
 E_CHP_Heat_Water = solph.Transformer(
         label = "E_CHP_Heat_Water",
         inputs = {b_gas:solph.Flow()},
-        outputs = {b_el:solph.Flow(nominal_value=4122,max=0.1,variable_costs = 1), b_heat:solph.Flow()},
+        outputs = {b_el:solph.Flow(nominal_value=4122,max=0.8,variable_costs = 1), b_heat:solph.Flow()},
         conversion_factors = {b_el:0.25, b_heat:0.5},
     )
 energysystem.add(E_CHP_Heat_Water)
@@ -107,7 +110,7 @@ energysystem.add(F_CCGT)
 G_Turb_K = solph.Transformer(
         label = "G_Turb_K",
         inputs = {b_gas:solph.Flow()},
-        outputs = {b_el:solph.Flow(nominal_value=8*300, min=0.1, max=1, variable_costs=500)},
+        outputs = {b_el:solph.Flow(nominal_value=8*300, min=0, max=1, variable_costs=500)},
         conversion_factors = {b_el:0.45},
     )
 energysystem.add(G_Turb_K)
@@ -141,13 +144,13 @@ energysystem.add(F_El_Boiler)
 #             )
 # energysystem.add(Z_storage)
 
-# E_Boiler_Gas = solph.Transformer(
-#         label = "E_Boiler_Gas",
-#         inputs = {b_gas:solph.Flow()},
-#         outputs = {b_heat:solph.Flow(nominal_value=10000,variable_costs=10000)},
-#         conversion_factors = {b_heat:0.9},
-#     )
-
+E_Boiler_Gas = solph.Transformer(
+        label = "E_Boiler_Gas",
+        inputs = {b_gas:solph.Flow()},
+        outputs = {b_heat:solph.Flow(nominal_value=500,fix=1,variable_costs=10000)},
+        conversion_factors = {b_heat:0.9},
+    )
+energysystem.add(E_Boiler_Gas)
 
 El_demand =  solph.Sink(
         label="El_demand",
@@ -212,7 +215,7 @@ dF_Electr = data[columns]
 fig, axes = plt.subplots(nrows=1, ncols=2)
 
 
-ax = dF_Electr.plot(ax = axes[0] ,kind="area",  stacked = True , grid=True, rot=0, ylim=(0,8000),legend = 'reverse')
+ax = dF_Electr.plot(ax = axes[0] ,kind="area",  stacked = True , grid=True, rot=0, ylim=(0,10000),legend = 'reverse')
 
 
 
@@ -237,7 +240,7 @@ dF_Heat = data[columns]
 
 
 
-ax = dF_Heat.plot(ax = axes[1],kind="area",  stacked = True , grid=True, rot=0,ylim=(0,8000),legend='reverse')
+ax = dF_Heat.plot(ax = axes[1],kind="area",  stacked = True , grid=True, rot=0,ylim=(0,10000),legend='reverse')
 
 
 

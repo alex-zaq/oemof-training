@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 import oemof_visio as oev
+import pprint
 
 
 ##################################################
@@ -73,7 +74,7 @@ energysystem.add(A_Bel_NPP)
 B_New_NPP_TOI = solph.Source(
     label="B_New_NPP_TOI",
     outputs={b_el:solph.Flow(fix=NEW_NPP_Toi ,
-    nominal_value=1255,variable_costs=0)}
+    nominal_value=1200,variable_costs=0)}
     )
 energysystem.add(B_New_NPP_TOI)
 
@@ -88,19 +89,19 @@ C_Block_Station = solph.Transformer(
 energysystem.add(C_Block_Station)
 
 
-D_CHP_Steam = solph.Source(
-    label="D_CHP_Steam",
-    outputs={b_el:solph.Flow(fix=tech_fix["CHP_Steam"]  ,
-    nominal_value=250,variable_costs=0)}
-    )
-energysystem.add(D_CHP_Steam)
+# D_CHP_Steam = solph.Source(
+#     label="D_CHP_Steam",
+#     outputs={b_el:solph.Flow(fix=tech_fix["CHP_Steam"]  ,
+#     nominal_value=250,variable_costs=0)}
+#     )
+# energysystem.add(D_CHP_Steam)
 
 max=tech_max["CHP_HeatWater"]
 E_CHP_Heat_Water = solph.Transformer(
         label = "E_CHP_Heat_Water",
         inputs = {b_gas:solph.Flow()},
-        outputs = {b_el:solph.Flow(nominal_value=250,variable_costs = 1), b_heat:solph.Flow()},
-        conversion_factors = {b_el:0.25, b_heat:0.5},
+        outputs = {b_el:solph.Flow(nominal_value=250, min=0.3,variable_costs = 1), b_heat:solph.Flow()},
+        conversion_factors = {b_el:0.25, b_heat:0.45},
     )
 energysystem.add(E_CHP_Heat_Water)
 
@@ -108,7 +109,7 @@ energysystem.add(E_CHP_Heat_Water)
 F_CCGT = solph.Transformer(
         label = "F_CCGT",
         inputs = {b_gas:solph.Flow()},
-        outputs = {b_el:solph.Flow(nominal_value=1256, min = 0.286,variable_costs=1)},
+        outputs = {b_el:solph.Flow(nominal_value=1256, min = 0.3,variable_costs=1)},
         conversion_factors = {b_el:0.60},
     )
 energysystem.add(F_CCGT)
@@ -163,6 +164,20 @@ energysystem.add(F_El_Boiler)
 #     )
 # energysystem.add(E_Boiler_Gas)
 
+
+pv = solph.Source(
+    label = "PV",outputs = {b_el:solph.Flow(nominal_value=250,variable_costs=0, fix = tech_fix["PV"])})
+energysystem.add(pv)
+
+wind = solph.Source(
+    label = "wind",outputs = {b_el:solph.Flow(nominal_value=250,variable_costs=0, fix = tech_fix["Wind"])})
+energysystem.add(wind)
+
+hydro = solph.Source(
+    label = "hydro",outputs = {b_el:solph.Flow(nominal_value=98,variable_costs=0, fix = tech_fix["Hydro"])})
+energysystem.add(hydro)
+
+
 El_demand =  solph.Sink(
         label="El_demand",
         inputs = {b_el: solph.Flow(fix =demands_power["Electricity"], nominal_value = peak_load )} 
@@ -188,6 +203,15 @@ data_el = solph.views.node(results, "electricity")["sequences"]
 data_h = solph.views.node(results, "heat_water")["sequences"]
 
 
+# data_el.rename({(('A_BelNPP', 'electricity'), 'flow'):'БелАЭС'})
+
+
+
+# pprint.pprint(data_el)
+
+
+
+
 out_cols_el = oev.plot.divide_bus_columns(
     "electricity", data_el.columns
 )["in_cols"]
@@ -207,33 +231,77 @@ in_cols_h = oev.plot.divide_bus_columns(
 
 
 color_dict = {
-   (('electricity', 'El_demand'), 'flow') : "#000000", 
-   (('A_BelNPP', 'electricity'), 'flow') :  "#008000",
-   (('B_New_NPP_TOI', 'electricity'), 'flow') : "#00ff00", 
-   (('C_Block_Station', 'electricity'), 'flow') : "#00ffff", 
-   (('D_CHP_Steam', 'electricity'), 'flow') : "#8000ff", 
-   (('F_CCGT', 'electricity'), 'flow') : "#ffff00", 
-   (('G_Turb_K', 'electricity'), 'flow') : "#0080ff",
-   (('E_Boiler_Gas', 'heat_water'), 'flow') : "#ff0000", 
-   (('F_El_Boiler', 'heat_water'), 'flow') : "#0080ff", 
+   "Мощность без ЭК" : "#000000", 
+   "БелАЭС" :  "#00b050",
+   "Новая АЭС" : "#a9d18e", 
+   "Блок-станции" : "#7030a0",  
+   "ТЭЦ": "#f57a23", 
+   "ПГУ" : "#ffff00", 
+   "Турбина 'К'": "#0080ff", 
+   "ГЭС": "#00ffff" ,
+   "ВЭУ": "#0080ff" ,
+   "СЭС": "#ffff00", 
+   "Электрокотлы": "#8080ff", 
+   "ВИЭ": "#808080"
    
-
-}
-
-
-# current_color = color_dict
-# current_color = None
+   }
 
 
 
 elboiler_in_key = (('electricity', 'F_El_Boiler'), 'flow') 
 in_cols_el.remove(elboiler_in_key)
-
 fig = plt.figure()
 
-ax1 = data_el[out_cols_el].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,1), legend = 'reverse' , title ="Электрический график (Лето - 2035)" )
-ax2 = data_el[in_cols_el].plot(kind="line" ,ax = ax1, color = color_dict )
-ax3 = data_h[out_cols_h].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,2), title = "Тепловой график (Лето - 2035)")
+data_el = data_el[out_cols_el+in_cols_el]
+
+
+
+
+data_el["БелАЭС"] = data_el.pop((('A_BelNPP', 'electricity'), 'flow'))
+data_el["Новая АЭС"] = data_el.pop((('B_New_NPP_TOI', 'electricity'), 'flow'))
+data_el["Блок-станции"] = data_el.pop((('C_Block_Station', 'electricity'), 'flow'))
+data_el["ТЭЦ"] = data_el.pop((('E_CHP_Heat_Water', 'electricity'), 'flow'))
+data_el["ПГУ"] = data_el.pop((('F_CCGT', 'electricity'), 'flow'))
+data_el["Турбина 'К'"] = data_el.pop((('G_Turb_K', 'electricity'), 'flow'))
+
+
+# data_el["ВЭУ"] = data_el.pop((('wind', 'electricity'), 'flow'))
+# data_el["ГЭС"] = data_el.pop((('hydro', 'electricity'), 'flow'))
+# data_el["СЭС"] = data_el.pop((('PV', 'electricity'), 'flow'))
+
+
+ren_df= pd.DataFrame({"wind":data_el.pop((('wind', 'electricity'), 'flow'))})
+ren_df["hydro"]=data_el.pop((('hydro', 'electricity'), 'flow'))
+ren_df["Solar"]=data_el.pop((('PV', 'electricity'), 'flow'))
+ren_df["renewables"] = ren_df["wind"] + ren_df["Solar"] + ren_df["hydro"]
+
+
+data_el["ВИЭ"] = ren_df["renewables"]
+
+
+data_h["ТЭЦ"] = data_h.pop((('E_CHP_Heat_Water', 'heat_water'), 'flow'))
+data_h["Электрокотлы"] = data_h.pop((('F_El_Boiler', 'heat_water'), 'flow'))
+
+
+data_el["Мощность без ЭК"] = data_el.pop((( 'electricity','El_demand'), 'flow'))
+
+
+order_el = ["БелАЭС","Новая АЭС","Блок-станции","ТЭЦ","ПГУ","Турбина 'К'", "ВИЭ"]
+order_h = ["ТЭЦ","Электрокотлы"]
+
+
+
+
+# data_el[order_el].to_excel(current_folder+"\output_el.xlsx", header = True)
+# data_h[order_h].to_excel(current_folder+"\output_h.xlsx", header = True)
+data_el["Мощность без ЭК"].to_excel(current_folder+"\output_el_load.xlsx", header = True)
+
+
+
+
+ax1 = data_el[order_el].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,1) , color = color_dict ,legend = 'reverse')
+ax2 = data_el["Мощность без ЭК"].plot(kind="line", ax = ax1, color = color_dict , legend = True )
+ax3 = data_h[order_h].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,2), color = color_dict ,legend = 'reverse')
 ax1.set_xlabel("Дата")
 ax1.set_ylabel("Мощность, МВт (э)")
 ax3.set_xlabel("Дата")

@@ -20,7 +20,6 @@ energysystem = solph.EnergySystem(timeindex=date_time_index)
 
 
 
-
 # options
 ##################################################
 Bel_NPP_fix_lst = ["Bel_NPP_July_December","Bel_NPP_April_December","Full_Power"]

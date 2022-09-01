@@ -1,6 +1,9 @@
 
 
+from errno import EHOSTDOWN
+from tkinter import E
 from oemof import solph
+from oemof.solph import views
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -51,7 +54,7 @@ NEW_NPP_Toi = tech_fix[NEW_NPP_TOI_fix_lst[2]]
 
 # Fuels
 ################################################## 
-b_gas= solph.Bus(label="natural_gas")
+b_gas= solph.Bus(label="gas")
 b_heat = solph.Bus(label="heat_water")
 b_el = solph.Bus(label="electricity")
 energysystem.add(b_gas,b_el,b_heat)
@@ -60,7 +63,7 @@ energysystem.add(b_gas,b_el,b_heat)
 # Tech
 ##################################################
 Import_Gas = solph.Source(
-    label = "Natural_Gas",outputs = {b_gas:solph.Flow(variable_costs=0)})
+    label = "Generator",outputs = {b_gas:solph.Flow(variable_costs=0)})
 energysystem.add(Import_Gas)
 
 A_Bel_NPP = solph.Source(
@@ -203,13 +206,44 @@ data_el = solph.views.node(results, "electricity")["sequences"]
 data_h = solph.views.node(results, "heat_water")["sequences"]
 
 
+# solph.views.convert_keys_to_strings(results)
+
+# print(results[( Import_Gas, b_gas)]['sequences'])
+
+# print(results[(E_CHP_Heat_Water, b_el )]['sequences'])
+# print(results[(E_CHP_Heat_Water, b_heat )]['sequences'])
+
+# e = results[(E_CHP_Heat_Water, b_el )]['sequences']['flow'][-1]
+# h = results[(E_CHP_Heat_Water, b_heat )]['sequences']['flow'][-1]
+# g = results[(b_gas, E_CHP_Heat_Water )]['sequences']['flow'][-1]
+
+
+# print(e,h,g)
+
+
+# print(sum(results[( Import_Gas, b_gas)]['sequences']['flow']))
+
+ 
+
+
+# node_gen = energysystem.groups['A_BelNPP']
+# print(results[(E_CHP_Heat_Water, b_el)])
+
+ 
+
+
+
+
+
+# flows = [x for x in results.keys() ]
+# res= solph.processing.create_dataframe(model)
+# res.to_excel("result_output.xlsx")
+# views.convert_keys_to_strings(results)
+# print(results[('Natural_Gas', 'natural_gas')]['sequences'])
+# data_gas = solph.views.node(results, 'Natural_Gas')
+# data_ng = solph.views.node(results, "natural_gas")["sequences"];
 # data_el.rename({(('A_BelNPP', 'electricity'), 'flow'):'БелАЭС'})
-
-
-
 # pprint.pprint(data_el)
-
-
 
 
 out_cols_el = oev.plot.divide_bus_columns(
@@ -294,14 +328,15 @@ order_h = ["ТЭЦ","Электрокотлы"]
 
 # data_el[order_el].to_excel(current_folder+"\output_el.xlsx", header = True)
 # data_h[order_h].to_excel(current_folder+"\output_h.xlsx", header = True)
-data_el["Мощность без ЭК"].to_excel(current_folder+"\output_el_load.xlsx", header = True)
+# data_el["Мощность без ЭК"].to_excel(current_folder+"\output_el_load.xlsx", header = True)
 
 
 
 
-ax1 = data_el[order_el].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,1) , color = color_dict ,legend = 'reverse')
-ax2 = data_el["Мощность без ЭК"].plot(kind="line", ax = ax1, color = color_dict , legend = True )
-ax3 = data_h[order_h].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,2), color = color_dict ,legend = 'reverse')
+ax1 = data_el[order_el].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,1) , color = color_dict, legend = 'reverse' )
+ax2 = data_el["Мощность без ЭК"].plot(kind="line", ax = ax1, color = color_dict , legend = 'reverse'  )
+ax3 = data_h[order_h].plot(kind="area", ylim=(0,7000),ax = fig.add_subplot(1,2,2), color = color_dict,)
+# ax1.title = 'asdfasd'
 ax1.set_xlabel("Дата")
 ax1.set_ylabel("Мощность, МВт (э)")
 ax3.set_xlabel("Дата")

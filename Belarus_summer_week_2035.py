@@ -9,14 +9,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import datetime as dt
-import oemof_visio as oev
-import pprint
+ 
+ 
 
 
 ##################################################
-number_of_time_steps = 24 * 7
+number_of_time_steps = 24
 current_folder = os.getcwd()
-demands_power = pd.read_excel(os.path.join(current_folder,'demands_power.xlsx'))
+data = pd.read_excel(os.path.join(current_folder,'data.xlsx'), sheet_name='electric_demands_rel')
+
+data2 = pd.read_excel(os.path.join(current_folder,'data.xlsx'), sheet_name='chp_el_winter_workday_abs')
+data3 = pd.read_excel(os.path.join(current_folder,'data.xlsx'), sheet_name='chp_el_winter_weekday_abs')
+
+ 
+# chp = {};
+
+# chp['Зима_рабочий'] = data2
+# chp['Зима_выходной'] = data3
+ 
+
+
 # tech_fix = pd.read_excel(os.path.join(current_folder,"Tech_Fix.xlsx"))
 # tech_max = pd.read_excel(os.path.join(current_folder,"Tech_max.xlsx"))
 

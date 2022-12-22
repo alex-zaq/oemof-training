@@ -27,16 +27,24 @@ import datetime as dt
 # перенос в эксель: по большим группам, по станциям, по блокам: заполнение электрического графика (полная выработка, спрос без эк), нагрузка электрокотлов
 
 #################################################################################
+
+
+
+
 number_of_time_steps = 24
 current_folder = os.getcwd()
-el_global_data = pd.read_excel(os.path.join(current_folder,'data.xlsx'), sheet_name='electric_demand_2021_odu')
-el_chp_data = pd.read_excel(os.path.join(current_folder,'data.xlsx'), sheet_name='chp_el_winter_workday_abs')
+el_global_data = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
+el_chp_data = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='chp_el_summer_workday_abs')
 #################################################################################
 
 
 
-peak_load = max(el_global_data['el_winter_workDay_odu'][:number_of_time_steps]);
-el_global_demand_profile = el_global_data['el_winter_workDay_odu'][:number_of_time_steps]/peak_load
+# peak_load = max(el_global_data['el_winter_workDay_odu'][:number_of_time_steps]);
+# el_global_demand_profile = el_global_data['el_winter_workDay_odu'][:number_of_time_steps]/peak_load
+
+
+peak_load = max(el_global_data['el_summer_workDay_odu'][:number_of_time_steps]);
+el_global_demand_profile = el_global_data['el_summer_workDay_odu'][:number_of_time_steps]/peak_load
 
 
 
@@ -47,7 +55,7 @@ el_small_chp_profile = el_chp_data['Малые ТЭЦ'][:number_of_time_steps]/s
 # el_chp_max_load = max( el_chp_data['Минская ТЭЦ-4'][:number_of_time_steps])
 
 
-el_heat_ratio = 2.3;
+el_heat_ratio = 1.9;
 
 
 current_start_date = dt.datetime(2020,6,8,1,0,0)
@@ -62,6 +70,7 @@ energysystem.add(b_gas_bus, b_el_global_bus)
 
 
 
+NppPart = 0.92
 #################################################################################
 natural_gas_generator = solph.components.Source(
     label = "natural_gas_generator",
@@ -73,7 +82,7 @@ energysystem.add(natural_gas_generator)
 bel_npp_vver_1200_1 = solph.components.Source(
     label="bel_Npp_vver_1200_1_1",
 	 
-    outputs={b_el_global_bus:solph.Flow( min=0.75, nominal_value= 1170, variable_costs= -10)},
+    outputs={b_el_global_bus:solph.Flow( fix = 1, nominal_value= 1170 * NppPart, variable_costs= -10)},
     
     # conversion_factors = {b_el_global_bus: 0.375}
     )
@@ -81,7 +90,7 @@ energysystem.add(bel_npp_vver_1200_1)
 bel_npp_vver_1200_2 = solph.components.Source(
     label="bel_Npp_vver_1200_2",
 	 	 
-    outputs={b_el_global_bus:solph.Flow( fix = 1 , nominal_value= 1170, variable_costs= -10)},
+    outputs={b_el_global_bus:solph.Flow( fix = 1 , nominal_value= 1170 * NppPart, variable_costs= -10)},
     
     # conversion_factors = {b_el_global_bus: 0.375}
     )
@@ -91,11 +100,11 @@ energysystem.add(bel_npp_vver_1200_2)
 #################################################################################
 night_start = 7 
 night_end = 2
-reduction = 0.8
+reduction = 0.9
 block_station_profile = [reduction] * night_start + (number_of_time_steps - night_start-night_end) * [1] + night_end * [reduction]
 block_station_ng = solph.components.Source(
     label="block_station_ng",
-    outputs={b_el_global_bus:solph.Flow( fix = block_station_profile, nominal_value= 600, variable_costs=0),
+    outputs={b_el_global_bus:solph.Flow( fix = block_station_profile, nominal_value= 500, variable_costs=0),
              },
     )
 energysystem.add(block_station_ng)
@@ -456,8 +465,8 @@ small_chp = solph.components.Transformer(
     )
 energysystem.add(small_chp)
 #################################################################################
-startupOptions = [-100000] + 23* [2 * 100000]
-shutdownOptions = 24 * [2 * 100000]
+startupOptions = [-100000] + 23* [2 * 1000000000]
+shutdownOptions = 24 * [2 * 10000000006]
 #################################################################################
 # КЭС
 #################################################################################
@@ -466,7 +475,7 @@ shutdownOptions = 24 * [2 * 100000]
 lukomol_ccgt_427_block_9 = solph.components.Transformer(
     label="lukomol_ccgt_427_block_9",
 		inputs = {b_gas_bus:solph.Flow()},
-    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1, startup_costs = startupOptions, shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 427, variable_costs=41)},
+    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1, startup_costs = startupOptions, shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 427, variable_costs=35)},
 		conversion_factors = {b_gas_bus:1, b_el_global_bus: 0.57}
     )
 energysystem.add(lukomol_ccgt_427_block_9)
@@ -538,7 +547,7 @@ energysystem.add(lukomol_K_300_block_8)
 bereza_ccgt_427_block_7 = solph.components.Transformer(
     label="bereza_ccgt_427_block_7",
 		inputs = {b_gas_bus:solph.Flow()},
-    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1,startup_costs = startupOptions,shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 427, variable_costs=40)},
+    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1,startup_costs = startupOptions,shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 427, variable_costs=35)},
 		conversion_factors = {b_gas_bus:1, b_el_global_bus: 0.57}
     )
 energysystem.add(bereza_ccgt_427_block_7)
@@ -573,7 +582,7 @@ energysystem.add(bereza_SSG_25_block_4_2)
 tec5_ccgt_399_block_2 = solph.components.Transformer(
     label="tec5_ccgt_399_block_2",
 		inputs = {b_gas_bus:solph.Flow()},
-    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1,startup_costs = startupOptions,shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 399.6, variable_costs=42)},
+    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1,startup_costs = startupOptions,shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 399.6, variable_costs=35)},
 		conversion_factors = {b_gas_bus:1, b_el_global_bus: 0.57}
     )
 energysystem.add(tec5_ccgt_399_block_2)
@@ -676,21 +685,40 @@ el_boiler_df = el_boiler_df[el_boiler_df > 0]
 
 print(el_boiler_df)
 
-ax1 = el_boiler_df.plot(kind="area", ylim=(0, 7000), legend = 'reverse')
 
 
+res = res.loc[:, (res > 0.1).any(axis=0)]
+res = res[res>0]
 
-res = res.loc[:, (res != 0).any(axis=0)]
-res = res[res > 0]
-ax2 = res.plot(kind="area", ylim=(0, 7000), legend = 'reverse')
-ax3 = demand.plot(kind="line", ylim=(0, 7000), ax=ax2 , color = 'black' , legend = 'reverse')
+# plt.legend(prop={'size': 6})
+plt.rc('legend',fontsize=7) # using a size in points
+
+
+ax2 = res.plot(kind="area", ylim=(0, 7000), legend = 'reverse', title = 'Производство электроэнергии Лето-рабочий')
+ax1 = el_boiler_df.plot(kind="area", ylim=(0, 7000) , stacked= True ,  legend = 'reverse', title = 'Потребление электрокотлов Лето-рабочий')
+ax3 = demand.plot(kind="line", ylim=(0, 7000), ax=ax2 , color = 'black' , legend = 'reverse', style='.-')
+
+handles, labels = ax2.get_legend_handles_labels()
+ax2.legend(handles[::-1], labels[::-1], loc='lower right')
+
+ax2.set_xlabel("Дата")
+ax2.set_ylabel("Мощность, МВт (э)")
+ax1.set_xlabel("Дата")
+ax1.set_ylabel("Мощность, МВт (э)")
+
+
 
 plt.show()
 
 
 
-# res.to_excel('winter_day_result.xlsx')
-# demand.to_excel('demand.xlsx')
+
+
+res.to_excel('summer_day_result_blocks.xlsx')
+el_boiler_df.to_excel('summer_day_elBoilers.xlsx')
+demand.to_excel('summer_day_demand.xlsx')
+
+
 
 
 

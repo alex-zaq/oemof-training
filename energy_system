@@ -1,416 +1,50 @@
 digraph {
-	subgraph cluster_1 {
-		color=black
-		label=Legends
-		Bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-		Sink [fontsize=10 shape=trapezium]
-		Source [fontsize=10 shape=invtrapezium]
-		"Transforme
-r" [fontsize=10 shape=rectangle]
-		Storage [fontsize=10 shape=rectangle style=rounded]
-	}
-	gas [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	electricity_global [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	natural_gas_global_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	electricity_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	heat_water_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
 	"natural_ga
 s_generato
-r" [fontsize=10 shape=invtrapezium]
-	"bel_Npp_vv
-er_1200_1_
-1" [fontsize=10 shape=invtrapezium]
-	"bel_Npp_vv
-er_1200_2" [fontsize=10 shape=invtrapezium]
-	"block_stat
-ion_ng" [fontsize=10 shape=invtrapezium]
-	b_el_mogilev_tec_2_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"mogilev_te
-c_2" [fontsize=10 shape=rectangle]
-	"mogilev_te
-c_2_el_dem
-and" [fontsize=10 shape=trapezium]
-	"elboilers_
-mogilev_te
-c_2" [fontsize=10 shape=rectangle]
-	b_el_bobruisk_tec_2_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"bobruisk_t
-ec_2" [fontsize=10 shape=rectangle]
-	"elboilers_
-bobruisk_t
-ec_2" [fontsize=10 shape=rectangle]
-	"bobruisk_t
-ec_2_el_de
-mand" [fontsize=10 shape=trapezium]
-	b_el_grodno_tec_2_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"grodno_tec
-_2" [fontsize=10 shape=rectangle]
-	"elboilers_
-grodno_tec
-_2" [fontsize=10 shape=rectangle]
-	"grodno_tec
-_2_el_dema
-nd" [fontsize=10 shape=trapezium]
-	b_el_novopozkay_tec_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"novopozkya
-_tec_2" [fontsize=10 shape=rectangle]
-	"novopozkya
-_tec_2_el_
-demand" [fontsize=10 shape=trapezium]
-	b_el_minskay_tec_4_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"minskay_te
-c_4" [fontsize=10 shape=rectangle]
-	"elboilers_
-minskay_te
-c_4" [fontsize=10 shape=rectangle]
-	"minskay_te
-c_4_el_dem
-and" [fontsize=10 shape=trapezium]
-	b_el_minskay_tec_3_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"minskay_te
-c_3" [fontsize=10 shape=rectangle]
-	"elboilers_
-minskay_te
-c_3" [fontsize=10 shape=rectangle]
-	"minskay_te
-c_3_el_dem
-and" [fontsize=10 shape=trapezium]
-	b_el_gomelskya_tec2_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"gomelskya_
-tec2" [fontsize=10 shape=rectangle]
-	"elboilers_
-gomelskya_
-tec2" [fontsize=10 shape=rectangle]
-	"gomelskya_
-tec2_el_de
-mand" [fontsize=10 shape=trapezium]
-	b_el_mozyrskay_tec2_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"mozyrskay_
-tec2" [fontsize=10 shape=rectangle]
-	"mozyrskay_
-tec2_el_de
-mand" [fontsize=10 shape=trapezium]
-	b_el_svetlogorskay_tec_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"svetlogors
-kay_tec" [fontsize=10 shape=rectangle]
-	"svetlogors
-kay_tec_el
-_demand" [fontsize=10 shape=trapezium]
-	b_el_minskaya_tec2_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"minskaya_t
-ec2" [fontsize=10 shape=rectangle]
-	"elboilers_
-minskaya_t
-ec2" [fontsize=10 shape=rectangle]
-	"minskaya_t
-ec2_el_dem
-and" [fontsize=10 shape=trapezium]
-	b_th_district_boiler_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	"boilers_di
-strict" [fontsize=10 shape=rectangle]
-	"elboilers_
-district" [fontsize=10 shape=rectangle]
-	"boilers_di
-strict_dem
-and" [fontsize=10 shape=trapezium]
-	b_th_cpp_heat_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-	cpp_heat [fontsize=10 shape=rectangle]
-	"elboilers_
-cpp" [fontsize=10 shape=rectangle]
-	"cpp_heat_d
-emand" [fontsize=10 shape=trapezium]
-	small_chp [fontsize=10 shape=rectangle]
-	"lukomol_cc
-gt_427_blo
-ck_9" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-1" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-2" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-3" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-4" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-5" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-6" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-7" [fontsize=10 shape=rectangle]
-	"lukomol_K_
-300_block_
-8" [fontsize=10 shape=rectangle]
-	"bereza_ccg
-t_427_bloc
-k_7" [fontsize=10 shape=rectangle]
-	"bereza_K_1
-60_block_4" [fontsize=10 shape=rectangle]
-	"bereza_SSG
-_25_block_
-4_1" [fontsize=10 shape=rectangle]
-	"bereza_SSG
-_25_block_
-4_2" [fontsize=10 shape=rectangle]
-	"tec5_ccgt_
-399_block_
-2" [fontsize=10 shape=rectangle]
-	"tec5_TK_33
-0_block_1" [fontsize=10 shape=rectangle]
-	"el_demand_
-global" [fontsize=10 shape=trapezium]
+r_source" [fontsize=10 shape=invtrapezium]
+	"back_elect
+ricity_tr" [fontsize=10 shape=rectangle]
+	"back_heat_
+water_tr" [fontsize=10 shape=rectangle]
+	chp_natural_gas_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	"chp_natura
+l_gas_tr" [fontsize=10 shape=rectangle]
+	"back_chp_e
+lectricity
+_tr" [fontsize=10 shape=rectangle]
+	"electricit
+y_sink" [fontsize=10 shape=trapezium]
+	"heat_water
+_sink" [fontsize=10 shape=trapezium]
 	"natural_ga
 s_generato
-r" -> gas
-	gas -> "mogilev_te
-c_2"
-	gas -> "bobruisk_t
-ec_2"
-	gas -> "grodno_tec
-_2"
-	gas -> "novopozkya
-_tec_2"
-	gas -> "minskay_te
-c_4"
-	gas -> "minskay_te
-c_3"
-	gas -> "gomelskya_
-tec2"
-	gas -> "mozyrskay_
-tec2"
-	gas -> "svetlogors
-kay_tec"
-	gas -> "minskaya_t
-ec2"
-	gas -> "boilers_di
-strict"
-	gas -> cpp_heat
-	gas -> small_chp
-	gas -> "lukomol_cc
-gt_427_blo
-ck_9"
-	gas -> "lukomol_K_
-300_block_
-1"
-	gas -> "lukomol_K_
-300_block_
-2"
-	gas -> "lukomol_K_
-300_block_
-3"
-	gas -> "lukomol_K_
-300_block_
-4"
-	gas -> "lukomol_K_
-300_block_
-5"
-	gas -> "lukomol_K_
-300_block_
-6"
-	gas -> "lukomol_K_
-300_block_
-7"
-	gas -> "lukomol_K_
-300_block_
-8"
-	gas -> "bereza_ccg
-t_427_bloc
-k_7"
-	gas -> "bereza_K_1
-60_block_4"
-	gas -> "bereza_SSG
-_25_block_
-4_1"
-	gas -> "bereza_SSG
-_25_block_
-4_2"
-	gas -> "tec5_ccgt_
-399_block_
-2"
-	gas -> "tec5_TK_33
-0_block_1"
-	"block_stat
-ion_ng" -> electricity_global
-	"minskay_te
-c_3" -> electricity_global
-	"svetlogors
-kay_tec" -> electricity_global
-	"lukomol_K_
-300_block_
-6" -> electricity_global
-	"gomelskya_
-tec2" -> electricity_global
-	"bel_Npp_vv
-er_1200_1_
-1" -> electricity_global
-	"mozyrskay_
-tec2" -> electricity_global
-	"lukomol_K_
-300_block_
-7" -> electricity_global
-	"bereza_SSG
-_25_block_
-4_1" -> electricity_global
-	"bereza_ccg
-t_427_bloc
-k_7" -> electricity_global
-	"tec5_ccgt_
-399_block_
-2" -> electricity_global
-	"bobruisk_t
-ec_2" -> electricity_global
-	"bereza_SSG
-_25_block_
-4_2" -> electricity_global
-	"tec5_TK_33
-0_block_1" -> electricity_global
-	"bel_Npp_vv
-er_1200_2" -> electricity_global
-	"minskay_te
-c_4" -> electricity_global
-	"mogilev_te
-c_2" -> electricity_global
-	"lukomol_K_
-300_block_
-1" -> electricity_global
-	"bereza_K_1
-60_block_4" -> electricity_global
-	"lukomol_K_
-300_block_
-5" -> electricity_global
-	"lukomol_K_
-300_block_
-3" -> electricity_global
-	"minskaya_t
-ec2" -> electricity_global
-	small_chp -> electricity_global
-	"lukomol_K_
-300_block_
-8" -> electricity_global
-	"novopozkya
-_tec_2" -> electricity_global
-	"grodno_tec
-_2" -> electricity_global
-	"lukomol_K_
-300_block_
-4" -> electricity_global
-	"lukomol_K_
-300_block_
-2" -> electricity_global
-	"lukomol_cc
-gt_427_blo
-ck_9" -> electricity_global
-	electricity_global -> "elboilers_
-mogilev_te
-c_2"
-	electricity_global -> "elboilers_
-bobruisk_t
-ec_2"
-	electricity_global -> "elboilers_
-grodno_tec
-_2"
-	electricity_global -> "elboilers_
-minskay_te
-c_4"
-	electricity_global -> "elboilers_
-minskay_te
-c_3"
-	electricity_global -> "elboilers_
-gomelskya_
-tec2"
-	electricity_global -> "elboilers_
-minskaya_t
-ec2"
-	electricity_global -> "elboilers_
-district"
-	electricity_global -> "elboilers_
-cpp"
-	electricity_global -> "el_demand_
-global"
-	"mogilev_te
-c_2" -> b_el_mogilev_tec_2_bus
-	"elboilers_
-mogilev_te
-c_2" -> b_el_mogilev_tec_2_bus
-	b_el_mogilev_tec_2_bus -> "mogilev_te
-c_2_el_dem
-and"
-	"elboilers_
-bobruisk_t
-ec_2" -> b_el_bobruisk_tec_2_bus
-	"bobruisk_t
-ec_2" -> b_el_bobruisk_tec_2_bus
-	b_el_bobruisk_tec_2_bus -> "bobruisk_t
-ec_2_el_de
-mand"
-	"grodno_tec
-_2" -> b_el_grodno_tec_2_bus
-	"elboilers_
-grodno_tec
-_2" -> b_el_grodno_tec_2_bus
-	b_el_grodno_tec_2_bus -> "grodno_tec
-_2_el_dema
-nd"
-	"novopozkya
-_tec_2" -> b_el_novopozkay_tec_bus
-	b_el_novopozkay_tec_bus -> "novopozkya
-_tec_2_el_
-demand"
-	"minskay_te
-c_4" -> b_el_minskay_tec_4_bus
-	"elboilers_
-minskay_te
-c_4" -> b_el_minskay_tec_4_bus
-	b_el_minskay_tec_4_bus -> "minskay_te
-c_4_el_dem
-and"
-	"elboilers_
-minskay_te
-c_3" -> b_el_minskay_tec_3_bus
-	"minskay_te
-c_3" -> b_el_minskay_tec_3_bus
-	b_el_minskay_tec_3_bus -> "minskay_te
-c_3_el_dem
-and"
-	"elboilers_
-gomelskya_
-tec2" -> b_el_gomelskya_tec2_bus
-	"gomelskya_
-tec2" -> b_el_gomelskya_tec2_bus
-	b_el_gomelskya_tec2_bus -> "gomelskya_
-tec2_el_de
-mand"
-	"mozyrskay_
-tec2" -> b_el_mozyrskay_tec2_bus
-	b_el_mozyrskay_tec2_bus -> "mozyrskay_
-tec2_el_de
-mand"
-	"svetlogors
-kay_tec" -> b_el_svetlogorskay_tec_bus
-	b_el_svetlogorskay_tec_bus -> "svetlogors
-kay_tec_el
-_demand"
-	"elboilers_
-minskaya_t
-ec2" -> b_el_minskaya_tec2_bus
-	"minskaya_t
-ec2" -> b_el_minskaya_tec2_bus
-	b_el_minskaya_tec2_bus -> "minskaya_t
-ec2_el_dem
-and"
-	"elboilers_
-district" -> b_th_district_boiler_bus
-	"boilers_di
-strict" -> b_th_district_boiler_bus
-	b_th_district_boiler_bus -> "boilers_di
-strict_dem
-and"
-	cpp_heat -> b_th_cpp_heat_bus
-	"elboilers_
-cpp" -> b_th_cpp_heat_bus
-	b_th_cpp_heat_bus -> "cpp_heat_d
-emand"
+r_source" -> natural_gas_global_bus
+	natural_gas_global_bus -> "back_elect
+ricity_tr"
+	natural_gas_global_bus -> "back_heat_
+water_tr"
+	natural_gas_global_bus -> "chp_natura
+l_gas_tr"
+	"back_chp_e
+lectricity
+_tr" -> electricity_bus
+	"back_elect
+ricity_tr" -> electricity_bus
+	electricity_bus -> "electricit
+y_sink"
+	"back_chp_e
+lectricity
+_tr" -> heat_water_bus
+	"back_heat_
+water_tr" -> heat_water_bus
+	heat_water_bus -> "heat_water
+_sink"
+	"chp_natura
+l_gas_tr" -> chp_natural_gas_bus
+	chp_natural_gas_bus -> "back_chp_e
+lectricity
+_tr"
 }

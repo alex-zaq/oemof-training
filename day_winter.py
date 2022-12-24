@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import datetime as dt
+from oemof_visio import ESGraphRenderer
 # import oemof_visio as oev
  
 #  
@@ -706,7 +707,9 @@ ax2.set_ylabel("Мощность, МВт (э)")
 ax1.set_xlabel("Дата")
 ax1.set_ylabel("Мощность, МВт (э)")
 
+gr = ESGraphRenderer(energy_system=energysystem, filepath="energy_system", img_format="png", txt_fontsize=10, txt_width=10, legend= True)
 
+gr.view()
 
 plt.show()
 
@@ -720,8 +723,6 @@ plt.show()
 
 # plt.set_figwidth(10)
 # plt.set_figheight(10)
-
-plt.show()
 
 
 

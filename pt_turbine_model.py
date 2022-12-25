@@ -71,29 +71,44 @@ energysystem.add(back_steam_tr)
 
 natural_gas_pt_60_bus = solph.Bus('natural_gas_pt_60_bus')
 electricity_pt_60_bus = solph.Bus('electricity_pt_60_bus')
+fake_on_of_pt_60_bus = solph.Bus('fake_on_of_pt_60_bus')
 heat_water_chp_bus = solph.Bus('heat_water_chp_bus')
 steam_chp_bus = solph.Bus('steam_chp_bus')
 
-# chp_pt_60_natural_gas_tr = solph.components.Transformer (
-#     label = 'chp_pt_60_natural_gas_tr',
-# 		inputs = {natural_gas_global_bus: solph.Flow()},
-# 		outputs = {natural_gas_pt_60_bus: solph.Flow(nominal_value = ?)},
-		
-#  ) 
 
-chp_pt_60_P_mode_tr = solph.components.Transformer (
+
+chp_pt_60_natural_gas_tr = solph.components.Transformer (
+    label = 'chp_pt_60_natural_gas_tr',
+		inputs = {natural_gas_global_bus: solph.Flow()},
+		outputs = {natural_gas_pt_60_bus: solph.Flow(nominal_value = 3000)},
+		
+ ) 
+
+chp_pt_60_P_mode_first_tr = solph.components.Transformer (
     label = 'chp_pt_60_P_mode_tr',
-		inputs = {natural_gas_pt_60_bus: solph.Flow()},
+		inputs = {natural_gas_pt_60_bus: solph.Flow(nominal_value = 1000)},
+		outputs = {electricity_pt_60_bus: solph.Flow(nominal_value = 60),
+								fake_on_of_pt_60_bus: solph.Flow(),
+								steam_chp_bus: solph.Flow(nominal_value = 244.23)
+               },
+		conversion_factors = {natural_gas_pt_60_bus: 6.76, electricity_pt_60_bus: 1, steam_chp_bus: 4.07, fake_on_of_pt_60_bus: 5}
+ ) 
+
+chp_pt_60_P_mode_second_tr = solph.components.Transformer (
+    label = 'chp_pt_60_P_mode_second_tr',
+		inputs = {natural_gas_pt_60_bus: solph.Flow(nominal_value = 500),
+							fake_on_of_pt_60_bus: solph.Flow()
+            },
 		outputs = {electricity_pt_60_bus: solph.Flow(nominal_value = 60),
 								steam_chp_bus: solph.Flow(nominal_value = 244.23)
                },
-		conversion_factors = {natural_gas_pt_60_bus: 6.76, electricity_pt_60_bus: 1, steam_chp_bus: 4.07}
+		conversion_factors = {fake_on_of_pt_60_bus: 0.0001,natural_gas_pt_60_bus: 6.76, electricity_pt_60_bus: 1, steam_chp_bus: 4.07}
  ) 
 
 chp_pt_60_T_mode_tr = solph.components.Transformer (
     label = 'chp_pt_60_T_mode_tr',
-		inputs = {natural_gas_pt_60_bus: solph.Flow()},
-		outputs = {electricity_pt_60_bus: solph.Flow(nominal_value = 6),
+		inputs = {natural_gas_pt_60_bus: solph.Flow( nominal_value = 1000)},
+		outputs = {electricity_pt_60_bus: solph.Flow(nominal_value = 60),
 								heat_water_chp_bus: solph.Flow(nominal_value = 12)
              },
   	conversion_factors = {natural_gas_pt_60_bus: 4, electricity_pt_60_bus: 1, steam_chp_bus: 2}
@@ -103,13 +118,18 @@ chp_pt_60_T_mode_tr = solph.components.Transformer (
 
 chp_electric_output_tr = solph.components.Transformer (
     label = 'chp_electric_output_tr',
-		inputs = {electricity_pt_60_bus: solph.Flow()},
-		outputs = {electricity_bus: solph.Flow(nominal_value = 60, min = 0.5, nonconvex = solph.NonConvex()),
+		inputs = {electricity_pt_60_bus: solph.Flow(),
+							steam_chp_bus: solph.Flow(),
+							heat_water_chp_bus:solph.Flow()
+            },
+		outputs = {electricity_bus: solph.Flow(nominal_value = 60, min = 0.3, nonconvex = solph.NonConvex()),
+							steam_chp_bus: solph.Flow(),
+							heat_water_chp_bus:solph.Flow()
              },
  ) 
 
 
-energysystem.add(chp_pt_60_natural_gas_tr, chp_pt_60_P_mode_tr, chp_pt_60_P_mode_tr, chp_electric_output_tr)
+energysystem.add(chp_pt_60_natural_gas_tr, chp_pt_60_P_mode_first_tr, chp_pt_60_P_mode_second_tr, chp_electric_output_tr)
 
 
 

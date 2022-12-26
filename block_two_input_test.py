@@ -13,7 +13,9 @@ def createBackForBus(bus):
 		inputs = {b_gas_bus: solph.Flow()},
     outputs = {bus:solph.Flow(variable_costs=99999)})
 	
- 
+def addToEnergySystem(e, component):
+  e.add(component)
+   
  
 
 number_of_time_steps = 24
@@ -55,7 +57,6 @@ fake_flow_on_off_sr = solph.components.Source(
     outputs = {fake_flow_on_off_bus:solph.Flow(nominal_value = 1)})
 energysystem.add(fake_flow_on_off_sr)
 
-
 chp_tr = solph.components.Transformer(
     label="chp_tr",
 		inputs = {b_gas_bus: solph.Flow(),
@@ -64,7 +65,10 @@ chp_tr = solph.components.Transformer(
     outputs={b_el_global_bus:solph.Flow(nominal_value = 500), b_heat_global_bus: solph.Flow()},
     conversion_factors = { fake_flow_on_off_bus: 0.0001,b_gas_bus: 4 , b_el_global_bus: 1, b_heat_global_bus: 2}
     )
-energysystem.add(chp_tr)
+
+addToEnergySystem(energysystem, chp_tr)
+
+# energysystem.add(chp_tr)
 
 
 ########################################################################################################################################################################

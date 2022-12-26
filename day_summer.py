@@ -11,7 +11,6 @@ import os
 import datetime as dt
 # import oemof_visio as oev
  
-#  
 
 # слабые метса модели - список
 # умножить на два в датафрейме электрокотлы

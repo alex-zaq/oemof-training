@@ -33,9 +33,9 @@ from oemof_visio import ESGraphRenderer
 
 
 number_of_time_steps = 24
-current_folder = os.getcwd()
-el_global_data = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
-el_chp_data = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='chp_el_winter_workday_abs')
+data_folder = os.getcwd()+'/data'
+el_global_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
+el_chp_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='chp_el_winter_workday_abs')
 #################################################################################
 
 
@@ -707,11 +707,43 @@ ax2.set_ylabel("Мощность, МВт (э)")
 ax1.set_xlabel("Дата")
 ax1.set_ylabel("Мощность, МВт (э)")
 
-gr = ESGraphRenderer(energy_system=energysystem, filepath="energy_system", img_format="png", txt_fontsize=10, txt_width=10, legend= True)
 
+# gr.view()
+
+# plt.show()
+
+
+
+current_folder = os.getcwd()
+result_folder = 'results'
+path_results = os.path.join(current_folder, result_folder)
+
+if not os.path.isdir(path_results):
+  os.makedirs(path_results)
+
+script_name = os.path.basename(__file__)[:-3]
+path_local_result = os.path.join(path_results, script_name)
+
+if not os.path.isdir(path_local_result):
+  os.makedirs(path_local_result)
+
+def getExcelResult(dataframe, path, tag_comment =''):
+  dataframe.to_excel(path + '/' + script_name + '_' + tag_comment + '.xlsx')
+
+gr = ESGraphRenderer(energy_system=energysystem, filepath=path_local_result+'/res' , img_format="png", txt_fontsize=10, txt_width=10)
 gr.view()
 
-plt.show()
+getExcelResult(res, path_local_result)
+
+
+
+# res.to_excel(path_local_result + '/winter_day_result_blocks.xlsx')
+# el_boiler_df.to_excel(path_local_result + '/winter_day_elBoilers.xlsx')
+# demand.to_excel(path_local_result + '/winter_day_demand.xlsx')
+
+
+
+
 
 # plt.legend(marker = 'o')
 

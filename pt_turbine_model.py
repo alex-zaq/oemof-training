@@ -14,8 +14,8 @@ date_time_index = pd.date_range(current_start_date, periods=number_of_time_steps
 energysystem = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= False)
 
 
-current_folder = os.getcwd()
-el_global_abs_profile = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')['el_winter_workDay_odu'][:number_of_time_steps]
+data_folder = os.getcwd()+'/data'
+el_global_abs_profile = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')['el_winter_workDay_odu'][:number_of_time_steps]
 heat_demand_data = [400] * 24;
 steam_demand_data = [600] * 24;
 

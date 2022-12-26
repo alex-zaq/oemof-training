@@ -23,8 +23,8 @@ current_start_date = dt.datetime(2020,6,8,1,0,0)
 date_time_index = pd.date_range(current_start_date, periods=number_of_time_steps, freq="H")
 energysystem = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= False)
 
-current_folder = os.getcwd()
-el_global_data_file = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')['el_winter_workDay_odu'][:number_of_time_steps];
+data_folder = os.getcwd()+'/data'
+el_global_data_file = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')['el_winter_workDay_odu'][:number_of_time_steps];
 
 el_global_profile = el_global_data_file/ max(el_global_data_file)
 el_peak_load = 2000
@@ -52,10 +52,10 @@ heat_back_generator_tr = createBackForBus(b_heat_global_bus)
 energysystem.add(el_back_generator_tr,heat_back_generator_tr)
 
 
-fake_flow_on_off_sr = solph.components.Source(
-    label = "fake_flow_on_off_sr",
-    outputs = {fake_flow_on_off_bus:solph.Flow(nominal_value = 1)})
-energysystem.add(fake_flow_on_off_sr)
+# fake_flow_on_off_sr = solph.components.Source(
+#     label = "fake_flow_on_off_sr",
+#     outputs = {fake_flow_on_off_bus:solph.Flow(nominal_value = 1)})
+# energysystem.add(fake_flow_on_off_sr)
 
 chp_tr = solph.components.Transformer(
     label="chp_tr",

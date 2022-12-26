@@ -31,9 +31,9 @@ import datetime as dt
 
 
 number_of_time_steps = 24
-current_folder = os.getcwd()
-el_global_data = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
-el_chp_data = pd.read_excel(os.path.join(current_folder,'data_by_day.xlsx'), sheet_name='chp_el_summer_workday_abs')
+data_folder = os.getcwd() + "/data"
+el_global_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
+el_chp_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='chp_el_summer_workday_abs')
 #################################################################################
 
 
@@ -707,15 +707,26 @@ ax1.set_ylabel("Мощность, МВт (э)")
 
 
 
-plt.show()
+# plt.show()
 
 
+current_folder = os.getcwd()
+result_folder = 'results'
+path_results = os.path.join(current_folder, result_folder)
+
+if not os.path.isdir(path_results):
+  os.makedirs(path_results)
+
+script_name = os.path.basename(__file__)[:-3]
+path_local_result = os.path.join(path_results, script_name)
+
+if not os.path.isdir(path_local_result):
+  os.makedirs(path_local_result)
 
 
-
-res.to_excel('summer_day_result_blocks.xlsx')
-el_boiler_df.to_excel('summer_day_elBoilers.xlsx')
-demand.to_excel('summer_day_demand.xlsx')
+res.to_excel(path_local_result + '/summer_day_result_blocks.xlsx')
+el_boiler_df.to_excel(path_local_result + '/summer_day_elBoilers.xlsx')
+demand.to_excel(path_local_result + '/summer_day_demand.xlsx')
 
 
 

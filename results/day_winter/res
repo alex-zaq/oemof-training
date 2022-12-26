@@ -1,14 +1,4 @@
 digraph {
-	subgraph cluster_1 {
-		color=black
-		label=Legends
-		Bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
-		Sink [fontsize=10 shape=trapezium]
-		Source [fontsize=10 shape=invtrapezium]
-		"Transforme
-r" [fontsize=10 shape=rectangle]
-		Storage [fontsize=10 shape=rectangle style=rounded]
-	}
 	gas [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
 	electricity_global [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
 	"natural_ga
@@ -232,77 +222,77 @@ _25_block_
 2"
 	gas -> "tec5_TK_33
 0_block_1"
-	"gomelskya_
-tec2" -> electricity_global
-	"mogilev_te
-c_2" -> electricity_global
-	"bereza_ccg
-t_427_bloc
-k_7" -> electricity_global
+	"minskaya_t
+ec2" -> electricity_global
+	"lukomol_K_
+300_block_
+5" -> electricity_global
+	"lukomol_K_
+300_block_
+6" -> electricity_global
+	"bereza_SSG
+_25_block_
+4_1" -> electricity_global
+	"lukomol_K_
+300_block_
+1" -> electricity_global
+	"minskay_te
+c_4" -> electricity_global
 	"lukomol_cc
 gt_427_blo
 ck_9" -> electricity_global
 	"lukomol_K_
 300_block_
 3" -> electricity_global
-	"novopozkya
-_tec_2" -> electricity_global
 	"block_stat
 ion_ng" -> electricity_global
-	"svetlogors
-kay_tec" -> electricity_global
+	"minskay_te
+c_3" -> electricity_global
 	"lukomol_K_
 300_block_
-6" -> electricity_global
-	"lukomol_K_
-300_block_
-1" -> electricity_global
-	"lukomol_K_
-300_block_
-5" -> electricity_global
-	"bel_Npp_vv
-er_1200_2" -> electricity_global
-	small_chp -> electricity_global
+4" -> electricity_global
 	"bel_Npp_vv
 er_1200_1_
 1" -> electricity_global
 	"bereza_SSG
 _25_block_
-4_1" -> electricity_global
-	"lukomol_K_
-300_block_
-4" -> electricity_global
-	"mozyrskay_
-tec2" -> electricity_global
-	"tec5_TK_33
-0_block_1" -> electricity_global
-	"lukomol_K_
-300_block_
-2" -> electricity_global
-	"bereza_K_1
-60_block_4" -> electricity_global
-	"minskay_te
-c_3" -> electricity_global
+4_2" -> electricity_global
 	"bobruisk_t
 ec_2" -> electricity_global
 	"tec5_ccgt_
 399_block_
 2" -> electricity_global
-	"minskay_te
-c_4" -> electricity_global
 	"lukomol_K_
 300_block_
 7" -> electricity_global
-	"bereza_SSG
-_25_block_
-4_2" -> electricity_global
-	"minskaya_t
-ec2" -> electricity_global
-	"grodno_tec
-_2" -> electricity_global
+	"bel_Npp_vv
+er_1200_2" -> electricity_global
+	"gomelskya_
+tec2" -> electricity_global
+	small_chp -> electricity_global
 	"lukomol_K_
 300_block_
 8" -> electricity_global
+	"mogilev_te
+c_2" -> electricity_global
+	"novopozkya
+_tec_2" -> electricity_global
+	"tec5_TK_33
+0_block_1" -> electricity_global
+	"bereza_K_1
+60_block_4" -> electricity_global
+	"svetlogors
+kay_tec" -> electricity_global
+	"lukomol_K_
+300_block_
+2" -> electricity_global
+	"mozyrskay_
+tec2" -> electricity_global
+	"bereza_ccg
+t_427_bloc
+k_7" -> electricity_global
+	"grodno_tec
+_2" -> electricity_global
 	electricity_global -> "elboilers_
 mogilev_te
 c_2"
@@ -359,10 +349,10 @@ _tec_2" -> b_el_novopozkay_tec_bus
 	b_el_novopozkay_tec_bus -> "novopozkya
 _tec_2_el_
 demand"
-	"minskay_te
-c_4" -> b_el_minskay_tec_4_bus
 	"elboilers_
 minskay_te
+c_4" -> b_el_minskay_tec_4_bus
+	"minskay_te
 c_4" -> b_el_minskay_tec_4_bus
 	b_el_minskay_tec_4_bus -> "minskay_te
 c_4_el_dem
@@ -375,10 +365,10 @@ c_3" -> b_el_minskay_tec_3_bus
 	b_el_minskay_tec_3_bus -> "minskay_te
 c_3_el_dem
 and"
+	"gomelskya_
+tec2" -> b_el_gomelskya_tec2_bus
 	"elboilers_
 gomelskya_
-tec2" -> b_el_gomelskya_tec2_bus
-	"gomelskya_
 tec2" -> b_el_gomelskya_tec2_bus
 	b_el_gomelskya_tec2_bus -> "gomelskya_
 tec2_el_de
@@ -393,18 +383,18 @@ kay_tec" -> b_el_svetlogorskay_tec_bus
 	b_el_svetlogorskay_tec_bus -> "svetlogors
 kay_tec_el
 _demand"
-	"minskaya_t
-ec2" -> b_el_minskaya_tec2_bus
 	"elboilers_
 minskaya_t
+ec2" -> b_el_minskaya_tec2_bus
+	"minskaya_t
 ec2" -> b_el_minskaya_tec2_bus
 	b_el_minskaya_tec2_bus -> "minskaya_t
 ec2_el_dem
 and"
-	"boilers_di
-strict" -> b_th_district_boiler_bus
 	"elboilers_
 district" -> b_th_district_boiler_bus
+	"boilers_di
+strict" -> b_th_district_boiler_bus
 	b_th_district_boiler_bus -> "boilers_di
 strict_dem
 and"

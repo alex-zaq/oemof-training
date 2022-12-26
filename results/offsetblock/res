@@ -1,0 +1,23 @@
+digraph {
+	natural_gas_global_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	electricity_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	"natural_ga
+s_generato
+r_source" [fontsize=10 shape=invtrapezium]
+	"back_elect
+ricity_tr" [fontsize=10 shape=rectangle]
+	ccgt_tr [fontsize=10 shape=rectangle]
+	"electricit
+y_sink" [fontsize=10 shape=trapezium]
+	"natural_ga
+s_generato
+r_source" -> natural_gas_global_bus
+	natural_gas_global_bus -> "back_elect
+ricity_tr"
+	natural_gas_global_bus -> ccgt_tr
+	"back_elect
+ricity_tr" -> electricity_bus
+	ccgt_tr -> electricity_bus
+	electricity_bus -> "electricit
+y_sink"
+}

@@ -1,0 +1,53 @@
+digraph {
+	natural_gas_global_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	electricity_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	heat_water_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	"natural_ga
+s_generato
+r_source" [fontsize=10 shape=invtrapezium]
+	"back_elect
+ricity_tr" [fontsize=10 shape=rectangle]
+	"back_heat_
+water_tr" [fontsize=10 shape=rectangle]
+	electricity_chp_bus [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	"chp_electr
+icity_tr_f
+irst" [fontsize=10 shape=rectangle]
+	"chp_electr
+icity_tr_s
+econd" [fontsize=10 shape=rectangle]
+	"electricit
+y_sink" [fontsize=10 shape=trapezium]
+	"heat_water
+_sink" [fontsize=10 shape=trapezium]
+	"natural_ga
+s_generato
+r_source" -> natural_gas_global_bus
+	natural_gas_global_bus -> "back_elect
+ricity_tr"
+	natural_gas_global_bus -> "back_heat_
+water_tr"
+	natural_gas_global_bus -> "chp_electr
+icity_tr_f
+irst"
+	"back_elect
+ricity_tr" -> electricity_bus
+	"chp_electr
+icity_tr_s
+econd" -> electricity_bus
+	electricity_bus -> "electricit
+y_sink"
+	"back_heat_
+water_tr" -> heat_water_bus
+	"chp_electr
+icity_tr_f
+irst" -> heat_water_bus
+	heat_water_bus -> "heat_water
+_sink"
+	"chp_electr
+icity_tr_f
+irst" -> electricity_chp_bus
+	electricity_chp_bus -> "chp_electr
+icity_tr_s
+econd"
+}

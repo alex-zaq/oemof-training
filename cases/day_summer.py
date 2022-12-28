@@ -693,6 +693,8 @@ res = res[res>0]
 plt.rc('legend',fontsize=7) # using a size in points
 
 
+
+
 ax2 = res.plot(kind="area", ylim=(0, 7000), legend = 'reverse', title = 'Производство электроэнергии Лето-рабочий')
 ax1 = el_boiler_df.plot(kind="area", ylim=(0, 7000) , stacked= True ,  legend = 'reverse', title = 'Потребление электрокотлов Лето-рабочий')
 ax3 = demand.plot(kind="line", ylim=(0, 7000), ax=ax2 , color = 'black' , legend = 'reverse', style='.-')

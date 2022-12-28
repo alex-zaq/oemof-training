@@ -10,7 +10,7 @@ import datetime as dt
 
 # создать турбину типа Т
 # создать турбину типа Р
-# создать турбину типа ПТ
+
 # создать электрокотел
 # создать метод быстрого построения графиков
 # сделать метод создания станции
@@ -100,21 +100,36 @@ def get_blocks_method_by_energy_system(energy_system):
 		return tr
 
 	def create_pt_turbine(label, nominal_el_value, min_power_fraction, input_flow, output_flow_el, output_flow_T, output_flow_P, nominal_input_t, nominal_input_P, efficiency_T, efficiency_P, heat_to_el_P, heat_to_el_T, variable_costs = 0, boiler_efficiency = 1):
-		heat_water_bus = solph.Bus( label + 'heat_water_bus')
-		steam_bus = solph.Bus( label + 'steam_bus')
-		electricity_inner_bus = solph.Bus(label + 'electricity_inner_bus')
-
+		# кпд котла?
+		[el_inner_bus] = get_bus_list_by_name(label + 'el_inner_bus')
+  
 		P_mode_tr = solph.components.Transformer (
-    label =  'P_mode_tr',
-		inputs = {natural_gas_global_bus: solph.Flow(nominal_value = 305.38)},
-		outputs = {chp_pt_60_electricity_inner_bus: solph.Flow(),
-								steam_bus: solph.Flow()
+    label =  label + 'P_mode_tr',
+		inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P)},
+		outputs = {el_inner_bus: solph.Flow(),
+								output_flow_P: solph.Flow()
                },
-		conversion_factors = {natural_gas_global_bus: (1 + 3.8) / 0.91, chp_pt_60_electricity_inner_bus: 1, steam_bus: 3.8 }
- ) 
+		conversion_factors = {input_flow: (1 + heat_to_el_P) / efficiency_P, el_inner_bus: 1, output_flow_P: heat_to_el_P})
 
+		T_mode_tr = solph.components.Transformer (
+    label = label + 'T_mode_tr',
+		inputs = {input_flow: solph.Flow(nominal_value = nominal_input_t)},
+		outputs = {output_flow_T: solph.Flow(),
+								el_inner_bus: solph.Flow()
+             },
+  	conversion_factors = {input_flow: (1 + heat_to_el_T) / efficiency_T, el_inner_bus: 1, output_flow_T: heat_to_el_T})
 
-	return [create_back_Trasformer, get_bus_list_by_name, create_source]
+		main_output_tr = solph.components.Transformer (
+    label = label + 'main_output_tr',
+		inputs = {el_inner_bus: solph.Flow()},
+		outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)}) 
+
+		energy_system.add(P_mode_tr, T_mode_tr, main_output_tr)
+		# TODO словарь?
+		return [main_output_tr,P_mode_tr,T_mode_tr]
+
+ 
+	return [create_back_Trasformer, get_bus_list_by_name, create_sink_absolute_demand, create_back_Trasformer ]
     
 	
     

@@ -9,14 +9,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import datetime as dt
-from oemof_visio import ESGraphRenderer
 # import oemof_visio as oev
  
-#  
 
 # слабые метса модели - список
 # умножить на два в датафрейме электрокотлы
-# убрать потовры - имена файлов
+# убрать повторы - имена файлов
 # удобство исходных данных
 # проверить электрокотлы 
 # вариант с параллельными тепловыми спросами
@@ -33,9 +31,9 @@ from oemof_visio import ESGraphRenderer
 
 
 number_of_time_steps = 24
-data_folder = os.getcwd()+'/data'
+data_folder = os.getcwd() + "/data"
 el_global_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
-el_chp_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='chp_el_winter_workday_abs')
+el_chp_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='chp_el_summer_workday_abs')
 #################################################################################
 
 
@@ -44,8 +42,8 @@ el_chp_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_
 # el_global_demand_profile = el_global_data['el_winter_workDay_odu'][:number_of_time_steps]/peak_load
 
 
-peak_load = max(el_global_data['el_winter_workDay_odu'][:number_of_time_steps]);
-el_global_demand_profile = el_global_data['el_winter_workDay_odu'][:number_of_time_steps]/peak_load
+peak_load = max(el_global_data['el_summer_workDay_odu'][:number_of_time_steps]);
+el_global_demand_profile = el_global_data['el_summer_workDay_odu'][:number_of_time_steps]/peak_load
 
 
 
@@ -71,7 +69,7 @@ energysystem.add(b_gas_bus, b_el_global_bus)
 
 
 
-NppPart = 1
+NppPart = 0.92
 #################################################################################
 natural_gas_generator = solph.components.Source(
     label = "natural_gas_generator",
@@ -682,8 +680,8 @@ el_boiler_df['ЭК_Минская ТЭЦ-2'] =  data_el_global[((b_el_global_bus
 # el_boiler_df = el_boiler_df.multiply(el_heat_ratio);
 el_boiler_df['ЭК_Тепло КЭС'] =  data_el_global[((b_el_global_bus.label, elboilers_cpp.label),'flow')]
 el_boiler_df['ЭК_РК_и_МТЭЦ'] =  data_el_global[((b_el_global_bus.label, elboilers_district.label),'flow')]
-
 el_boiler_df = el_boiler_df[el_boiler_df > 0]
+
 print(el_boiler_df)
 
 
@@ -695,8 +693,8 @@ res = res[res>0]
 plt.rc('legend',fontsize=7) # using a size in points
 
 
-ax2 = res.plot(kind="area", ylim=(0, 7000), legend = 'reverse', title = 'Производство электроэнергии Зима-рабочий')
-ax1 = el_boiler_df.plot(kind="area", ylim=(0, 7000) , stacked= True ,  legend = 'reverse', title = 'Потребление электрокотлов Зима-рабочий')
+ax2 = res.plot(kind="area", ylim=(0, 7000), legend = 'reverse', title = 'Производство электроэнергии Лето-рабочий')
+ax1 = el_boiler_df.plot(kind="area", ylim=(0, 7000) , stacked= True ,  legend = 'reverse', title = 'Потребление электрокотлов Лето-рабочий')
 ax3 = demand.plot(kind="line", ylim=(0, 7000), ax=ax2 , color = 'black' , legend = 'reverse', style='.-')
 
 handles, labels = ax2.get_legend_handles_labels()
@@ -708,10 +706,8 @@ ax1.set_xlabel("Дата")
 ax1.set_ylabel("Мощность, МВт (э)")
 
 
-# gr.view()
 
 # plt.show()
-
 
 
 current_folder = os.getcwd()
@@ -727,42 +723,10 @@ path_local_result = os.path.join(path_results, script_name)
 if not os.path.isdir(path_local_result):
   os.makedirs(path_local_result)
 
-def getExcelResult(dataframe, path, tag_comment =''):
-  dataframe.to_excel(path + '/' + script_name + '_' + tag_comment + '.xlsx')
 
-gr = ESGraphRenderer(energy_system=energysystem, filepath=path_local_result+'/res' , img_format="png", txt_fontsize=10, txt_width=10)
-gr.view()
-
-getExcelResult(res, path_local_result)
-
-
-
-# res.to_excel(path_local_result + '/winter_day_result_blocks.xlsx')
-# el_boiler_df.to_excel(path_local_result + '/winter_day_elBoilers.xlsx')
-# demand.to_excel(path_local_result + '/winter_day_demand.xlsx')
-
-
-
-
-
-# plt.legend(marker = 'o')
-
-# plt.legend(loc='lower right')
-
-# plt.legend(loc='center left', bbox_to_anchor=(1, 0.5));
-
-# plt.subplots_adjust(right=0.2) 
-
-# plt.set_figwidth(10)
-# plt.set_figheight(10)
-
-
-
-
-
-# res.to_excel('winter_day_result_blocks.xlsx')
-# el_boiler_df.to_excel('winter_day_elBoilers.xlsx')
-# demand.to_excel('winter_day_demand.xlsx')
+res.to_excel(path_local_result + '/summer_day_result_blocks.xlsx')
+el_boiler_df.to_excel(path_local_result + '/summer_day_elBoilers.xlsx')
+demand.to_excel(path_local_result + '/summer_day_demand.xlsx')
 
 
 

@@ -140,7 +140,23 @@ def get_chp_method_by_energy_system(energy_system, block_collection):
 		block_collection.append(P_mode_tr, T_mode_tr, main_output_tr) 
 		# TODO словарь?
 		return [main_output_tr, P_mode_tr, T_mode_tr]
-	return [create_pt_turbine]
+
+	def create_back_pressure_turbine(label, nominal_value, min_power_fraction, input_flow, output_flow_el, output_flow_P, heat_to_el_P, efficiency_P, boiler_efficiency = 1 , variable_costs = 0):
+		tr = solph.components.Transformer(
+		label=label, 
+		inputs = {input_flow: solph.Flow()},
+		outputs = {output_flow_el: solph.Flow( nominal_value = nominal_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
+							output_flow_P: solph.Flow()},
+		conversion_factors = {input_flow: (1 + heat_to_el_P) /(efficiency_P * boiler_efficiency), output_flow_el: 1, output_flow_P: heat_to_el_P}) 
+		energy_system.add(tr)
+		block_collection.append(tr) 
+		return tr
+
+	return [create_pt_turbine, create_back_pressure_turbine]
+#  пт с т режимом 
+#  пт с п режимом
+#  р
+#  т
   
   
 

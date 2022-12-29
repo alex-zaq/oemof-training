@@ -730,10 +730,12 @@ if not os.path.isdir(path_local_result):
 def getExcelResult(dataframe, path, tag_comment =''):
   dataframe.to_excel(path + '/' + script_name + '_' + tag_comment + '.xlsx')
 
-gr = ESGraphRenderer(energy_system=energysystem, filepath=path_local_result+'/res' , img_format="png", txt_fontsize=10, txt_width=10)
-gr.view()
-
 getExcelResult(res, path_local_result)
+
+
+# gr = ESGraphRenderer(energy_system=energysystem, filepath=path_local_result+'/res' , img_format="png", txt_fontsize=10, txt_width=10)
+# gr.view()
+
 
 
 

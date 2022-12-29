@@ -1,0 +1,20 @@
+digraph {
+	bgas [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	bel [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	bth [color=lightgrey fixedsize=shape fontsize=10 height=0.3 shape=rectangle style=filled width=4.1]
+	gas_source [fontsize=10 shape=invtrapezium]
+	el_back_tr [fontsize=10 shape=rectangle]
+	"heat_back_
+tr" [fontsize=10 shape=rectangle]
+	el_sink [fontsize=10 shape=trapezium]
+	th_sink [fontsize=10 shape=trapezium]
+	gas_source -> bgas
+	bgas -> el_back_tr
+	bgas -> "heat_back_
+tr"
+	el_back_tr -> bel
+	bel -> el_sink
+	"heat_back_
+tr" -> bth
+	bth -> th_sink
+}

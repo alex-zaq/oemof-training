@@ -8,9 +8,7 @@ import datetime as dt
 from enum import Enum
  
 
-# создать турбину типа Т
-# создать турбину типа Р
-
+ 
 # создать электрокотел
 # создать метод быстрого построения графиков
 # сделать метод создания станции
@@ -25,16 +23,18 @@ from enum import Enum
 
 # разделать на функции по типам действий
 
-    
+##################################################################################################################
+# Методы получения объектов bus различных типов
+##################################################################################################################    
 def get_sources_methods_by_energy_system(energy_system, block_collection):
 	def create_source(label, output_flow, variable_costs):
 		ng = solph.components.Source(label=label, outputs = {output_flow: solph.Flow(variable_costs = variable_costs)} )
 		energy_system.add(ng)
 		block_collection.append(ng)
 		return ng
-	return [create_source]
+	return create_source
     
-def get_sinks_method_by_energy_system(energy_system, block_collection):
+def get_sinks_method_by_energy_system(energy_system, block_collection, sink_type):
 	def create_sink_absolute_demand(label, input_flow, demand_absolute_data):
 		sink = solph.components.Sink(label=label, inputs = {input_flow: solph.Flow(nominal_value=1, fix = demand_absolute_data)})
 		energy_system.add(sink)
@@ -45,13 +45,36 @@ def get_sinks_method_by_energy_system(energy_system, block_collection):
 		energy_system.add(sink)
 		block_collection.append(sink)
 		return sink
-	return [create_sink_absolute_demand, create_sink_fraction_demand]
+
+	res_dict = {
+		'абс': create_sink_absolute_demand,
+		'отн': create_sink_fraction_demand,
+	}
+
+	if not isinstance(sink_type, list):
+		if sink_type in res_dict:
+			return res_dict[sink_type]
+		else:
+			raise Exception('параметр не является списком')
+
+	if len(sink_type) == 0:
+		raise Exception('cписок типов спросов пуст')
+		
+	res = []
+	for sink in sink_type:
+		if sink in res_dict:
+			res += [res_dict[sink]]
+   
+	if len(res) != 0:
+		return res
+	else:
+		raise Exception('не определено ни одного спроса')
   
   
 ##################################################################################################################
-# Методы получения источников одного вида энергии     
+# Методы получения источников одного вида энергии (с одним входом) различных типов 
 ##################################################################################################################
-def get_simple_transformers_method_by_energy_system(energy_system, block_collection):
+def get_simple_transformers_method_by_energy_system(energy_system, block_collection, block_type):
 	def create_simple_transformer(label, nominal_value, input_flow, output_flow, efficiency, variable_costs):
 		tr = solph.components.Transformer(
 		label=label, 
@@ -75,7 +98,7 @@ def get_simple_transformers_method_by_energy_system(energy_system, block_collect
 	def create_NPP_block(label, nominal_value, min_power_fraction, output_flow, variable_costs):
 			npp_block = solph.components.Source(
 			label = label,
-			outputs = {output_flow: solph.Flow(nominal_value = nominal_value, min = min_power_fraction, nonconvex = solph.NonConvex( ), variable_costs = variable_costs)}
+			outputs = {output_flow: solph.Flow(nominal_value = nominal_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)}
 			)
 			energy_system.add(npp_block)
 			block_collection.append(npp_block) 
@@ -100,31 +123,59 @@ def get_simple_transformers_method_by_energy_system(energy_system, block_collect
 		energy_system.add(tr)
 		block_collection.append(tr) 
 		return tr
- 
-	return [create_simple_transformer, create_simple_transformer_nonconvex, create_NPP_block, create_offset_transformer]
-    
+
+	res_dict = {
+	'simple': create_simple_transformer,
+	'simple_nonconvex': create_simple_transformer_nonconvex,
+	'offset': create_offset_transformer,
+	'NPP': create_NPP_block,
+}
+
+	if not isinstance(block_type, list):
+		if block_type in res_dict:
+			return res_dict[block_type]
+		else:
+			raise Exception('параметр не является списком')
+
+	if len(block_type) == 0:
+		raise Exception('cписок типов турбин пуст')
+		
+	res = []
+	for block in block_type:
+		if block in res_dict:
+			res += [res_dict[block]]
+		
+	if len(res) != 0:
+		return res
+	else:
+		raise Exception('не определено ни одной турбины')
+		
+	     
 
 def get_buses_method_by_energy_system(energy_system):
+  # проверки
 	def get_bus_list_by_name(*bus_list):
 		res = []
 		for bus_name in bus_list:
 			res.append(solph.Bus(bus_name))
 		energy_system.add(*res)
+		if len(res) == 1:
+			return res[0]
 		return res
-	return [get_bus_list_by_name]
+	return get_bus_list_by_name
     
     
 ##################################################################################################################
 # Методы получения турбин ТЭЦ различных типов    
 ##################################################################################################################
-def get_chp_method_by_energy_system(energy_system, block_collection, turbine_type = None):
+def get_chp_method_by_energy_system(energy_system, block_collection, turbine_type):
 	def create_chp_PT_turbine(label, nominal_el_value, min_power_fraction, input_flow, output_flow_el, output_flow_T, output_flow_P, nominal_input_t, nominal_input_P, efficiency_T, efficiency_P, heat_to_el_P, heat_to_el_T, variable_costs = 0, boiler_efficiency = 1):
     
 		# кпд котла?
-		[el_inner_bus] = get_buses_method_by_energy_system(energy_system).get_bus_list_by_name(label + 'el_inner_bus')
+		[el_inner_bus] = get_buses_method_by_energy_system(energy_system).get_bus_list_by_name(label + 'электричество-промежуточное')
   
 		P_mode_tr = solph.components.Transformer (
-    label =  label + 'P_mode',
+    label =  label + '_П_режим',
 		inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P)},
 		outputs = {el_inner_bus: solph.Flow(),
 								output_flow_P: solph.Flow()
@@ -132,7 +183,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 		conversion_factors = {input_flow: (1 + heat_to_el_P) / efficiency_P, el_inner_bus: 1, output_flow_P: heat_to_el_P})
 
 		T_mode_tr = solph.components.Transformer (
-    label = label + 'T_mode',
+    label = label + '_T_режим',
 		inputs = {input_flow: solph.Flow(nominal_value = nominal_input_t)},
 		outputs = {output_flow_T: solph.Flow(),
 								el_inner_bus: solph.Flow()
@@ -140,7 +191,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
   	conversion_factors = {input_flow: (1 + heat_to_el_T) / efficiency_T, el_inner_bus: 1, output_flow_T: heat_to_el_T})
 
 		main_output_tr = solph.components.Transformer (
-    label = label + 'main_output',
+    label = label + '_электроэнергия',
 		inputs = {el_inner_bus: solph.Flow()},
 		outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)}) 
 
@@ -150,7 +201,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 	def create_chp_PT_turbine_full_P_mode(label, nominal_el_value, min_power_fraction, input_flow, output_flow_el, output_flow_P, nominal_input_P, efficiency_P, heat_to_el_P, variable_costs = 0, boiler_efficiency = 1):
 		# кпд котла?
 		pt_full_P_mode = solph.components.Transformer (
-    label =  label + 'main_output_full_P_mode',
+    label =  label + '_электроэнергия_чистый_П_режим',
 		inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P)},
 		outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
 								output_flow_P: solph.Flow()
@@ -163,7 +214,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 	def create_chp_PT_turbine_full_T_mode(label, nominal_el_value, min_power_fraction, input_flow, output_flow_el, output_flow_T, nominal_input_T, efficiency_T, heat_to_el_T, variable_costs = 0, boiler_efficiency = 1):
 		# кпд котла?
 		pt_full_T_mode = solph.components.Transformer (
-    label =  label + 'main_output_full_P_mode',
+    label =  label + '_электроэнергия_чистый_Т_режим',
 		inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
 		outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
 								output_flow_T: solph.Flow()
@@ -182,7 +233,11 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 		outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
 								output_flow_T: solph.Flow()
                },
-		conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+  
+		conversion_factors = {output_flow_el: 1, output_flow_T: heat_to_el_T},	
+  
+  	# conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+  
 		conversion_factor_full_condensation = efficiency_full_condensing_mode
 	
    )
@@ -202,15 +257,40 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 		block_collection.append(tr) 
 		return tr
 
-	if turbine_type:
-		if turbine_type == 'ПТ':
-			return [create_chp_PT_turbine, create_chp_PT_turbine_full_P_mode, create_chp_PT_turbine_full_T_mode]
-		elif turbine_type == 'Т':
-			return [create_chp_T_turbine]
-		elif turbine_type == 'Р':
-			return [create_back_pressure_turbine]
+	res_dict = {
+		'ПТ': create_chp_PT_turbine,
+		'Т': create_chp_T_turbine,
+		'Р': create_back_pressure_turbine,
+		'ПТ-Т': create_chp_PT_turbine_full_T_mode,
+		'ПТ-П': create_chp_PT_turbine_full_P_mode,
+	}
+
+	if not isinstance(turbine_type, list):
+		if turbine_type in res_dict:
+			return res_dict[turbine_type]
+		else:
+			raise Exception('параметр не является списком')
+
+	if len(turbine_type) == 0:
+		raise Exception('cписок типов турбин пуст')
+		
+	res = []
+	for turb_type in turbine_type:
+		if turb_type in res_dict:
+			res += [res_dict[turb_type]]
+   
+	if len(res) != 0:
+		return res
+	else:
+		raise Exception('не определено ни одной турбины')
+   
+     
+    
+
+    
+  
+
  
-	return [create_chp_PT_turbine, create_chp_PT_turbine_full_P_mode, create_chp_PT_turbine_full_T_mode,create_chp_T_turbine,create_back_pressure_turbine]
     
 				
    

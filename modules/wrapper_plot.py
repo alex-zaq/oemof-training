@@ -6,10 +6,6 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 
- 
-
-# быстрая отрисовка графиков
-# быстрая запись в эксель
 
 
 def get_dataframe_by_commodity(results, node_collection, target_bus):

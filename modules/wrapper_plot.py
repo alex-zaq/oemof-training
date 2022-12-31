@@ -8,7 +8,7 @@ import datetime as dt
 
 
 
-def get_dataframe_by_commodity(results, node_collection, target_bus):
+def get_dataframe_by_bus(results, node_collection, target_bus):
 	res = pd.DataFrame()
 	results_by_commodity = solph.views.node(results, target_bus.label)["sequences"].dropna()
 	print(results_by_commodity)

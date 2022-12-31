@@ -47,8 +47,8 @@ def get_sinks_method_by_energy_system(energy_system, block_collection, sink_type
 		return sink
 
 	res_dict = {
-		'абс': create_sink_absolute_demand,
-		'отн': create_sink_fraction_demand,
+		'abs': create_sink_absolute_demand,
+		'rel': create_sink_fraction_demand,
 	}
 
 	if not isinstance(sink_type, list):
@@ -171,8 +171,10 @@ def get_buses_method_by_energy_system(energy_system):
 def get_chp_method_by_energy_system(energy_system, block_collection, turbine_type):
 	def create_chp_PT_turbine(label, nominal_el_value, min_power_fraction, input_flow, output_flow_el, output_flow_T, output_flow_P, nominal_input_t, nominal_input_P, efficiency_T, efficiency_P, heat_to_el_P, heat_to_el_T, variable_costs = 0, boiler_efficiency = 1):
     
+       
+    
 		# кпд котла?
-		[el_inner_bus] = get_buses_method_by_energy_system(energy_system).get_bus_list_by_name(label + 'электричество-промежуточное')
+		el_inner_bus = get_buses_method_by_energy_system(energy_system).get_bus_list_by_name(label + '_электричество-промежуточное')
   
 		P_mode_tr = solph.components.Transformer (
     label =  label + '_П_режим',
@@ -180,7 +182,9 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 		outputs = {el_inner_bus: solph.Flow(),
 								output_flow_P: solph.Flow()
                },
-		conversion_factors = {input_flow: (1 + heat_to_el_P) / efficiency_P, el_inner_bus: 1, output_flow_P: heat_to_el_P})
+		conversion_factors = {input_flow: (1 + heat_to_el_P) / efficiency_P, el_inner_bus: 1, output_flow_P: heat_to_el_P}
+		
+  )
 
 		T_mode_tr = solph.components.Transformer (
     label = label + '_T_режим',
@@ -197,6 +201,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 
 		energy_system.add(P_mode_tr, T_mode_tr, main_output_tr)
 		block_collection.append(P_mode_tr, T_mode_tr, main_output_tr) 
+		return [P_mode_tr, T_mode_tr, main_output_tr]
 
 	def create_chp_PT_turbine_full_P_mode(label, nominal_el_value, min_power_fraction, input_flow, output_flow_el, output_flow_P, nominal_input_P, efficiency_P, heat_to_el_P, variable_costs = 0, boiler_efficiency = 1):
 		# кпд котла?
@@ -233,13 +238,8 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 		outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
 								output_flow_T: solph.Flow()
                },
-  
-		conversion_factors = {output_flow_el: 1, output_flow_T: heat_to_el_T},	
-  
-  	# conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
-  
-		conversion_factor_full_condensation = efficiency_full_condensing_mode
-	
+  	conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+		conversion_factor_full_condensation = {output_flow_el: efficiency_full_condensing_mode}
    )
 		energy_system.add(T_turbine)
 		block_collection.append(T_turbine) 

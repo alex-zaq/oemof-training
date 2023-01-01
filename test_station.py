@@ -25,7 +25,7 @@ block_list = []
 
 create_source = get_sources_methods_by_energy_system(es, block_list)
 get_bus_list_by_name = get_buses_method_by_energy_system(es)
-create_sink_abs_demand= get_sinks_method_by_energy_system(es, block_list, 'абс')
+create_sink_abs_demand= get_sinks_method_by_energy_system(es, block_list, 'abs')
 create_T_turb = get_chp_method_by_energy_system(es, block_list, 'Т')
 
 [bgas_bus, bel_bus, bth_bus] = get_bus_list_by_name('bgas','bel','bth')
@@ -35,12 +35,17 @@ heat_back_source = create_source("heat_back_tr", bth_bus, 999)
 el_sink = create_sink_abs_demand("el_sink", bel_bus, 900)
 
 
-create_test_station = get_station_method_by_energysystem(es, block_list, bgas_bus, bel_bus, 'Тестовая станция')
+create_Novopolockay_tec = get_station_method_by_energysystem(es, block_list, bgas_bus, bel_bus, 'Новополоцкая ТЭЦ')
+create_Minskay_tec_4= get_station_method_by_energysystem(es, block_list, bgas_bus, bel_bus, 'Минская ТЭЦ-4')
 
 
 hw_demand = [900 for _ in range(number_of_time_steps)]
-[heat_tr_dict, heat_bus_dict] = create_test_station('тестовая станция_1',hw_demand, None, None)
-[heat_tr_dict_2, heat_bus_dict_2] = create_test_station('тестовая станция_2',hw_demand, None, None) 
+steam_demand = [900 for _ in range(number_of_time_steps)]
+
+
+(heat_tr_dict, heat_bus_dict) = create_Novopolockay_tec('Новополоцкая ТЭЦ', hw_demand, steam_demand, planning_outage = None)
+ 
+(heat_tr_dict_2, heat_bus_dict_2) = create_Minskay_tec_4('Минская ТЭЦ-4', hw_demand, steam_demand = None, planning_outage = None)
  
 
 
@@ -66,9 +71,13 @@ df1 = pd.DataFrame(df, columns=['dfg'])
 # print(df_h)
 # print(df_h_2)
 
-print(df_h_union)
-print(df)
-print(df1)
+# print(df_h_union)
+# print(df)
+# print(df1)
+
+
+fig, axes = plt.subplots(nrows=1, ncols=3)
+(first_pos,second_pos,third_pos) = (axes[0], axes[1], axes[2])
 
 # ax1 = df_el.plot(kind="area", ylim=(0, 7000), legend = 'reverse', title = 'Производство электроэнергии' )
 # ax2 = df_h_union.plot(kind="area", ylim=(0, 7000), legend = 'reverse', title = 'Производство тепла' )

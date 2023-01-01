@@ -16,10 +16,10 @@ from oemof_visio import ESGraphRenderer
 # сделать метод создания станции
 #  (добавить в э все турбины,электрокотлы, станции со всеми настройками)
 
-
+# плохо
 def get_reader_by_folder(folder_data, src_file_name):
 	def get_sheet_name_by_work_book(sheet_name):
-		return pd.read_excel(os.path.join(folder_data, src_file_name + '.xlsx'), sheet_name= sheet_name)
+		return pd.read_excel(os.path.join(folder_data, src_file_name), sheet_name= sheet_name)
 	return get_sheet_name_by_work_book
 
 def __get_local_path(folders_options):

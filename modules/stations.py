@@ -11,84 +11,78 @@ from modules.helpers import set_label
 from modules.helpers import counter
  
 
-
-
-# газовые котлы - гвс
-# газовые котлы - пар
-# электрокотлы  - гвс
-# электрокотлы  - пар
-
-
-# ВИЭ
-
-# турбины КЭС
-			# 
-
-
-# ПГУ КЭС
-# тубины ТЭЦ
-# малые ТЭЦ
-# блок-станции(газ)
-# ядерные реакторы
-
-
-# проблемные энергоисточники
-# ТК-330 - минская тэц-5
-# ГТУ-125 - гродненская тэц-5
-# ПГУ-222 - минская тэц-3
-
-
-
-
-
-def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, station_list):
-  
+def get_station_method_by_energysystem(es, global_block_list, glob_gas_flow, glob_el_flow, station_list):
   
 	index = 0
-  
 	def reset_index():
 		nonlocal index 
 		index = 0
-		
 	def inc_index():
 		nonlocal index
 		index = index + 1
 		return index
-        
-	def get_renewables_source(renewables_type, install_power, fixed_load_profile):
-		pass
   
-	def get_el_boilers_hw(station_name, install_power, output_flow_T):
-		pass
-
-	def get_el_boilers_steam(station_name, install_power, output_flow_P):
-		pass
   
-	def get_gas_boilers_hw(station_name, install_power, output_flow_T):
+#################################################################################
+# Электрокотел (пар, гвс)
+#################################################################################
+	def get_el_boilers(station_name, install_power, output_flow, commodity_tag, variable_costs):
+		create_el_boilers = get_simple_transformers_method_by_energy_system(es, global_block_list, 'simple')
+		return create_el_boilers (
+			index = inc_index(),
+			station_name = station_name,
+			station_type = None,
+			block_name = set_label('ЭК', commodity_tag),
+			block_type =  set_label('ЭК', commodity_tag),
+			commodity_tag = commodity_tag,
+			nominal_value = install_power,
+			input_flow = glob_el_flow,
+			output_flow = output_flow,
+			efficiency = 0.99,
+			variable_costs = variable_costs,
+		)
+##################################################################################################################################################################
+# Газовый котел (пар, гвс)
+#################################################################################
+	def get_gas_boilers(station_name, install_power, output_flow, commodity_tag, variable_costs):
+		create_gas_boilers = get_simple_transformers_method_by_energy_system(es, global_block_list, 'simple')
+		return create_gas_boilers (
+		index = inc_index(),
+		station_name = station_name,
+		station_type = None,
+		block_name = set_label('КОТ', commodity_tag),
+		block_type =  set_label('КОТ', commodity_tag),
+		commodity_tag = commodity_tag,
+		nominal_value = install_power,
+		input_flow = glob_gas_flow,
+		output_flow = output_flow,
+		efficiency = 0.90,
+		variable_costs = variable_costs,
+		)
+#################################################################################
+# конденсационные турбины ГРЭС Белэнерго  (электроэнергия)
+#################################################################################
+	def get_k_160(station_name, planning_outage):
 		pass
 
-	def get_gas_boilers_steam(station_name, install_power, output_flow_P):
+	def get_k_175(station_name, planning_outage):
 		pass
 
-	def get_small_chp(station_name, install_power, fixed_load_profile):
+	def get_k_300(station_name, planning_outage):
 		pass
-  
-	def get_K_300(station_name, planning_outage):
-		pass
- 
-	def get_K_160(station_name, planning_outage):
+#################################################################################
+# парогазовые установки ГРЭС Белэнерго (электроэнергия)
+#################################################################################
+	def get_ccgt_399(station_name, planning_outage):
 		pass
 
-	def get_CCGT_427(station_name, planning_outage):
-		pass	
-
-	def get_CCGT_399(station_name, planning_outage):
+	def get_ccgt_427(station_name, planning_outage):
 		pass
-    
-    
-
+#################################################################################
+# теплофикационные турбины крупных ТЭЦ Белэнерго (электроэнергия, гвс, пар)
+#################################################################################
 	def get_t_250(station_name, output_flow_T):
-		create_T_turb = get_chp_method_by_energy_system(es, bl_lst, 'Т')
+		create_T_turb = get_chp_method_by_energy_system(es, global_block_list, 'Т')
 		t = create_T_turb(
 				index = inc_index(),
 				station_name = station_name,
@@ -107,7 +101,7 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 		return t
 
 	def get_t_110(station_name, output_flow_T):
-		create_T_turb = get_chp_method_by_energy_system(es, bl_lst, 'Т')
+		create_T_turb = get_chp_method_by_energy_system(es, global_block_list, 'Т')
 		return create_T_turb(
 				index = inc_index(),
 				station_name = station_name,
@@ -125,7 +119,7 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 				boiler_efficiency = 1)
 
 	def get_pt_60_t(station_name, output_flow_T):
-		create_pt_60_t_turb = get_chp_method_by_energy_system(es, bl_lst, 'ПТ-Т')
+		create_pt_60_t_turb = get_chp_method_by_energy_system(es, global_block_list, 'ПТ-Т')
 		return create_pt_60_t_turb(
 				index = inc_index(),
 				station_name = station_name,
@@ -142,7 +136,7 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 				boiler_efficiency = 1)
 
 	def get_pt_60(station_name, output_flow_P, output_flow_T):
-		create_pt_turb = get_chp_method_by_energy_system(es, bl_lst, 'ПТ')
+		create_pt_turb = get_chp_method_by_energy_system(es, global_block_list, 'ПТ')
 		return create_pt_turb(
 				index = inc_index(),
 				station_name = station_name,
@@ -163,7 +157,7 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 				boiler_efficiency = 1)
   
 	def get_p_50(station_name, output_flow_P):
-		create_back_pressure_turb = get_chp_method_by_energy_system(es, bl_lst, 'Р')
+		create_back_pressure_turb = get_chp_method_by_energy_system(es, global_block_list, 'Р')
 		return create_back_pressure_turb(
 				index = inc_index(),
 				station_name = station_name,
@@ -178,17 +172,28 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 				variable_costs = 0,
 				boiler_efficiency = 1)
   
-	def get_block_station_natural_gas(station_name):
-		create_block_station_natural_gas = get_simple_transformers_method_by_energy_system(es, bl_lst, 'simple')
+	def get_ccgt_chp_222(station_name, planning_outage):  # теплофикационная ПГУ
+		pass	
+#################################################################################
+# Блок-станции(газ) (электроэнергия)
+#################################################################################
+	def get_block_station_ng(station_name):
+		create_block_station_natural_gas = get_simple_transformers_method_by_energy_system(es, global_block_list, 'simple')
 		return create_block_station_natural_gas(
 			index = inc_index(),
 			station_name = station_name,
 			block_name = 'Блок-станции(газ)',
-   
 		)
-  
+#################################################################################
+# Малые ТЭЦ Белэнерго (электроэнергия, гвс, пар?)
+#################################################################################  
+	def get_small_chp(station_name, install_power, fixed_load_profile):
+		pass
+#################################################################################
+# АЭС (электроэнергия)
+#################################################################################
 	def get_vver_1200(station_name, variable_costs, full_load = False):
-		create_npp_vver_1200 = get_simple_transformers_method_by_energy_system(es, bl_lst, 'NPP')
+		create_npp_vver_1200 = get_simple_transformers_method_by_energy_system(es, global_block_list, 'NPP')
 		return create_npp_vver_1200(
 			index = inc_index(),
 			station_name = station_name,
@@ -199,10 +204,8 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 			output_flow = glob_el_flow,
 			variable_costs = variable_costs
 		)
-
-  
 	def get_vver_toi(station_name, variable_costs, full_load = False):
-		create_npp_vver_toi = get_simple_transformers_method_by_energy_system(es, bl_lst, 'NPP')
+		create_npp_vver_toi = get_simple_transformers_method_by_energy_system(es, global_block_list, 'NPP')
 		return create_npp_vver_toi(
 			index = inc_index(),
 			station_name = station_name,
@@ -213,15 +216,45 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 			output_flow = glob_el_flow,
 			variable_costs = variable_costs
 		)
+################################################################################# 
+# Опциональные энергоисточники
+################################################################################# 
+	def get_vver_600(station_name):
+		pass	
+ 
+	def get_npp_300(station_name):
+		pass	
+  
+	def get_smr_ritm_200(station_name):
+		pass	
+
+	def get_storage(station_name, capacity, eff_in, eff_out):
+		pass
+
+	def get_renewables_source(renewables_type, install_power, fixed_load_profile):
+		pass
+
+	def get_ocgt_25(station_name):
+		pass
+			
+	def get_ocgt_100(station_name):
+		pass
+			
+	def get_ocgt_125(station_name):
+		pass			
+################################################################################# 
+################################################################################# 
+  
   
 
 	def create_test_station (station_name, heat_water_demand_data, steam_demand_date, planning_outage):
+		'тестовая станция'		
 		reset_index()
 		station_name = station_name
 		hw_bus_name = 'Отопление+ГВС'
-		create_source = get_sources_methods_by_energy_system(es, bl_lst)
+		create_source = get_sources_methods_by_energy_system(es, global_block_list)
 		create_buses = get_buses_method_by_energy_system(es)
-		create_abs_demand = get_sinks_method_by_energy_system(es, bl_lst, 'абс')
+		create_abs_demand = get_sinks_method_by_energy_system(es, global_block_list, 'абс')
   		# тепловые спросы - bus
 		###############################################################
 		hw_bus = create_buses(set_label(station_name, station_name))
@@ -249,14 +282,12 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
      
   
   
-	def create_Minskay_tec_4(station_name, heat_water_demand_data, steam_demand_date = None, planning_outage = None):
-	#  startup options, planning outage
+	def create_Minskay_tec_4(station_name, heat_water_demand_data, steam_demand = None, planning_outage = None):
+		'Минская ТЭЦ-4'
 		reset_index()
-		hw_bus_name = 'Отопление+ГВС'
+		hw_bus_name = 'гвс'
 		create_buses = get_buses_method_by_energy_system(es)
-		create_abs_demand = get_sinks_method_by_energy_system(es, bl_lst, sink_type= 'abs')
-		create_simple_tr = get_simple_transformers_method_by_energy_system(es, bl_lst, block_type= 'simple')
-		# тепловые спросы - bus
+		create_abs_demand = get_sinks_method_by_energy_system(es, global_block_list, sink_type= 'abs')
 		###############################################################
 		hw_bus = create_buses(set_label(station_name, hw_bus_name))
 		steam_bus = None
@@ -268,7 +299,7 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 		t_250_3 = get_t_250(station_name, hw_bus)
 		t_110_1 = get_t_250(station_name, hw_bus)
 		t_110_2 = get_t_250(station_name, hw_bus)
-		el_boiler = create_simple_tr(set_label(station_name,'ЭК'), 1.163 * 137.6, glob_el_flow, hw_bus, 0.99, 0)
+		el_boilers_hw = get_el_boilers(station_name, 1.163 * 137.6, hw_bus, 'гвс' , 0)
 		# тепловые потребители - sink
 		###############################################################
 		hw_sink = create_abs_demand(
@@ -279,7 +310,7 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 		el = [pt_t_60, t_250_1, t_250_2, t_250_3, t_110_1, t_110_2]
 		hw_chp = [pt_t_60, t_250_1, t_250_2, t_250_3, t_110_1, t_110_2]
 		hw_gas_boilers = None
-		hw_el_boilers = [el_boiler]
+		hw_el_boilers = [el_boilers_hw]
 		steam_chp = None
 		steam_gas_boilers = None
 		steam_el_boilers = None
@@ -291,24 +322,29 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 					{'гвс': hw_bus, 'пар': steam_bus})
 
 	def create_Novopolockay_tec(station_name, heat_water_demand_data, steam_demand_date = None, planning_outage = None):
+			'Новополоцкая ТЭЦ'
 		#  startup options, planning outage
 			reset_index()
 			hw_bus_name = 'гвс'
 			steam_bus_name = 'пар'
 			create_buses = get_buses_method_by_energy_system(es)
-			create_abs_demand = get_sinks_method_by_energy_system(es, bl_lst, sink_type= 'abs')
-			create_simple_tr = get_simple_transformers_method_by_energy_system(es, bl_lst, block_type= 'simple')
+			create_abs_demand = get_sinks_method_by_energy_system(es, global_block_list, sink_type= 'abs')
+			create_simple_tr = get_simple_transformers_method_by_energy_system(es, global_block_list, block_type= 'simple')
 			# тепловые спросы - bus
 			###############################################################
 			hw_bus = create_buses(set_label(station_name, hw_bus_name))
 			steam_bus = create_buses(set_label(station_name, steam_bus_name))
 			# турбоагрегаты, котлы и электрокотлы - transformer
 			###############################################################
-			[pt_60_el_1, pt_60_t_1, pt_60_p_1] = get_pt_60(station_name,steam_bus, hw_bus)
-			[pt_60_el_2, pt_60_t_2, pt_60_p_2] = get_pt_60(station_name,steam_bus, hw_bus)
-			[pt_60_el_3, pt_60_t_3, pt_60_p_3] = get_pt_60(station_name,steam_bus, hw_bus)
+			# пт-60 - 3 шт. р-50 - 2 шт.
+			###############################################################
+			[pt_60_el_1, pt_60_t_1, pt_60_p_1] = get_pt_60(station_name, steam_bus, hw_bus)
+			[pt_60_el_2, pt_60_t_2, pt_60_p_2] = get_pt_60(station_name, steam_bus, hw_bus)
+			[pt_60_el_3, pt_60_t_3, pt_60_p_3] = get_pt_60(station_name, steam_bus, hw_bus)
 			p_50_1 = get_p_50(station_name, steam_bus)
 			p_50_2 = get_p_50(station_name, steam_bus)
+			el_boilers_steam = get_el_boilers(station_name, 1.163 * 137.6, steam_bus, 'пар' , 0)
+			gas_boilers_steam = get_gas_boilers(station_name, 500, steam_bus, 'пар', 0 )
 			# тепловые потребители - sink
 			###############################################################
 			hw_sink = create_abs_demand(
@@ -321,8 +357,8 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 			steam_chp = [pt_60_p_1, pt_60_p_2, pt_60_p_3, p_50_1, p_50_2]
 			hw_gas_boilers = None
 			hw_el_boilers = None
-			steam_gas_boilers = None
-			steam_el_boilers = None
+			steam_gas_boilers = [gas_boilers_steam]
+			steam_el_boilers = [el_boilers_steam]
 			###############################################################
 		# sink?
 			return ({'э': el,
@@ -331,10 +367,19 @@ def get_station_method_by_energysystem(es, bl_lst, glob_gas_flow, glob_el_flow, 
 						{'гвс': hw_bus, 'пар': steam_bus})
 
 
+	def create_Bel_Npp(station_name, planning_outage = None):
+		'Белорусская АЭС'
+		reset_index()
+		vver_1200_1 = get_vver_1200(station_name, -999, True)
+		vver_1200_2 = get_vver_1200(station_name, -999, True)
+		el = [vver_1200_1, vver_1200_2]
+		return el
+   
 
 	station_dict = {
 		'Минская ТЭЦ-4': create_Minskay_tec_4,
 		'Новополоцкая ТЭЦ':create_Novopolockay_tec,
+		'Белорусская АЭС': create_Bel_Npp,
 		'Тестовая станция': create_test_station
 	}
 

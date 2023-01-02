@@ -32,6 +32,8 @@ def __get_local_path(folders_options):
 			os.makedirs(path_local_result)
 		return path_local_result
  
+# переделать в более интуитивный метод 
+ 
 def import_dataframe_to_excel(df, folders_options, excel_name):
 		path_local_result = __get_local_path(folders_options)
 		df.to_excel(path_local_result + '/'+ excel_name+'.xlsx')

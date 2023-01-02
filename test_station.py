@@ -19,6 +19,11 @@ date_time_index = pd.date_range(current_start_date, periods=number_of_time_steps
 es = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= False)
 block_list = []
 
+
+
+# (tec_hw, tec_steam) = (file['sheetname-hw']['tec'], file['sheetname-hw']['tec'])
+
+
 # src_name = 'data_by_day'
 # get_sheet_name_by_work_book = get_reader_by_folder(os.getcwd()+'/data',src_name)
 # el_global_data = get_sheet_name_by_work_book('electric_demands_abs')[:number_of_time_steps]
@@ -41,10 +46,7 @@ create_Minskay_tec_4= get_station_method_by_energysystem(es, block_list, bgas_bu
 
 hw_demand = [900 for _ in range(number_of_time_steps)]
 steam_demand = [900 for _ in range(number_of_time_steps)]
-
-
 (heat_tr_dict, heat_bus_dict) = create_Novopolockay_tec('Новополоцкая ТЭЦ', hw_demand, steam_demand, planning_outage = None)
- 
 (heat_tr_dict_2, heat_bus_dict_2) = create_Minskay_tec_4('Минская ТЭЦ-4', hw_demand, steam_demand = None, planning_outage = None)
  
 

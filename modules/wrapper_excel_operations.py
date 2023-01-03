@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import datetime as dt
+from pathlib import Path
 from oemof_visio import ESGraphRenderer
  
 
@@ -34,9 +35,18 @@ def __get_local_path(folders_options):
  
 # переделать в более интуитивный метод 
  
-def import_dataframe_to_excel(df, folders_options, excel_name):
-		path_local_result = __get_local_path(folders_options)
-		df.to_excel(path_local_result + '/'+ excel_name+'.xlsx')
+# def import_dataframe_to_excel(df, folders_options, excel_name):
+# 		path_local_result = __get_local_path(folders_options)
+# 		df.to_excel(path_local_result + '/'+ excel_name+'.xlsx') 
+  
+
+def import_dataframe_to_excel(dataframe, path, excel_name):
+		Path(path).mkdir(parents=True, exist_ok=True)
+		dataframe.to_excel(path + '/'+ excel_name)
+
+  
+  
+  
  
 def create_res_scheme(energy_system, folders_options):
 		path_local_result = __get_local_path(folders_options)

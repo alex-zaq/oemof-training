@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 from oemof_visio import ESGraphRenderer
+from modules.wrapper_excel_operations import *
 # import oemof_visio as oev
  
 #  
@@ -48,8 +49,9 @@ peak_load = max(el_global_data['el_winter_workDay_odu'][:number_of_time_steps]);
 el_global_demand_profile = el_global_data['el_winter_workDay_odu'][:number_of_time_steps]/peak_load
 
 
+schp =  el_chp_data['Малые ТЭЦ'][:number_of_time_steps]
 
-small_chp_maxload = max( el_chp_data['Малые ТЭЦ'][:number_of_time_steps])
+small_chp_maxload = max(schp)
 el_small_chp_profile = el_chp_data['Малые ТЭЦ'][:number_of_time_steps]/small_chp_maxload
 
 # el_chp_demand_profile = el_chp_data['Минская ТЭЦ-4'][:number_of_time_steps]/ max(el_chp_data['Минская ТЭЦ-4'][:number_of_time_steps])
@@ -713,24 +715,30 @@ ax1.set_ylabel("Мощность, МВт (э)")
 plt.show()
 
 
+import_dataframe_to_excel(
+  dataframe = res,
+  path = './results/day_winter/', 
+  file = 'zaq.xlsx')
 
-current_folder = os.getcwd()
-result_folder = 'results'
-path_results = os.path.join(current_folder, result_folder)
 
-if not os.path.isdir(path_results):
-  os.makedirs(path_results)
 
-script_name = os.path.basename(__file__)[:-3]
-path_local_result = os.path.join(path_results, script_name)
+# current_folder = os.getcwd()
+# result_folder = 'results'
+# path_results = os.path.join(current_folder, result_folder)
 
-if not os.path.isdir(path_local_result):
-  os.makedirs(path_local_result)
+# if not os.path.isdir(path_results):
+#   os.makedirs(path_results)
 
-def getExcelResult(dataframe, path, tag_comment =''):
-  dataframe.to_excel(path + '/' + script_name + '_' + tag_comment + '.xlsx')
+# script_name = os.path.basename(__file__)[:-3]
+# path_local_result = os.path.join(path_results, script_name)
 
-getExcelResult(res, path_local_result)
+# if not os.path.isdir(path_local_result):
+#   os.makedirs(path_local_result)
+
+# def getExcelResult(dataframe, path, tag_comment =''):
+#   dataframe.to_excel(path + '/' + script_name + '_' + tag_comment + '.xlsx')
+
+# getExcelResult(res, path_local_result)
 
 
 # gr = ESGraphRenderer(energy_system=energysystem, filepath=path_local_result+'/res' , img_format="png", txt_fontsize=10, txt_width=10)

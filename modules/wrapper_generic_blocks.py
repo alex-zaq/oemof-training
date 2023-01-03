@@ -157,8 +157,8 @@ def get_simple_transformers_method_by_energy_system(energy_system, block_collect
 		P_out_min = nominal_value * min_power_fraction     # absolute minimal output power
 		P_in_min = P_out_min / (efficiency_min * boiler_efficiency)
 		P_in_max = P_out_max / (efficiency_max * boiler_efficiency)
-		c1 = (P_out_max-P_out_min)/(P_in_max-P_in_min)
-		c0 = P_out_max - c1*P_in_max
+		c1 = (P_out_max-P_out_min) / (P_in_max-P_in_min)
+		c0 = P_out_max - c1 * P_in_max
 
 		tr = solph.components.OffsetTransformer(
 			label= set_label(station_name, block_name, str(index)), 
@@ -251,7 +251,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 								output_flow_P: solph.Flow()
                },
 		conversion_factors = {input_flow: (1 + heat_to_el_P) / efficiency_P, el_inner_bus: 1, output_flow_P: heat_to_el_P},
-		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'тэц', 'вид тепла': 'пар'}
+		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'пт', 'вид тепла': 'пар'}
 		
   )
 
@@ -262,14 +262,14 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 								el_inner_bus: solph.Flow()
              },
   	conversion_factors = {input_flow: (1 + heat_to_el_T) / efficiency_T, el_inner_bus: 1, output_flow_T: heat_to_el_T},
-		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'тэц', 'вид тепла': 'гвс' }
+		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'пт', 'вид тепла': 'гвс' }
    )
 
 		main_output_tr = solph.components.Transformer (
 		label= set_label(station_name, block_name, str(index), 'электроэнергия'),
 		inputs = {el_inner_bus: solph.Flow()},
 		outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)},
-		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'тэц', 'вид тепла': 'электричество'}
+		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'пт', 'вид тепла': 'электричество'}
   ) 
 
 		energy_system.add(P_mode_tr, T_mode_tr, main_output_tr)
@@ -300,7 +300,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 								output_flow_P: solph.Flow()
                },
 		conversion_factors = {input_flow: (1 + heat_to_el_P) / (efficiency_P * boiler_efficiency), output_flow_el: 1, output_flow_P: heat_to_el_P},
-		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'тэц', 'вид тепла': 'пар'}
+		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'пт', 'вид тепла': 'пар'}
   )
 		energy_system.add(pt_full_P_mode)
 		block_collection.append(pt_full_P_mode) 
@@ -328,7 +328,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 								output_flow_T: solph.Flow()
                },
 		conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
-		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'тэц', 'вид тепла': 'гвс'}
+		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'пт', 'вид тепла': 'гвс'}
   )
 		energy_system.add(pt_full_T_mode)
 		block_collection.append(pt_full_T_mode) 
@@ -359,7 +359,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
                },
   	conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
 		conversion_factor_full_condensation = {output_flow_el: efficiency_full_condensing_mode},
-		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'тэц', 'вид тепла': 'гвс'}
+		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'т', 'вид тепла': 'гвс'}
    )
 		energy_system.add(T_turbine)
 		block_collection.append(T_turbine) 
@@ -385,7 +385,7 @@ def get_chp_method_by_energy_system(energy_system, block_collection, turbine_typ
 		outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
 							output_flow_P: solph.Flow()},
 		conversion_factors = {input_flow: (1 + heat_to_el_P) /(efficiency_P * boiler_efficiency), output_flow_el: 1, output_flow_P: heat_to_el_P},
-		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'тэц', 'вид тепла': 'пар'}
+		group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'р', 'вид тепла': 'пар'}
   ) 
 		energy_system.add(tr)
 		block_collection.append(tr) 

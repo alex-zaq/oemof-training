@@ -8,7 +8,7 @@ import datetime as dt
 from modules.wrapper_generic_blocks import *
 from collections import namedtuple as nt
 from modules.helpers import set_label
-from modules.helpers import counter
+# from modules.helpers import counter
  
 
 def get_station_method_by_energysystem(es, global_block_list, glob_gas_flow, glob_el_flow, station_list):
@@ -63,114 +63,217 @@ def get_station_method_by_energysystem(es, global_block_list, glob_gas_flow, glo
 # конденсационные турбины ГРЭС Белэнерго  (электроэнергия)
 #################################################################################
 	def get_k_160(station_name, planning_outage):
-		pass
+		create_k_160 = get_simple_transformers_method_by_energy_system(es, global_block_list, 'offset')
+		return create_k_160(
+			index = inc_index(),
+			station_name = station_name,
+			station_type = 'КЭС',
+			block_name = 'К-160',
+			block_type = 'К',
+			commodity_tag = None,
+			nominal_value = 160,
+			input_flow = glob_gas_flow,
+			output_flow = glob_el_flow,
+			efficiency_min = 0.39,
+			efficiency_max = 0.42,
+			min_power_fraction = 0.4,
+			variable_costs = 0,
+			boiler_efficiency = 1   
+		)
 
 	def get_k_175(station_name, planning_outage):
-		pass
+		create_k_175 = get_simple_transformers_method_by_energy_system(es, global_block_list, 'offset')
+		return create_k_175(
+			index = inc_index(),
+			station_name = station_name,
+			station_type = 'КЭС',
+			block_name = 'К-175',
+			block_type = 'К',
+			commodity_tag = None,
+			nominal_value = 175,
+			input_flow = glob_gas_flow,
+			output_flow = glob_el_flow,
+			efficiency_min = 0.39,
+			efficiency_max = 0.43,
+			min_power_fraction = 0.4,
+			variable_costs = 0,
+			boiler_efficiency = 1   
+		)
 
 	def get_k_300(station_name, planning_outage):
-		pass
+		create_k_300 = get_simple_transformers_method_by_energy_system(es, global_block_list, 'offset')
+		return create_k_300(
+		index = inc_index(),
+		station_name = station_name,
+		station_type = 'КЭС',
+		block_name = 'К-300',
+		block_type = 'К',
+		commodity_tag = None,
+		nominal_value = 300,
+		input_flow = glob_gas_flow,
+		output_flow = glob_el_flow,
+		efficiency_min = 0.39,
+		efficiency_max = 0.44,
+		min_power_fraction = 0.4,
+		variable_costs = 0,
+		boiler_efficiency = 1   
+	)
+
 #################################################################################
 # парогазовые установки ГРЭС Белэнерго (электроэнергия)
 #################################################################################
 	def get_ccgt_399(station_name, planning_outage):
-		pass
+		create_ccgt_399 = get_simple_transformers_method_by_energy_system(es, global_block_list, 'offset')
+		return create_ccgt_399(
+		index = inc_index(),
+		station_name = station_name,
+		station_type = 'КЭС',
+		block_name = 'ПГУ-399',
+		block_type = 'ПГУ-КЭС',
+		commodity_tag = None,
+		nominal_value = 399,
+		input_flow = glob_gas_flow,
+		output_flow = glob_el_flow,
+		efficiency_min = 0.43,
+		efficiency_max = 0.56,
+		min_power_fraction = 0.4,
+		variable_costs = 0,
+		boiler_efficiency = 1   
+	)
 
 	def get_ccgt_427(station_name, planning_outage):
-		pass
+		create_ccgt_427 = get_simple_transformers_method_by_energy_system(es, global_block_list, 'offset')
+		return create_ccgt_427(
+		index = inc_index(),
+		station_name = station_name,
+		station_type = 'КЭС',
+		block_name = 'ПГУ-427',
+		block_type = 'ПГУ-КЭС',
+		commodity_tag = None,
+		nominal_value = 427,
+		input_flow = glob_gas_flow,
+		output_flow = glob_el_flow,
+		efficiency_min = 0.43,
+		efficiency_max = 0.59,
+		min_power_fraction = 0.4,
+		variable_costs = 0,
+		boiler_efficiency = 1   
+	)
 #################################################################################
 # теплофикационные турбины крупных ТЭЦ Белэнерго (электроэнергия, гвс, пар)
 #################################################################################
 	def get_t_250(station_name, output_flow_T):
 		create_T_turb = get_chp_method_by_energy_system(es, global_block_list, 'Т')
 		t = create_T_turb(
-				index = inc_index(),
-				station_name = station_name,
-				block_name = 'Т-250',
-				nominal_el_value = 250,
-				min_power_fraction = 0.5,
-				nominal_input_T = 350,
-				input_flow = glob_gas_flow,
-				output_flow_el = glob_el_flow,
-				output_flow_T = output_flow_T,
-				efficiency_T = 0.82,
-				heat_to_el_T = 1.9,
-				efficiency_full_condensing_mode = 0.41,
-				variable_costs = 0,
-				boiler_efficiency = 1)
+		index = inc_index(),
+		station_name = station_name,
+		block_name = 'Т-250',
+		nominal_el_value = 250,
+		min_power_fraction = 0.5,
+		nominal_input_T = 350,
+		input_flow = glob_gas_flow,
+		output_flow_el = glob_el_flow,
+		output_flow_T = output_flow_T,
+		efficiency_T = 0.82,
+		heat_to_el_T = 1.9,
+		efficiency_full_condensing_mode = 0.41,
+		variable_costs = 0,
+		boiler_efficiency = 1)
 		return t
 
 	def get_t_110(station_name, output_flow_T):
 		create_T_turb = get_chp_method_by_energy_system(es, global_block_list, 'Т')
 		return create_T_turb(
-				index = inc_index(),
-				station_name = station_name,
-				block_name = 'Т-110',
-				nominal_el_value = 110,
-				min_power_fraction = 0.35,
-				nominal_input_T = 350,
-				input_flow = glob_gas_flow,
-				output_flow_el = glob_el_flow,
-				output_flow_T = output_flow_T,
-				efficiency_T = 0.82,
-				heat_to_el_T = 1.9,
-				efficiency_full_condensing_mode = 0.41,
-				variable_costs = 0,
-				boiler_efficiency = 1)
+		index = inc_index(),
+		station_name = station_name,
+		block_name = 'Т-110',
+		nominal_el_value = 110,
+		min_power_fraction = 0.35,
+		nominal_input_T = 350,
+		input_flow = glob_gas_flow,
+		output_flow_el = glob_el_flow,
+		output_flow_T = output_flow_T,
+		efficiency_T = 0.82,
+		heat_to_el_T = 1.9,
+		efficiency_full_condensing_mode = 0.41,
+		variable_costs = 0,
+		boiler_efficiency = 1)
 
 	def get_pt_60_t(station_name, output_flow_T):
 		create_pt_60_t_turb = get_chp_method_by_energy_system(es, global_block_list, 'ПТ-Т')
 		return create_pt_60_t_turb(
-				index = inc_index(),
-				station_name = station_name,
-				block_name = 'ПТ-60',
-				nominal_el_value = 60,
-				min_power_fraction = 0.4,
-				input_flow = glob_gas_flow,
-				output_flow_el = glob_el_flow,
-				output_flow_T = output_flow_T,
-				nominal_input_T = 200,
-				efficiency_T = 0.91,
-				heat_to_el_T = 2.02,
-				variable_costs = 0,
-				boiler_efficiency = 1)
+		index = inc_index(),
+		station_name = station_name,
+		block_name = 'ПТ-60',
+		nominal_el_value = 60,
+		min_power_fraction = 0.4,
+		input_flow = glob_gas_flow,
+		output_flow_el = glob_el_flow,
+		output_flow_T = output_flow_T,
+		nominal_input_T = 200,
+		efficiency_T = 0.91,
+		heat_to_el_T = 2.02,
+		variable_costs = 0,
+		boiler_efficiency = 1)
 
 	def get_pt_60(station_name, output_flow_P, output_flow_T):
 		create_pt_turb = get_chp_method_by_energy_system(es, global_block_list, 'ПТ')
 		return create_pt_turb(
-				index = inc_index(),
-				station_name = station_name,
-				block_name = 'ПТ-60',
-				nominal_el_value = 60,
-				min_power_fraction = 0.4,
-				input_flow = glob_gas_flow,
-				output_flow_el = glob_el_flow,
-				output_flow_T = output_flow_T,
-				output_flow_P = output_flow_P,
-				nominal_input_t = 150,
-				nominal_input_P = 300,
-				efficiency_T = 0.91,
-				efficiency_P = 0.91,
-				heat_to_el_T = 2.02,
-				heat_to_el_P = 3.8,
-				variable_costs = 0,
-				boiler_efficiency = 1)
+		index = inc_index(),
+		station_name = station_name,
+		block_name = 'ПТ-60',
+		nominal_el_value = 60,
+		min_power_fraction = 0.4,
+		input_flow = glob_gas_flow,
+		output_flow_el = glob_el_flow,
+		output_flow_T = output_flow_T,
+		output_flow_P = output_flow_P,
+		nominal_input_t = 150,
+		nominal_input_P = 300,
+		efficiency_T = 0.91,
+		efficiency_P = 0.91,
+		heat_to_el_T = 2.02,
+		heat_to_el_P = 3.8,
+		variable_costs = 0,
+		boiler_efficiency = 1)
+  
+	def get_pt_135(station_name, output_flow_P, output_flow_T):
+		create_pt_turb = get_chp_method_by_energy_system(es, global_block_list, 'ПТ')
+		return create_pt_turb(
+		index = inc_index(),
+		station_name = station_name,
+		block_name = 'ПТ-135',
+		nominal_el_value = 135,
+		min_power_fraction = 0.4,
+		input_flow = glob_gas_flow,
+		output_flow_el = glob_el_flow,
+		output_flow_T = output_flow_T,
+		output_flow_P = output_flow_P,
+		nominal_input_t = 300,
+		nominal_input_P = 600,
+		efficiency_T = 0.91,
+		efficiency_P = 0.91,
+		heat_to_el_T = 2.02,
+		heat_to_el_P = 3.8,
+		variable_costs = 0,
+		boiler_efficiency = 1)
+
   
 	def get_p_50(station_name, output_flow_P):
 		create_back_pressure_turb = get_chp_method_by_energy_system(es, global_block_list, 'Р')
 		return create_back_pressure_turb(
-				index = inc_index(),
-				station_name = station_name,
-				block_name = 'Р-50',
-				nominal_el_value = 50,
-				min_power_fraction = 0.35,
-				input_flow = glob_gas_flow,
-				output_flow_el = glob_el_flow,
-				output_flow_P = output_flow_P,
-				efficiency_P = 0.91,
-				heat_to_el_P = 3.8,
-				variable_costs = 0,
-				boiler_efficiency = 1)
+		index = inc_index(),
+		station_name = station_name,
+		block_name = 'Р-50',
+		nominal_el_value = 50,
+		min_power_fraction = 0.35,
+		input_flow = glob_gas_flow,
+		output_flow_el = glob_el_flow,
+		output_flow_P = output_flow_P,
+		efficiency_P = 0.91,
+		heat_to_el_P = 3.8,
+		variable_costs = 0,
+		boiler_efficiency = 1)
   
 	def get_ccgt_chp_222(station_name, planning_outage):  # теплофикационная ПГУ
 		pass	

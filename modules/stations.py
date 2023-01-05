@@ -11,7 +11,7 @@ from modules.helpers import set_label
 # from modules.helpers import counter
  
 
-def get_station_method_by_energysystem(es, global_block_list, glob_gas_flow, glob_el_flow, station_list):
+def get_factory_method_by_energysystem(es, global_block_list, glob_gas_flow, glob_el_flow, selected_group):
   
 	index = 0
 	def reset_index():
@@ -347,6 +347,14 @@ def get_station_method_by_energysystem(es, global_block_list, glob_gas_flow, glo
 		pass			
 ################################################################################# 
 ################################################################################# 
+	def get_dummy_source(output_flow, variable_costs = 9999):
+		create_backstop_el = get_sources_methods_by_energy_system(es, global_block_list)
+		return create_backstop_el (
+			label=set_label('Dummy', 'electricity' , str(inc_index())),
+			output_flow=output_flow,
+			variable_costs = variable_costs
+		)
+################################################################################# 
   
   
 
@@ -354,33 +362,18 @@ def get_station_method_by_energysystem(es, global_block_list, glob_gas_flow, glo
 		'тестовая станция'		
 		reset_index()
 		station_name = station_name
-		hw_bus_name = 'Отопление+ГВС'
 		create_source = get_sources_methods_by_energy_system(es, global_block_list)
-		create_buses = get_buses_method_by_energy_system(es)
-		create_abs_demand = get_sinks_method_by_energy_system(es, global_block_list, 'абс')
   		# тепловые спросы - bus
 		###############################################################
-		hw_bus = create_buses(set_label(station_name, station_name))
-		
-		# турбоагрегаты, котлы и электрокотлы - transformer
 		###############################################################
-		t_250_1 = get_t_250(station_name, hw_bus)
-		heat_source = create_source(set_label(station_name, 'дорогой источник ГВС'), hw_bus, 9999) 
-
-		# тепловые потребители - sink
+		ccgt_427 = get_ccgt_427(station_name, None)
+		el_source = create_source(set_label(station_name, 'источник электричества'), glob_el_flow, 9999) 
 		###############################################################
-		hw_sink = create_abs_demand(
-		label = set_label(station_name, hw_bus_name, 'sink'),
-		input_flow = hw_bus,
-		demand_absolute_data = heat_water_demand_data)
-		###############################################################
-		el_tr_lst = [t_250_1]
-		hw_tr_lst = [t_250_1, heat_source]
+		el_tr_lst = [ccgt_427, el_source]
+		hw_tr_lst = None
 		steam_tr_lst = None
-		hw_bus_lst = hw_bus
+		hw_bus_lst = None
 		steam_bus_lst = None
-  
-
 		return ({'эл': el_tr_lst,'ГВС': hw_tr_lst, 'Пар': steam_tr_lst},{'ГВС': hw_bus_lst, 'Пар': None})
      
   
@@ -478,27 +471,28 @@ def get_station_method_by_energysystem(es, global_block_list, glob_gas_flow, glo
 		el = [vver_1200_1, vver_1200_2]
 		return el
    
-
+   
 	station_dict = {
 		'Минская ТЭЦ-4': create_Minskay_tec_4,
 		'Новополоцкая ТЭЦ':create_Novopolockay_tec,
 		'Белорусская АЭС': create_Bel_Npp,
-		'Тестовая станция': create_test_station
+		'Тестовая станция': create_test_station,
+		'пгу-427': get_ccgt_427,
+		'источник': get_dummy_source
 	}
 
-	if not isinstance(station_list, list):
-		if station_list in station_dict:
-			return station_dict[station_list]
-	else:
-		raise Exception('параметр не является списком')
+# если нет в словаре
+	if not isinstance(selected_group, list):
+		if selected_group in station_dict:
+			return station_dict[selected_group]
 
-	if len(station_list) == 0:
+	if len(selected_group) == 0:
 		raise Exception('cписок станций пуст')
 	
 	res = []
-	for station in station_list:
-		if station in station_dict:
-			res += [station_dict[station]]
+	for item in selected_group:
+		if item in station_dict:
+			res += [station_dict[item]]
 		
 	if len(res) != 0:
 		return res

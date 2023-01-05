@@ -11,7 +11,7 @@ from modules.wrapper_generic_blocks import *
 from modules.wrapper_plot import get_dataframe_by_bus
 from modules.wrapper_excel_operations import import_dataframe_to_excel
 from modules.wrapper_excel_operations import create_res_scheme
-from modules.stations import get_station_method_by_energysystem  
+from modules.stations import get_factory_method_by_energysystem  
 
 number_of_time_steps = 24
 current_start_date = dt.datetime(2020,6,8,1,0,0)
@@ -40,8 +40,8 @@ heat_back_source = create_source("heat_back_tr", bth_bus, 999)
 el_sink = create_sink_abs_demand("el_sink", bel_bus, 900)
 
 
-create_Novopolockay_tec = get_station_method_by_energysystem(es, block_list, bgas_bus, bel_bus, 'Новополоцкая ТЭЦ')
-create_Minskay_tec_4= get_station_method_by_energysystem(es, block_list, bgas_bus, bel_bus, 'Минская ТЭЦ-4')
+create_Novopolockay_tec = get_factory_method_by_energysystem(es, block_list, bgas_bus, bel_bus, 'Новополоцкая ТЭЦ')
+create_Minskay_tec_4= get_factory_method_by_energysystem(es, block_list, bgas_bus, bel_bus, 'Минская ТЭЦ-4')
 
 
 hw_demand = [900 for _ in range(number_of_time_steps)]

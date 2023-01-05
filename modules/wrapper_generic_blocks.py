@@ -163,7 +163,7 @@ def get_simple_transformers_method_by_energy_system(energy_system, block_collect
 		tr = solph.components.OffsetTransformer(
 			label= set_label(station_name, block_name, str(index)), 
    		inputs = {input_flow: solph.Flow(
-			nominal_value = nominal_value,
+			nominal_value = P_in_max,
 			max = 1,
 			min = P_in_min/P_in_max,
 			nonconvex = solph.NonConvex())},

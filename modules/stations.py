@@ -157,7 +157,7 @@ def get_factory_method_by_energysystem(es, global_block_list, glob_gas_flow, glo
 		efficiency_max = 0.59,
 		min_power_fraction = 0.4,
 		variable_costs = 0,
-		boiler_efficiency = 1   
+		boiler_efficiency = 1,
 	)
 #################################################################################
 # теплофикационные турбины крупных ТЭЦ Белэнерго (электроэнергия, гвс, пар)

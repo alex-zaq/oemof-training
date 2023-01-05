@@ -152,7 +152,8 @@ def get_simple_transformers_method_by_energy_system(energy_system, block_collect
 		efficiency_max,
 		min_power_fraction,
 		variable_costs = 0,
-		boiler_efficiency = 1):
+		boiler_efficiency = 1,
+  	):
 		P_out_max = nominal_value     										 # absolute nominal output power
 		P_out_min = nominal_value * min_power_fraction     # absolute minimal output power
 		P_in_min = P_out_min / (efficiency_min * boiler_efficiency)
@@ -166,6 +167,7 @@ def get_simple_transformers_method_by_energy_system(energy_system, block_collect
 			nominal_value = P_in_max,
 			max = 1,
 			min = P_in_min/P_in_max,
+			# fix = fixedGenerationData,
 			nonconvex = solph.NonConvex())},
 			outputs = {output_flow: solph.Flow(variable_costs = variable_costs)},
 			coefficients = [c0, c1],

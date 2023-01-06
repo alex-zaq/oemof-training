@@ -10,10 +10,11 @@ sys.path.insert(0, './')
 from modules.wrapper_plot import get_dataframe_by_output_bus,get_dataframe_by_input_bus 
 from modules.wrapper_excel_operations import import_dataframe_to_excel
 from modules.wrapper_excel_operations import create_res_scheme
-from modules.stations import get_factory_method_by_energysystem 
-from modules.wrapper_generic_blocks import (get_buses_method_by_energy_system, get_sinks_method_by_energy_system, get_buses_method_by_energy_system,get_sources_methods_by_energy_system)
+from drafts.functions_stations import get_factory_method_by_energysystem 
+from drafts.wrapper_generic_blocks import (get_buses_method_by_energy_system, get_sinks_method_by_energy_system, get_buses_method_by_energy_system,get_sources_methods_by_energy_system)
 from modules.helpers import set_XY_label
-
+from modules.classes_generic_blocks import * 
+from modules.classes_specific_blocks import * 
 
 
 # from modules.wrapper_generic_blocks import get_buses_method_by_energy_system
@@ -27,22 +28,15 @@ date_time_index = pd.date_range(current_start_date, periods=number_of_time_steps
 es = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= False)
 block_list = []
 
-create_buses = get_buses_method_by_energy_system(es)
-create_source = get_sources_methods_by_energy_system(es, block_list)
-
-[bgas_bus, bel_bus, bth_bus] = create_buses('bgas','bel','bth')
-gas_source = create_source("gas_source", bgas_bus, 0 )
-
-
-[get_ccgt_427, get_dummy_flow] = get_factory_method_by_energysystem(es,block_list,bgas_bus,bel_bus, ['пгу-427', 'источник'])
-ccgt_427 = get_ccgt_427('тестовая станция', None)
-# el_dummy_flow = get_dummy_flow(bel_bus, variable_costs = 9999)
-
-
-create_sink_abs_demand = get_sinks_method_by_energy_system(es, block_list, 'abs')
+[bgas_bus, bel_bus] = Generic_buses(es).create_buses('газ','электричество')
+gas_source = Generic_sources(es, block_list).create_source('источник газа', bgas_bus, 0)
 step = (427-427*0.4)/24
-el_sink = create_sink_abs_demand("el_sink", bel_bus, [427*0.4 + i*step for i in range(24)])
+el_sink = Generic_sinks(es).create_sink_absolute_demand('электричество_спрос', bel_bus, [427*0.4 + i*step for i in range(24)])
 
+
+specific_block_creator = Specific_blocks(es, block_list, bgas_bus, bel_bus)
+ccgt_427 = specific_block_creator.get_ccgt_427(1,'тестовая станция', planning_outage = None)
+  
 
 model = solph.Model(es)
 model.solve(solver="cplex")

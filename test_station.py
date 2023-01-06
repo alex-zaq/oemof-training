@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 #  изменить на конкретные функции
-from modules.wrapper_generic_blocks import *
+from drafts.wrapper_generic_blocks import *
 from modules.wrapper_plot import get_dataframe_by_bus
 from modules.wrapper_excel_operations import import_dataframe_to_excel
 from modules.wrapper_excel_operations import create_res_scheme
-from modules.stations import get_factory_method_by_energysystem  
+from drafts.functions_stations import get_factory_method_by_energysystem  
 
 number_of_time_steps = 24
 current_start_date = dt.datetime(2020,6,8,1,0,0)

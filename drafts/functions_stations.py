@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import datetime as dt
-from modules.wrapper_generic_blocks import *
+from drafts.wrapper_generic_blocks import *
 from collections import namedtuple as nt
 from modules.helpers import set_label
 # from modules.helpers import counter

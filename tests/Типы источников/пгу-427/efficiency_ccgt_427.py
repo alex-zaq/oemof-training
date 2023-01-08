@@ -1,20 +1,16 @@
+import sys
+sys.path.insert(0, './')
 from oemof import solph
 from oemof.solph import views
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-import sys
 import datetime as dt
-sys.path.insert(0, './')
-from modules.wrapper_plot import get_dataframe_by_output_bus,get_dataframe_by_input_bus 
-from modules.wrapper_excel_operations import import_dataframe_to_excel
-from modules.wrapper_excel_operations import create_res_scheme
-from drafts.functions_stations import get_factory_method_by_energysystem 
-from drafts.wrapper_generic_blocks import (get_buses_method_by_energy_system, get_sinks_method_by_energy_system, get_buses_method_by_energy_system,get_sources_methods_by_energy_system)
-from modules.helpers import set_XY_label
-from modules.classes_generic_blocks import * 
-from modules.classes_specific_blocks import * 
+from custom_modules.excel_operations import import_dataframe_to_excel, create_res_scheme, get_excel_reader
+from custom_modules.stations import Energy_system_creator
+from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
+from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months
 
 
 # from modules.wrapper_generic_blocks import get_buses_method_by_energy_system
@@ -26,10 +22,11 @@ number_of_time_steps = 24
 current_start_date = dt.datetime(2020,6,8,1,0,0)
 date_time_index = pd.date_range(current_start_date, periods=number_of_time_steps, freq="H")
 es = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= False)
-block_list = []
 
-[bgas_bus, bel_bus] = Generic_buses(es).create_buses('газ','электричество')
-gas_source = Generic_sources(es, block_list).create_source('источник газа', bgas_bus, 0)
+
+
+[bgas_bus, bel_bus] = Generic_buses(es).create_buses('газ_поток','электричество_поток')
+gas_source = Generic_sources(es).create_source('источник газа', bgas_bus, 0)
 step = (427-427*0.4)/24
 el_sink = Generic_sinks(es).create_sink_absolute_demand('электричество_спрос', bel_bus, [427*0.4 + i*step for i in range(24)])
 

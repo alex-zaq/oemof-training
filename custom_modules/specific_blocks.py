@@ -13,14 +13,16 @@ from custom_modules.helpers import *
 
 class Specific_blocks:
 
-        def __init__(self,es, block_collection, global_input_flow, global_output_flow) -> None:
-            self.block_collection = []
-            self.global_input_flow = global_input_flow
-            self.global_output_flow = global_output_flow
+        def __init__(self, es, global_natural_gas_flow, global_el_flow, block_collection = None) -> None:
+            self.block_collection = block_collection
+            self.global_natural_gas_flow = global_natural_gas_flow
+            self.global_el_flow = global_el_flow
             self.es = es
-            self.g_block_creator = Generic_blocks(es)
-            self.g_source_creator = Generic_sources(es)
+            self.g_block_creator = Generic_blocks(es, self.block_collection)
+            self.g_source_creator = Generic_sources(es, block_collection)
 
+        def get_block_collection(self):
+            return self.block_collection
    
         def get_el_boilers(self, index, station_name, install_power, output_flow, commodity_tag, variable_costs):
             return self.g_block_creator.create_simple_transformer(
@@ -31,7 +33,7 @@ class Specific_blocks:
                     block_type =  set_label('ЭК', commodity_tag),
                     commodity_tag = commodity_tag,
                     nominal_value = install_power,
-                    input_flow = self.global_input_flow,
+                    input_flow = self.global_el_flow,
                     output_flow = output_flow,
                     efficiency = 0.99,
                     variable_costs = variable_costs,
@@ -45,7 +47,7 @@ class Specific_blocks:
                     block_type =  set_label('ЭК', commodity_tag),
                     commodity_tag = commodity_tag,
                     nominal_value = install_power,
-                    input_flow = self.global_input_flow ,
+                    input_flow = self.global_natural_gas_flow ,
                     output_flow = output_flow,
                     efficiency = 0.90,
                     variable_costs = variable_costs,
@@ -59,8 +61,8 @@ class Specific_blocks:
                 block_type = 'К',
                 commodity_tag = None,
                 nominal_value = 160,
-                input_flow = self.global_input_flow,
-                output_flow = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
                 efficiency_min = 0.39,
                 efficiency_max = 0.42,
                 min_power_fraction = 0.4,
@@ -72,12 +74,12 @@ class Specific_blocks:
             index = index,
                 station_name = station_name,
                 station_type = 'КЭС',
-                block_name = 'К-160',
+                block_name = 'К-175',
                 block_type = 'К',
                 commodity_tag = None,
                 nominal_value = 175,
-                input_flow = self.global_input_flow,
-                output_flow = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
                 efficiency_min = 0.39,
                 efficiency_max = 0.42,
                 min_power_fraction = 0.4,
@@ -93,8 +95,8 @@ class Specific_blocks:
                 block_type = 'К',
                 commodity_tag = None,
                 nominal_value = 300,
-                input_flow = self.global_input_flow,
-                output_flow = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
                 efficiency_min = 0.39,
                 efficiency_max = 0.42,
                 min_power_fraction = 0.4,
@@ -111,10 +113,10 @@ class Specific_blocks:
                 block_type = 'К',
                 commodity_tag = None,
                 nominal_value = 310,
-                input_flow = self.global_input_flow,
-                output_flow = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
                 efficiency_min = 0.39,
-                efficiency_max = 0.42,
+                efficiency_max = 0.43,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 1  
@@ -129,10 +131,10 @@ class Specific_blocks:
                 block_type = 'К',
                 commodity_tag = None,
                 nominal_value = 315,
-                input_flow = self.global_input_flow,
-                output_flow = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
                 efficiency_min = 0.39,
-                efficiency_max = 0.42,
+                efficiency_max = 0.44,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 1  
@@ -149,8 +151,8 @@ class Specific_blocks:
                 block_type = 'ПГУ-КЭС',
                 commodity_tag = None,
                 nominal_value = 399,
-                input_flow = self.global_input_flow,
-                output_flow = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
                 efficiency_min = 0.43,
                 efficiency_max = 0.56,
                 min_power_fraction = 0.4,
@@ -166,8 +168,8 @@ class Specific_blocks:
                 block_type = 'ПГУ-КЭС',
                 commodity_tag = None,
                 nominal_value = 427,
-                input_flow = self.global_input_flow,
-                output_flow = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
                 efficiency_min = 0.43,
                 efficiency_max = 0.59,
                 min_power_fraction = 0.4,
@@ -190,8 +192,8 @@ class Specific_blocks:
                 nominal_el_value = 250,
                 min_power_fraction = 0.5,
                 nominal_input_T = 350,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
                 efficiency_T = 0.82,
                 heat_to_el_T = 1.9,
@@ -206,17 +208,17 @@ class Specific_blocks:
                 index = index,
                 station_name = station_name,
                 block_name = 'Т-250',
-                nominal_el_value = 250,
+                nominal_el_value = 300,
                 min_power_fraction = 0.5,
-                nominal_input_T = 350,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                nominal_input_T = 732,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
-                efficiency_T = 0.82,
-                heat_to_el_T = 1.9,
+                efficiency_T = 0.91,
+                heat_to_el_T = 1.6767,
                 efficiency_full_condensing_mode = 0.41,
                 variable_costs = 0,
-                boiler_efficiency = 1
+                boiler_efficiency = 0.9
             )
             
         def get_t_180(self, index, station_name, output_flow_T):
@@ -227,8 +229,8 @@ class Specific_blocks:
             nominal_el_value = 250,
             min_power_fraction = 0.5,
             nominal_input_T = 350,
-            input_flow = self.global_input_flow,
-            output_flow_el = self.global_output_flow,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
             output_flow_T = output_flow_T,
             efficiency_T = 0.82,
             heat_to_el_T = 1.9,
@@ -247,8 +249,8 @@ class Specific_blocks:
                 nominal_el_value = 110,
                 min_power_fraction = 0.35,
                 nominal_input_T = 350,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
                 efficiency_T = 0.82,
                 heat_to_el_T = 1.9,
@@ -266,8 +268,8 @@ class Specific_blocks:
             nominal_el_value = 250,
             min_power_fraction = 0.5,
             nominal_input_T = 350,
-            input_flow = self.global_input_flow,
-            output_flow_el = self.global_output_flow,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
             output_flow_T = output_flow_T,
             efficiency_T = 0.82,
             heat_to_el_T = 1.9,
@@ -286,8 +288,8 @@ class Specific_blocks:
             block_name = 'ПТ-50',
             nominal_el_value = 50,
             min_power_fraction = 0.4,
-            input_flow = self.global_input_flow,
-            output_flow_el = self.global_output_flow,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
             output_flow_P = output_flow_P,
             output_flow_T = output_flow_T,
             nominal_input_P = 280,
@@ -307,8 +309,8 @@ class Specific_blocks:
             block_name = 'ПТ-50_П',
             nominal_el_value = 50,
             min_power_fraction = 0.4,
-            input_flow = self.global_input_flow,
-            output_flow_el = self.global_output_flow,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
             output_flow_P = output_flow_P,
             nominal_input_P = 300,
             efficiency_P = 0.91,
@@ -324,8 +326,8 @@ class Specific_blocks:
             block_name = 'ПТ-50_Т',
             nominal_el_value = 50,
             min_power_fraction = 0.4,
-            input_flow = self.global_input_flow,
-            output_flow_el = self.global_output_flow,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
             output_flow_T = output_flow_T,
             nominal_input_T = 200,
             efficiency_T = 0.91,
@@ -343,8 +345,8 @@ class Specific_blocks:
                 block_name = 'ПТ-60',
                 nominal_el_value = 60,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
                 nominal_input_P = 300,
@@ -364,8 +366,8 @@ class Specific_blocks:
                 block_name = 'ПТ-60_П',
                 nominal_el_value = 60,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 nominal_input_P = 300,
                 efficiency_P = 0.91,
@@ -381,8 +383,8 @@ class Specific_blocks:
                 block_name = 'ПТ-60_Т',
                 nominal_el_value = 60,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
                 nominal_input_T = 200,
                 efficiency_T = 0.91,
@@ -401,8 +403,8 @@ class Specific_blocks:
                 block_name = 'ПТ-65',
                 nominal_el_value = 65,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
                 nominal_input_P = 300,
@@ -422,8 +424,8 @@ class Specific_blocks:
                 block_name = 'ПТ-65_П',
                 nominal_el_value = 65,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 nominal_input_P = 300,
                 efficiency_P = 0.91,
@@ -439,8 +441,8 @@ class Specific_blocks:
                 block_name = 'ПТ-65_Т',
                 nominal_el_value = 65,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
                 nominal_input_T = 200,
                 efficiency_T = 0.91,
@@ -458,8 +460,8 @@ class Specific_blocks:
                 block_name = 'ПТ-70',
                 nominal_el_value = 70,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
                 nominal_input_P = 300,
@@ -479,8 +481,8 @@ class Specific_blocks:
                 block_name = 'ПТ-70_П',
                 nominal_el_value = 70,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 nominal_input_P = 300,
                 efficiency_P = 0.91,
@@ -496,8 +498,8 @@ class Specific_blocks:
                 block_name = 'ПТ-70_Т',
                 nominal_el_value = 70,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
                 nominal_input_T = 200,
                 efficiency_T = 0.91,
@@ -515,8 +517,8 @@ class Specific_blocks:
                 block_name = 'ПТ-135',
                 nominal_el_value = 135,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
                 nominal_input_P = 300,
@@ -536,8 +538,8 @@ class Specific_blocks:
                 block_name = 'ПТ-135_П',
                 nominal_el_value = 135,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 nominal_input_P = 300,
                 efficiency_P = 0.91,
@@ -553,8 +555,8 @@ class Specific_blocks:
                 block_name = 'ПТ-135_Т',
                 nominal_el_value = 135,
                 min_power_fraction = 0.4,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
                 nominal_input_T = 200,
                 efficiency_T = 0.91,
@@ -572,7 +574,7 @@ class Specific_blocks:
                 block_name = 'ВВЭР-1200',
                 nominal_el_value = 1170,
                 min_power_fraction = 0.75,
-                output_flow = self.global_output_flow,
+                output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
             )
 ##################################################################################
@@ -585,7 +587,7 @@ class Specific_blocks:
                 block_name = 'ВВЭР-ТОИ',
                 nominal_el_value = 1255,
                 min_power_fraction = 0.75,
-                output_flow = self.global_output_flow,
+                output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
             )
  ##################################################################################
@@ -598,7 +600,7 @@ class Specific_blocks:
                 block_name = 'ВВЭР-600',
                 nominal_el_value = 600,
                 min_power_fraction = 0.65,
-                output_flow = self.global_output_flow,
+                output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
             )
  ##################################################################################
@@ -611,7 +613,7 @@ class Specific_blocks:
                 block_name = 'РИТМ-200',
                 nominal_el_value = 50,
                 min_power_fraction = 0.65,
-                output_flow = self.global_output_flow,
+                output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
             )
 
@@ -624,8 +626,8 @@ class Specific_blocks:
                 block_name = 'Р-50',
                 nominal_el_value = 50,
                 min_power_fraction = 0.35,
-                input_flow = self.global_input_flow,
-                output_flow_el = self.global_output_flow,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
@@ -634,11 +636,13 @@ class Specific_blocks:
             )
 
         def get_dummy_source(self, index, station_name, label ,output_flow, variable_costs = 9999):
-            return self.g_source_creator(
+            return self.g_source_creator.create_source(
                     label=set_label(station_name ,'Dummy', label, str(index)),
                     output_flow=output_flow,
                     variable_costs = variable_costs
             )
+            
+        
         
 
    

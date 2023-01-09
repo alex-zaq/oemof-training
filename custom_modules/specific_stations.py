@@ -13,14 +13,14 @@ from custom_modules.helpers import Custom_counter, set_label
 
 
 
-class Energy_system_creator:
+class Specific_stations:
   
         def __init__(self, es, global_input_flow, global_output_flow):
             self.es = es
             self.__block_collection = []
             self.__input_flow = global_input_flow
             self.__ouinput_flow = global_output_flow
-            self.block_creator = Specific_blocks(es, self.__block_collection, global_input_flow, global_output_flow)
+            self.block_creator = Specific_blocks(es, global_input_flow, global_output_flow)
             self.sink_creator = Generic_sinks(es)
             self.bus_creator = Generic_buses(es)
             self.active_stations_data = {}

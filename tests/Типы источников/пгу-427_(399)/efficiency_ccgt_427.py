@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 from custom_modules.excel_operations import import_dataframe_to_excel, create_res_scheme, get_excel_reader
-from custom_modules.stations import Energy_system_creator
+from custom_modules.specific_stations import Energy_system_creator
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months
 

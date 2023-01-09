@@ -2,7 +2,7 @@
 
 
 def getNt(Qt, Qp, pt, pn):
-  return 0.529 * Qt * pow(0.12 / pt, 0.14) + 0.305 * Qp * pow(1.3/pn, 0.34) - (9.9 - 0.048 * Qt)
+  return 0.529 * Qt * pow(0.12 / pt, 0.14) + 0.305 * Qp * pow(1.3 / pn, 0.34) - (9.9 - 0.048 * Qt)
 
 
 pt = 0.1176

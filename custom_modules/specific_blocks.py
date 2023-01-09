@@ -52,6 +52,28 @@ class Specific_blocks:
                     efficiency = 0.90,
                     variable_costs = variable_costs,
             )
+            
+            
+        def get_ocgt_120(self, index,station_name, planning_outage = None):
+            return self.g_block_creator.create_offset_transformer(
+            index = index,
+            station_name = station_name,
+            station_type = 'КЭС',
+            block_name = 'ГТУ-120',
+            block_type = 'ГТУ',
+            commodity_tag = None,
+            nominal_value = 160,
+            input_flow = self.global_natural_gas_flow,
+            output_flow = self.global_el_flow,
+            efficiency_min = 0.25,
+            efficiency_max = 0.40,
+            min_power_fraction = 0.25,
+            variable_costs = 0,
+            boiler_efficiency = 0.1  
+            )    
+            
+            
+            
         def get_k_160(self, index,station_name, planning_outage = None):
             return self.g_block_creator.create_offset_transformer(
             index = index,
@@ -63,12 +85,14 @@ class Specific_blocks:
                 nominal_value = 160,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
-                efficiency_min = 0.39,
-                efficiency_max = 0.42,
+                efficiency_min = 0.378,
+                efficiency_max = 0.423,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
-                boiler_efficiency = 1  
+                boiler_efficiency = 0.9  
             )
+            
+            
         def get_k_175(self, index,station_name, planning_outage = None):
             return self.g_block_creator.create_offset_transformer(
             index = index,
@@ -84,7 +108,7 @@ class Specific_blocks:
                 efficiency_max = 0.42,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
-                boiler_efficiency = 1  
+                boiler_efficiency = 0.9  
             )
         def get_k_300(self, index,station_name, planning_outage = None):
             return self.g_block_creator.create_offset_transformer(
@@ -97,11 +121,11 @@ class Specific_blocks:
                 nominal_value = 300,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
-                efficiency_min = 0.39,
-                efficiency_max = 0.42,
+                efficiency_min = 0.42,
+                efficiency_max = 0.469,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
-                boiler_efficiency = 1  
+                boiler_efficiency = 0.9  
             )
                
         def get_k_310(self, index,station_name, planning_outage = None):
@@ -115,13 +139,13 @@ class Specific_blocks:
                 nominal_value = 310,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
-                efficiency_min = 0.39,
-                efficiency_max = 0.43,
+                efficiency_min = 0.42,
+                efficiency_max = 0.48,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
-                boiler_efficiency = 1  
+                boiler_efficiency = 0.9  
             )
-                           
+                        #  минимум?  
         def get_k_315(self, index,station_name, planning_outage = None):
             return self.g_block_creator.create_offset_transformer(
                 index = index,
@@ -133,11 +157,11 @@ class Specific_blocks:
                 nominal_value = 315,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
-                efficiency_min = 0.39,
-                efficiency_max = 0.44,
+                efficiency_min = 0.42,
+                efficiency_max = 0.49,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
-                boiler_efficiency = 1  
+                boiler_efficiency = 0.9  
             )
                        
             
@@ -177,48 +201,31 @@ class Specific_blocks:
                 boiler_efficiency = 1  
             )
             
-        def get_cogt_chp_121(self, index, station_name, output_flow_T, output_flow_P, planning_outage = None):
-            pass
-
             
         def get_ccgt_сhp_222(self, index, station_name, output_flow_T, planning_outage = None, ):
             pass
             
-        def get_t_255(self, index, station_name, output_flow_T):
-            return self.g_block_creator.create_chp_T_turbine(
-                index = index,
-                station_name = station_name,
-                block_name = 'Т-255',
-                nominal_el_value = 250,
-                min_power_fraction = 0.5,
-                nominal_input_T = 350,
-                input_flow = self.global_natural_gas_flow,
-                output_flow_el = self.global_el_flow,
-                output_flow_T = output_flow_T,
-                efficiency_T = 0.82,
-                heat_to_el_T = 1.9,
-                efficiency_full_condensing_mode = 0.41,
-                variable_costs = 0,
-                boiler_efficiency = 1
-            )
-    
+        def get_ocgt_chp_121(self, index, station_name, output_flow_T, output_flow_P, planning_outage = None):
+            pass
+
             
         def get_t_250(self, index, station_name, output_flow_T):
             return self.g_block_creator.create_chp_T_turbine(
                 index = index,
                 station_name = station_name,
                 block_name = 'Т-250',
-                nominal_el_value = 300,
+                nominal_el_value = 250,
+                max_el_value = 300,
                 min_power_fraction = 0.5,
-                nominal_input_T = 732,
+                nominal_input_T = 750,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
-                efficiency_T = 0.91,
+                efficiency_T = 0.9,
                 heat_to_el_T = 1.6767,
-                efficiency_full_condensing_mode = 0.41,
+                efficiency_full_condensing_mode = 0.4,
                 variable_costs = 0,
-                boiler_efficiency = 0.9
+                boiler_efficiency = 1
             )
             
         def get_t_180(self, index, station_name, output_flow_T):
@@ -236,7 +243,7 @@ class Specific_blocks:
             heat_to_el_T = 1.9,
             efficiency_full_condensing_mode = 0.41,
             variable_costs = 0,
-            boiler_efficiency = 1
+            boiler_efficiency = 0.9
             ) 
             
             
@@ -247,16 +254,17 @@ class Specific_blocks:
                 station_name = station_name,
                 block_name = 'Т-110',
                 nominal_el_value = 110,
+                max_el_value = 120,
                 min_power_fraction = 0.35,
-                nominal_input_T = 350,
+                nominal_input_T = 333,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
-                efficiency_T = 0.82,
-                heat_to_el_T = 1.9,
-                efficiency_full_condensing_mode = 0.41,
+                efficiency_T = 0.9,
+                heat_to_el_T = 1.85,
+                efficiency_full_condensing_mode = 0.4,
                 variable_costs = 0,
-                boiler_efficiency = 1
+                boiler_efficiency = 0.9
             )
    
                        

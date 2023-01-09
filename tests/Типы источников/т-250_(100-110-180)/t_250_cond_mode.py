@@ -50,7 +50,7 @@ es = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= False)
 gas_source = Generic_sources(es).create_source('природный_газ_источник', gas_bus, 100)
 
 # print(power_loads)
-power_loads = 310
+power_loads = 300
 el_sink = Generic_sinks(es).create_sink_absolute_demand('электричество_потребитель', el_bus, demand_absolute_data= power_loads)
 # hw_sink = Generic_sinks(es).create_sink_absolute_demand('гвс_потребитель', hw_bus, demand_absolute_data= [600 for _ in range(24)])
 
@@ -77,10 +77,15 @@ df_el = get_dataframe_by_output_bus(results, block_collection, el_bus)
 
 df_el = df_el.loc[:, (df_el > 0.1).any(axis=0)]
 df_el = df_el[df_el>0]
+print(df_el)
 df_hw = get_dataframe_by_output_bus(results, block_collection, hw_bus)
+print(df_hw)
 df_gas = get_dataframe_by_input_bus(results, block_collection, gas_bus)
+print(df_gas)
 df_eff = df_el / df_gas
-# print(df_eff)
+print(df_eff)
+
+
 # сделать удобный методы\
 fig, axes = plt.subplots(nrows=1, ncols=4)
 # (first_pos,second_pos) = (axes[0], axes[1])
@@ -90,7 +95,7 @@ maxY = 1000
 ax_el = df_el.plot(kind="area", ylim=(0, maxY), ax = first_pos, legend = 'reverse', title = 'Производство электричества' )
 ax_hw = df_hw.plot(kind="area", ylim=(0, maxY) , ax = second_pos, legend = 'reverse', title = 'Производство ГВС' )
 ax_gas = df_gas.plot(kind="area", ylim=(0, maxY) , ax = third_pos, legend = 'reverse', title = 'Потребление газа' )
-ax_gas = df_eff.plot(kind="line", ylim=(0, 1) , ax = fourth_pos, legend = 'reverse', title = 'КПД' )
+ax_eff = df_eff.plot(kind="line", ylim=(0, 1) , ax = fourth_pos, legend = 'reverse', title = 'КПД' )
 
 
 plt.show()

@@ -265,6 +265,7 @@ class Generic_blocks:
             station_name,
             block_name,
             nominal_el_value,
+            max_el_value,
             min_power_fraction,
             input_flow,
             output_flow_el,
@@ -277,13 +278,31 @@ class Generic_blocks:
             boiler_efficiency = 1):
         # кпд котла?
             
+            # 669.175 - useful
+            
+            
+            
+            el_eff = (efficiency_T / (1+ heat_to_el_T)) * boiler_efficiency
+            hw_eff = (heat_to_el_T * el_eff )
+            # print(hw_eff/el_eff)
+            efficiency_full_condensing_mode = efficiency_full_condensing_mode - efficiency_full_condensing_mode * (1- boiler_efficiency)
+            # print(efficiency_full_condensing_mode)
+            nominal_input_T = max_el_value/efficiency_full_condensing_mode
+            # print(nominal_input_T)
+                       
+            p = nominal_el_value * min_power_fraction
+            update_min_fraction = p/max_el_value
+            # print(max_el_value*update_min_fraction)
+            
+            
             T_turbine = solph.components.ExtractionTurbineCHP (
             label= set_label(station_name, block_name, str(index)),
             inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
+            outputs = {output_flow_el: solph.Flow(nominal_value = max_el_value, min = update_min_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
                                     output_flow_T: solph.Flow()
                                     },
-            conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+            # conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+            conversion_factors = {output_flow_el: el_eff, output_flow_T: hw_eff},
             conversion_factor_full_condensation = {output_flow_el: efficiency_full_condensing_mode},
             group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'т', 'вид тепла': 'гвс'}
             )

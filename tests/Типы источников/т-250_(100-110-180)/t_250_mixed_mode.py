@@ -50,8 +50,8 @@ power_loads = power_selected_info['power-rel'].tolist()
 gas_source = Generic_sources(es).create_source('природный_газ_источник', gas_bus, 100)
 
 # print(power_loads)
-el_sink = Generic_sinks(es).create_sink_fraction_demand('электричество_потребитель', el_bus, demand_profile=power_loads, peak_load=220)
-hw_sink = Generic_sinks(es).create_sink_absolute_demand('гвс_потребитель', hw_bus, demand_absolute_data= [100 for _ in range(24)])
+el_sink = Generic_sinks(es).create_sink_fraction_demand('электричество_потребитель', el_bus, demand_profile=power_loads, peak_load=250)
+hw_sink = Generic_sinks(es).create_sink_absolute_demand('гвс_потребитель', hw_bus, demand_absolute_data= [150 for _ in range(24)])
 
 # block_collection = []
 counter = Custom_counter()
@@ -78,7 +78,7 @@ df_el = df_el.loc[:, (df_el > 0.1).any(axis=0)]
 df_el = df_el[df_el>0]
 df_hw = get_dataframe_by_output_bus(results, block_collection, hw_bus)
 df_gas = get_dataframe_by_input_bus(results, block_collection, gas_bus)
-df_eff = df_el / df_gas
+df_eff = (df_el+ df_hw) / df_gas
 # print(df_eff)
 # сделать удобный методы\
 fig, axes = plt.subplots(nrows=1, ncols=4)

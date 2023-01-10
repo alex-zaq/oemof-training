@@ -32,7 +32,7 @@ import datetime as dt
 
 number_of_time_steps = 24
 
-data_folder = os.getcwd() + "/data"
+data_folder = os.getcwd() + "/data_excel"
 el_global_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
 el_chp_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='chp_el_summer_workday_abs')
 #################################################################################
@@ -710,7 +710,7 @@ ax1.set_ylabel("Мощность, МВт (э)")
 
 
 
-# plt.show()
+plt.show()
 
 
 current_folder = os.getcwd()

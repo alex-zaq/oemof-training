@@ -152,8 +152,8 @@ class Generic_blocks:
             output_flow_el, 
             output_flow_T, 
             output_flow_P,
-            nominal_input_t,
-            nominal_input_P,
+            # nominal_input_t,
+            # nominal_input_P,
             efficiency_T,
             efficiency_P,
             heat_to_el_P,
@@ -166,22 +166,22 @@ class Generic_blocks:
 
             P_mode_tr = solph.components.Transformer (
             label= set_label(station_name, block_name, str(index), 'П_режим'),
-            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P)},
-            outputs = {el_inner_bus: solph.Flow(),
+            inputs = {input_flow: solph.Flow()},
+            outputs = {el_inner_bus: solph.Flow(nominal_el_value = nominal_el_value),
                                     output_flow_P: solph.Flow()
                                     },
-            conversion_factors = {input_flow: (1 + heat_to_el_P) / efficiency_P, el_inner_bus: 1, output_flow_P: heat_to_el_P},
+            conversion_factors = {input_flow: (1 + heat_to_el_P) / (efficiency_P * boiler_efficiency), el_inner_bus: 1, output_flow_P: heat_to_el_P},
             group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'пт', 'вид тепла': 'пар'}
 
             )
 
             T_mode_tr = solph.components.Transformer (
             label= set_label(station_name, block_name, str(index), 'Т_режим'),
-            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_t)},
+            inputs = {input_flow: solph.Flow()},
             outputs = {output_flow_T: solph.Flow(),
-                                    el_inner_bus: solph.Flow()
+                                    el_inner_bus: solph.Flow(nominal_el_value = nominal_el_value)
                                 },
-            conversion_factors = {input_flow: (1 + heat_to_el_T) / efficiency_T, el_inner_bus: 1, output_flow_T: heat_to_el_T},
+            conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), el_inner_bus: 1, output_flow_T: heat_to_el_T},
             group_options = {'станция': station_name, 'тип станции':'тэц', 'блок': block_name, 'тип блока': 'пт', 'вид тепла': 'гвс' }
             )
 

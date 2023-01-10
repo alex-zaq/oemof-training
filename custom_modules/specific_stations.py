@@ -10,7 +10,7 @@ from custom_modules.helpers import set_label
 from custom_modules.specific_blocks import Specific_blocks
 from custom_modules.generic_blocks import Generic_sinks, Generic_buses
 from custom_modules.helpers import Custom_counter, set_label
-
+from functools import reduce
 
 
 class Specific_stations:
@@ -47,6 +47,8 @@ class Specific_stations:
                 if self.active_stations_data[k]['пар'] != None:
                     all_steam_buses += [self.active_stations_data[k]['пар']]
                 
+        def get_station_el_install_power(self, block_lst):
+            return reduce(lambda a, b: a.nominal_power + b.nominal_power, block_lst)
         
 
         def add_Minskay_tec_4(self, heat_water_demand_data, steam_demand_data = None, planning_outage = None):
@@ -98,8 +100,10 @@ class Specific_stations:
             steam_chp_turb = None
             steam_gas_boilers = None
             steam_el_boilers = None
+            install_power = self.get_station_el_install_power(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
                 'э-тэц-источник': el_turb,
                 'гвс-тэц-источник': hw_chp_turb,
                 'гвс-кот-источник': hw_gas_boilers,
@@ -157,8 +161,10 @@ class Specific_stations:
             steam_chp_turb = [pt_p_60_1, pt_p_60_2, pt_p_50_1]
             steam_gas_boilers = back_steam_gas_boilers
             steam_el_boilers = None
+            install_power = self.get_station_el_install_power(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
                 'э-тэц-источник': el_turb,
                 'гвс-тэц-источник': hw_chp_turb,
                 'гвс-кот-источник': hw_gas_boilers,
@@ -225,8 +231,10 @@ class Specific_stations:
             steam_chp_turb = None
             steam_gas_boilers = None
             steam_el_boilers = None
+            install_power = self.get_station_el_install_power(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
                 'э-тэц-источник': el_turb,
                 'гвс-тэц-источник': hw_chp_turb,
                 'гвс-кот-источник': hw_gas_boilers,
@@ -273,8 +281,10 @@ class Specific_stations:
             steam_chp_turb = None
             steam_gas_boilers = None
             steam_el_boilers = None
+            install_power = self.get_station_el_install_power(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
                 'э-тэц-источник': el_turb,
                 'гвс-тэц-источник': hw_chp_turb,
                 'гвс-кот-источник': hw_gas_boilers,

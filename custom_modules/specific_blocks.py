@@ -223,7 +223,7 @@ class Specific_blocks:
                 output_flow_T = output_flow_T,
                 efficiency_T = 0.9,
                 heat_to_el_T = 1.6767,
-                efficiency_full_condensing_mode = 0.4,
+                efficiency_full_condensing_mode = 0.41,
                 variable_costs = 0,
                 boiler_efficiency = 1
             )
@@ -241,7 +241,7 @@ class Specific_blocks:
             output_flow_T = output_flow_T,
             efficiency_T = 0.82,
             heat_to_el_T = 1.9,
-            efficiency_full_condensing_mode = 0.41,
+            efficiency_full_condensing_mode = 0.4,
             variable_costs = 0,
             boiler_efficiency = 0.9
             ) 
@@ -262,7 +262,7 @@ class Specific_blocks:
                 output_flow_T = output_flow_T,
                 efficiency_T = 0.9,
                 heat_to_el_T = 1.85,
-                efficiency_full_condensing_mode = 0.4,
+                efficiency_full_condensing_mode = 0.39,
                 variable_costs = 0,
                 boiler_efficiency = 0.9
             )
@@ -357,14 +357,14 @@ class Specific_blocks:
                 output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
-                nominal_input_P = 300,
-                nominal_input_t = 150,
-                efficiency_P = 0.91,
-                efficiency_T = 0.91,
+                # nominal_input_P = 300,
+                # nominal_input_t = 150,
+                efficiency_P = 0.9,
+                efficiency_T = 0.9,
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1
+                boiler_efficiency = 0.9
             )
    
         def get_pt_60_p(self, index, station_name, output_flow_P):

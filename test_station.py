@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 from custom_modules.excel_operations import import_dataframe_to_excel, create_res_scheme, get_excel_reader
-from custom_modules.specific_stations import Energy_system_creator
+from custom_modules.specific_stations import Specific_stations
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months
 
@@ -53,7 +53,7 @@ hw_novopolockay_tec, steam_novopolockay_tec = hw_selected_info['Новополо
 gas_source = Generic_sources(es).create_source('природный_газ_источник', gas_bus, 0)
 el_sink = Generic_sinks(es).create_sink_absolute_demand('электричество_потребитель', el_bus, demand_absolute_data = power_loads)
 
-es_creator = Energy_system_creator(es, gas_bus, el_bus)
+es_creator = Specific_stations(es, gas_bus, el_bus)
 
 es_creator.add_Bel_npp()
 es_creator.add_Lukomolskay_gres()

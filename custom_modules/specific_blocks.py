@@ -45,55 +45,50 @@ class Specific_blocks:
                     'station_type': 'нет типа станции'
             }
    
-        def get_el_boilers(self, index, station_name, install_power, output_flow, variable_costs, group_options = None):
+        def get_el_boilers(self, index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
             block_type = self.block_type['эк']
-            # heat_demand_type  = output_flow.heat_demand_group_name if hasattr(output_flow, 'heat_demand_type') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_simple_transformer(
-            nominal_value = install_power,
+            nominal_value = nominal_value,
             input_flow = self.global_el_flow,
             output_flow = output_flow,
             efficiency = 0.99,
             variable_costs = variable_costs,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': block_type,
+            'block_name': block_type,
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,
             'block_order': None,
-            'nominal_value': install_power
+            'nominal_value': nominal_value
             })
             
-        def get_gas_boilers(self, index, station_name, install_power, output_flow, variable_costs, group_options):
+        def get_gas_boilers(self, index, station_name, nominal_value, output_flow, variable_costs, group_options):
             block_type = self.block_type['кот']
-            # heat_demand_type  = output_flow.heat_demand_group_name if hasattr(output_flow, 'heat_demand_type') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_simple_transformer(
-            nominal_value = install_power,
+            nominal_value = nominal_value,
             input_flow = self.global_natural_gas_flow ,
             output_flow = output_flow,
             efficiency = 0.90,
             variable_costs = variable_costs,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': block_type,
+            'block_name': block_type,
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,
             'block_order': None,
-            'nominal_value': install_power
+            'nominal_value': nominal_value
             }
             )
             
             
         def get_ocgt_120(self, index,station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['гту']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
             nominal_value = 120,
             input_flow = self.global_natural_gas_flow,
@@ -104,10 +99,10 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,  
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': 'ГТУ-120',
+            'block_name': 'ГТУ-120',
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,
@@ -119,7 +114,6 @@ class Specific_blocks:
             
         def get_k_160(self, index, station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 160,
                 input_flow = self.global_natural_gas_flow,
@@ -130,10 +124,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'К-160',
+                'block_name': 'К-160',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -143,9 +137,8 @@ class Specific_blocks:
             )
             
             
-        def get_k_175(self, index,station_name, station_type,  group_options = None, planning_outage = None):
+        def get_k_175(self, index,station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 175,
                 input_flow = self.global_natural_gas_flow,
@@ -156,10 +149,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'К-175',
+                'block_name': 'К-175',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -169,7 +162,6 @@ class Specific_blocks:
             )
         def get_k_300(self, index, station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 300,
                 input_flow = self.global_natural_gas_flow,
@@ -180,10 +172,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'К-300',
+                'block_name': 'К-300',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -192,9 +184,8 @@ class Specific_blocks:
                 }    
             )
                
-        def get_k_310(self, index,station_name, station_type,  group_options = None, planning_outage = None):
+        def get_k_310(self, index,station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 310,
                 input_flow = self.global_natural_gas_flow,
@@ -205,10 +196,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'К-310',
+                'block_name': 'К-310',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -217,9 +208,8 @@ class Specific_blocks:
                 }      
             )
                         #  минимум?  
-        def get_k_315(self, index, station_name, station_type , group_options = None, planning_outage = None):
+        def get_k_315(self, index, station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 315,
                 input_flow = self.global_natural_gas_flow,
@@ -230,10 +220,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'К-315',
+                'block_name': 'К-315',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -244,9 +234,8 @@ class Specific_blocks:
                        
             
             
-        def get_ccgt_399(self, index, station_name, statio ,  group_options = None, planning_outage = None):
+        def get_ccgt_399(self, index, station_name,  group_options = None, planning_outage = None):
             block_type = self.block_type['пгу-кэс']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 399,
                 input_flow = self.global_natural_gas_flow,
@@ -257,10 +246,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПГУ-399',
+                'block_name': 'ПГУ-399',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -270,8 +259,8 @@ class Specific_blocks:
             )
         def get_ccgt_427(self, index, station_name,  group_options = None, planning_outage = None):
             block_type = self.block_type['пгу-кэс']
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_offset_transformer(
+                nominal_value = 427,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
                 efficiency_min = 0.43,
@@ -280,10 +269,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,  
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПГУ-427',
+                'block_name': 'ПГУ-427',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -319,8 +308,6 @@ class Specific_blocks:
             
         def get_t_250(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['т']
-            # heat_demand_type  = output_flow_T.heat_demand_group_name if hasattr(output_flow_T, 'heat_demand_type') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_T_turbine(
                 nominal_el_value = 250,
                 max_el_value = 300,
@@ -335,10 +322,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'Т-250',
+                'block_name': 'Т-250',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -350,8 +337,6 @@ class Specific_blocks:
             
         def get_t_180(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['т']
-            # heat_demand_type  = output_flow_T.heat_demand_group_name if hasattr(output_flow_T, 'heat_demand_type') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_T_turbine(
             nominal_el_value = 180,
             min_power_fraction = 0.5,
@@ -365,10 +350,10 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 0.9,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': 'Т-180',
+            'block_name': 'Т-180',
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,
@@ -380,8 +365,6 @@ class Specific_blocks:
             
         def get_t_110(self, index, station_name, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['т']
-            # heat_demand_type  = output_flow_T.heat_demand_group_name if hasattr(output_flow_T, 'heat_demand_type') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_T_turbine(
                 nominal_el_value = 110,
                 max_el_value = 120,
@@ -396,10 +379,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'Т-110',
+                'block_name': 'Т-110',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
@@ -411,8 +394,6 @@ class Specific_blocks:
                        
         def get_t_100(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['т']
-            # heat_demand_type  = output_flow_T.heat_demand_group_name if hasattr(output_flow_T, 'heat_demand_group_name') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_T_turbine(
             index = index,
             station_name = station_name,
@@ -429,10 +410,10 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': 'Т-110',
+            'block_name': 'Т-110',
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,
@@ -446,9 +427,6 @@ class Specific_blocks:
 ################################################################################## 
         def get_pt_50(self, index, station_name, output_flow_P, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
-            # heat_type_hw  = output_flow_T.heat_demand_group_name if hasattr(output_flow_T, 'heat_demand_group_name') else 'не задан тепловой спрос'
-            # heat_type_steam  = output_flow_P.heat_demand_group_name if hasattr(output_flow_P, 'heat_demand_group_name') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_PT_turbine(
             nominal_el_value = 50,
             min_power_fraction = 0.4,
@@ -456,8 +434,6 @@ class Specific_blocks:
             output_flow_el = self.global_el_flow,
             output_flow_P = output_flow_P,
             output_flow_T = output_flow_T,
-            nominal_input_P = 280,
-            nominal_input_t = 140,
             efficiency_P = 0.89,
             efficiency_T = 0.89,
             heat_to_el_P = 3.8,
@@ -465,10 +441,10 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': 'ПТ-50',
+            'block_name': 'ПТ-50',
             'block_type': block_type,
             'heat_demand_type_hw': None,
             'heat_demand_type_steam': None,
@@ -480,8 +456,6 @@ class Specific_blocks:
                    
         def get_pt_50_p(self, index, station_name, output_flow_P,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
-            # heat_type_steam  = output_flow_P.heat_demand_group_name if hasattr(output_flow_P, 'heat_demand_group_name') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_PT_turbine_full_P_mode(
             nominal_el_value = 50,
             min_power_fraction = 0.4,
@@ -494,10 +468,10 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': 'ПТ-50_П',
+            'block_name': 'ПТ-50_П',
             'block_type': block_type,
             'heat_demand_type_steam': None,
             'station_order': None,
@@ -508,8 +482,6 @@ class Specific_blocks:
 
         def get_pt_50_t(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
-            # heat_type_hw  = output_flow_T.heat_demand_group_name if hasattr(output_flow_T, 'heat_demand_group_name') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
             nominal_el_value = 50,
             min_power_fraction = 0.4,
@@ -522,10 +494,10 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': 'ПТ-50_Т',
+            'block_name': 'ПТ-50_Т',
             'block_type': block_type,
             'heat_demand_type_hw': None,
             'station_order': None,
@@ -538,9 +510,6 @@ class Specific_blocks:
 ##################################################################################   
         def get_pt_60(self, index, station_name, output_flow_P, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
-            # heat_type_hw  = output_flow_T.heat_demand_group_name if hasattr(output_flow_T, 'heat_demand_group_name') else 'не задан тепловой спрос'
-            # heat_type_steam  = output_flow_P.heat_demand_group_name if hasattr(output_flow_P, 'heat_demand_group_name') else 'не задан тепловой спрос'
-            # group_options = self.get_default_group_options_by_block_type(block_type) if not group_options else group_options
             return self.g_block_creator.create_chp_PT_turbine(
                 nominal_el_value = 60,
                 min_power_fraction = 0.4,
@@ -555,10 +524,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-60',
+                'block_name': 'ПТ-60',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -582,10 +551,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1, 
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-60_П',
+                'block_name': 'ПТ-60_П',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -598,7 +567,6 @@ class Specific_blocks:
         def get_pt_60_t(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
-                block_name = 'ПТ-60_Т',
                 nominal_el_value = 60,
                 min_power_fraction = 0.4,
                 input_flow = self.global_natural_gas_flow,
@@ -610,10 +578,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-60_Т',
+                'block_name': 'ПТ-60_Т',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -629,7 +597,6 @@ class Specific_blocks:
         def get_pt_65(self, index, station_name, output_flow_P, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine(
-                block_name = 'ПТ-65',
                 nominal_el_value = 65,
                 min_power_fraction = 0.4,
                 input_flow = self.global_natural_gas_flow,
@@ -645,10 +612,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-65',
+                'block_name': 'ПТ-65',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -672,10 +639,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-65_П',
+                'block_name': 'ПТ-65_П',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -688,7 +655,6 @@ class Specific_blocks:
         def get_pt_65_t(self, index, station_name, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
-                index = index,
                 nominal_el_value = 65,
                 min_power_fraction = 0.4,
                 input_flow = self.global_natural_gas_flow,
@@ -700,10 +666,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-65_Т',
+                'block_name': 'ПТ-65_Т',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -733,10 +699,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-70',
+                'block_name': 'ПТ-70',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -760,10 +726,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-70_П',
+                'block_name': 'ПТ-70_П',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -787,10 +753,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-70_Т',
+                'block_name': 'ПТ-70_Т',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -820,10 +786,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-135',
+                'block_name': 'ПТ-135',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -847,10 +813,10 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ПТ-135_П',
+                'block_name': 'ПТ-135_П',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -874,7 +840,7 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
                 'block': 'ПТ-135_Т',
@@ -900,10 +866,10 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': index,
+            'index': str(index),
             'station_name': station_name,
             'station_type': None,
-            'block': 'Р-50',
+            'block_name': 'Р-50',
             'block_type': block_type,
             'heat_demand_type_hw': None,
             'heat_demand_type_steam': None,
@@ -923,10 +889,10 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ВВЭР-1200',
+                'block_name': 'ВВЭР-1200',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -946,10 +912,10 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ВВЭР-ТОИ',
+                'block_name': 'ВВЭР-ТОИ',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -969,10 +935,10 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'ВВЭР-600',
+                'block_name': 'ВВЭР-600',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,
@@ -992,10 +958,10 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': index,
+                'index': str(index),
                 'station_name': station_name,
                 'station_type': None,
-                'block': 'РИТМ-200',
+                'block_name': 'РИТМ-200',
                 'block_type': block_type,
                 'heat_demand_type_hw': None,
                 'heat_demand_type_steam': None,

@@ -38,7 +38,7 @@ class Specific_stations:
                 
         def get_install_power_blocklist(self, block_list):
             'возвращает установленную мощность списка блоков'
-            return block_list.reduce(lambda x: x.group_options['nominal_value'], block_list)
+            return sum([x.group_options['nominal_value'] for x in block_list])
                 
                 
         def get_station_el_install_power(self):
@@ -60,18 +60,16 @@ class Specific_stations:
 
  
         def set_heat_water_groupname_all_stations(self, hw_group_name):
+            'устанавливает название группы все источников гвс'
             hw_all_blocks = self.get_all_heat_water_blocks()
             for block in hw_all_blocks:
                 block.group_options['heat_demand_type'] = hw_group_name
  
         def set_steam_groupname_all_stations(self, steam_group_name):
+            'устанавливает название группы все источников пара'
             hw_all_blocks = self.get_all_steam_blocks()
             for block in hw_all_blocks:
                 block.group_options['heat_demand_type'] = steam_group_name
-            
-        
-        
-        
         
         
         def get_all_blocks_by_station(self, station_name):
@@ -130,6 +128,7 @@ class Specific_stations:
                 
         
         def get_all_heat_water_blocks(self):
+            'получить все блоки гвс энергосистемы'
             res = []
             for station_name, _ in self.active_stations_data:
                 res += self.get_heat_water_blocks_by_station(station_name)
@@ -137,12 +136,14 @@ class Specific_stations:
                 
         
         def get_all_steam_blocks(self):
+            'получить все блоки пара энергосистемы'
             res = []
             for station_name, _ in self.active_stations_data:
                 res += self.get_steam_blocks_by_station(station_name)
             return res
 
         def get_blocks_by_station_type(self, station_type):
+            'получить блоки всех видов для указанной станции'
             res = []
             all_blocks = self.get_all_blocks()
             for block in all_blocks:
@@ -152,6 +153,7 @@ class Specific_stations:
         
         
         def get_blocks_by_block_type(self, block_type):
+            'получить все блоки указанного типа'
             res = []
             all_blocks = self.get_all_blocks()
             for block in all_blocks:
@@ -159,7 +161,6 @@ class Specific_stations:
                    res.append(block) 
             return res
               
-
                 
         def set_station_order(self, order_list):
             'устанавливает порядок отображения отдельных станции'
@@ -186,9 +187,6 @@ class Specific_stations:
                block_by_type = self.get_blocks_by_block_type(block_type)
             for block in block_by_type:
                block.group_options['block_order'] = order
-
-
-
 
 
 
@@ -244,7 +242,7 @@ class Specific_stations:
             steam_chp_turb = None
             steam_gas_boilers = None
             steam_el_boilers = None
-            install_power = self.get_station_el_install_power(el_turb)
+            install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -309,7 +307,7 @@ class Specific_stations:
             steam_chp_turb = [pt_p_60_1, pt_p_60_2, pt_p_50_1]
             steam_gas_boilers = back_steam_gas_boilers
             steam_el_boilers = None
-            install_power = self.get_station_el_install_power(el_turb)
+            install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -331,7 +329,7 @@ class Specific_stations:
                 } 
             
             
-        def add_Lukomolskay_gres(self, station_type, heat_water_demand_data = None):
+        def add_Lukomolskay_gres(self, heat_water_demand_data = None):
             station_name = 'Лукомольская ГРЭС'
             plot_options =  {'station_order': 1, 'block_type_order': ['пгу-кэс','к','эк','кот']}
             ###############################################################
@@ -352,21 +350,20 @@ class Specific_stations:
             # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1(300) 
             # SGT5-PAC 4000F- 286 МВт  N141-563/551 - 141 МВт
             # эк - 68.8 гкал/ч  пвк - нет
-            station_opions = dict(station_name=station_name, station_type=station_type)
             ###############################################################
-            k_315_1 = block_creator.get_k_315(next(), station_opions,  plot_options)
-            k_315_2 = block_creator.get_k_315(next(), station_opions, plot_options)
-            k_315_3 = block_creator.get_k_315(next(), station_opions, plot_options)
-            k_310_4 = block_creator.get_k_310(next(), station_opions, plot_options)
-            k_300_5 = block_creator.get_k_300(next(), station_opions, plot_options)
-            k_300_6 = block_creator.get_k_300(next(), station_opions, plot_options)
-            k_300_7 = block_creator.get_k_300(next(), station_opions, plot_options)
-            k_300_8 = block_creator.get_k_300(next(), station_opions, plot_options)
-            ccgt_427 = block_creator.get_ccgt_427(next(), station_opions, plot_options)
+            k_315_1 = block_creator.get_k_315(next(), station_name)
+            k_315_2 = block_creator.get_k_315(next(), station_name)
+            k_315_3 = block_creator.get_k_315(next(), station_name)
+            k_310_4 = block_creator.get_k_310(next(), station_name)
+            k_300_5 = block_creator.get_k_300(next(), station_name)
+            k_300_6 = block_creator.get_k_300(next(), station_name)
+            k_300_7 = block_creator.get_k_300(next(), station_name)
+            k_300_8 = block_creator.get_k_300(next(), station_name)
+            ccgt_427 = block_creator.get_ccgt_427(next(), station_name)
             ###############################################################
-            el_boilers_hw = block_creator.get_el_boilers(next(), station_opions, 1.163 * 68.8, hw_bus, hw_name , 0, plot_options)
+            el_boilers_hw = block_creator.get_el_boilers(next(), station_name, 1.163 * 68.8, hw_bus, hw_name , 0)
             # фейковые дорогие источники тепла
-            back_hw_gas_boilers = block_creator.get_gas_boilers(next(),station_opions, 10_000, hw_bus, hw_name, 9999, plot_options)
+            back_hw_gas_boilers = block_creator.get_gas_boilers(next() ,station_name, 10_000, hw_bus, hw_name, 9999)
             # тепловые потребители - sink
             ###############################################################
             hw_sink = create_sink_abs(label = set_label(
@@ -386,7 +383,7 @@ class Specific_stations:
             steam_chp_turb = None
             steam_gas_boilers = None
             steam_el_boilers = None
-            install_power = self.get_station_el_install_power(el_turb)
+            install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -441,7 +438,7 @@ class Specific_stations:
             steam_chp_turb = None
             steam_gas_boilers = None
             steam_el_boilers = None
-            install_power = self.get_station_el_install_power(el_turb)
+            install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,

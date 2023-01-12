@@ -338,6 +338,26 @@ class Generic_blocks:
                  self.block_collection.append(tr)
             return tr
 
+        # def create_ccgt(
+        #     self,
+        #     index,
+        #     station_name,
+        #     block_name,
+        #     nominal_el_value,
+        #     max_el_value,
+        #     min_power_fraction,
+        #     input_flow,
+        #     output_flow_el,
+        #     output_flow_T,
+        #     nominal_input_T,
+        #     efficiency_T,
+        #     heat_to_el_T,
+        #     efficiency_full_condensing_mode,
+        #     variable_costs = 0,
+        #     boiler_efficiency = 1
+        # ):
+        
+
         
 class Generic_sinks:
 

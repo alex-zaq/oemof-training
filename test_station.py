@@ -49,6 +49,7 @@ hw_novopolockay_tec, steam_novopolockay_tec = hw_selected_info['Новополо
 
 
 [el_bus, gas_bus] = Generic_buses(es).create_buses('электричество_поток','природный_газ_поток')
+
 gas_source = Generic_sources(es).create_source('природный_газ_источник', gas_bus, 0)
 el_sink = Generic_sinks(es).create_sink_absolute_demand('электричество_потребитель', el_bus, demand_absolute_data = power_loads)
 

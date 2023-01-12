@@ -177,8 +177,8 @@ class Specific_stations:
                 'гвс-потребитель': hw_sink,
                 'пар-потребитель': steam_sink
                 } 
-                        
-        def add_Lukomolskay_gres(self, heat_water_demand_data = None, planning_outage = None):
+        def add_Lukomolskay_gres(self, station_type, heat_water_demand_data = None, planning_outage = None,
+                                 plot_options = {'station_order': 1, 'block_type_order': ['пгу-кэс','к','эк','кот']}):
             station_name = 'Лукомольская ГРЭС'
             ###############################################################
             create_buses = self.bus_creator.create_buses
@@ -198,20 +198,21 @@ class Specific_stations:
             # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1(300) 
             # SGT5-PAC 4000F- 286 МВт  N141-563/551 - 141 МВт
             # эк - 68.8 гкал/ч  пвк - нет
+            station_opions = dict(station_name=station_name, station_type=station_type)
             ###############################################################
-            k_315_1 = block_creator.get_k_315(next(), station_name)
-            k_315_2 = block_creator.get_k_315(next(), station_name)
-            k_315_3 = block_creator.get_k_315(next(), station_name)
-            k_310_4 = block_creator.get_k_310(next(), station_name)
-            k_300_5 = block_creator.get_k_300(next(), station_name)
-            k_300_6 = block_creator.get_k_300(next(), station_name)
-            k_300_7 = block_creator.get_k_300(next(), station_name)
-            k_300_8 = block_creator.get_k_300(next(), station_name)
-            ccgt_427 = block_creator.get_ccgt_427(next(), station_name)
+            k_315_1 = block_creator.get_k_315(next(), station_opions,  plot_options)
+            k_315_2 = block_creator.get_k_315(next(), station_opions, plot_options)
+            k_315_3 = block_creator.get_k_315(next(), station_opions, plot_options)
+            k_310_4 = block_creator.get_k_310(next(), station_opions, plot_options)
+            k_300_5 = block_creator.get_k_300(next(), station_opions, plot_options)
+            k_300_6 = block_creator.get_k_300(next(), station_opions, plot_options)
+            k_300_7 = block_creator.get_k_300(next(), station_opions, plot_options)
+            k_300_8 = block_creator.get_k_300(next(), station_opions, plot_options)
+            ccgt_427 = block_creator.get_ccgt_427(next(), station_opions, plot_options)
             ###############################################################
-            el_boilers_hw = block_creator.get_el_boilers(next(), station_name, 1.163 * 68.8, hw_bus, hw_name , 0)
+            el_boilers_hw = block_creator.get_el_boilers(next(), station_opions, 1.163 * 68.8, hw_bus, hw_name , 0, plot_options)
             # фейковые дорогие источники тепла
-            back_hw_gas_boilers = block_creator.get_gas_boilers(next(),station_name, 10_000, hw_bus, hw_name, 9999)
+            back_hw_gas_boilers = block_creator.get_gas_boilers(next(),station_opions, 10_000, hw_bus, hw_name, 9999, plot_options)
             # тепловые потребители - sink
             ###############################################################
             hw_sink = create_sink_abs(label = set_label(

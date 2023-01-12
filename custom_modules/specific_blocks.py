@@ -13,44 +13,66 @@ from custom_modules.helpers import *
 
 class Specific_blocks:
 
-        def __init__(self, es, global_natural_gas_flow, global_el_flow, block_collection = None) -> None:
+
+
+        def __init__(self, es, global_natural_gas_flow, global_el_flow, block_collection = None):
             self.block_collection = block_collection
             self.global_natural_gas_flow = global_natural_gas_flow
             self.global_el_flow = global_el_flow
             self.es = es
             self.g_block_creator = Generic_blocks(es, self.block_collection)
-            self.g_source_creator = Generic_sources(es, block_collection)
+            self.g_source_creator = Generic_sources(es, self.block_collection)
+            self.station_type = {'тэц':'тэц', 'кэс':'кэс', 'аэс':'аэс',
+                                 'блок-станции':'блок-станции', 'виэ':'виэ'
+                                 }
+            self.block_type = {'р':'р', 'т':'т', 'пт':'пт', 'к':'к',
+                               'пгу-кэс':'пгу-кэс', 'пгу-тэц':'пгу-тэц',
+                               'гту':'гту','гту-тэц':'гту-тэц', 'эк':'эк',
+                               'кот':'кот', 'ввэр':'ввэр', 'ммр':'ммр',
+                               'виэ-солнце':'виэ-солнце','виэ-вода':'виэ-вода',
+                               'виэ-ветер':'виэ-ветер'
+                               }
+
 
         def get_block_collection(self):
             return self.block_collection
    
-        def get_el_boilers(self, index, station_name, install_power, output_flow, commodity_tag, variable_costs):
+        def get_el_boilers(self, index, station_opions, heat_demand_type, install_power ,output_flow, variable_costs, plot_options):
             return self.g_block_creator.create_simple_transformer(
-                    index = index,
-                    station_name = station_name,
-                    station_type = None,
-                    block_name = set_label('ЭК', commodity_tag),
-                    block_type =  set_label('ЭК', commodity_tag),
-                    commodity_tag = commodity_tag,
                     nominal_value = install_power,
                     input_flow = self.global_el_flow,
                     output_flow = output_flow,
                     efficiency = 0.99,
                     variable_costs = variable_costs,
-            )
-        def get_gas_boilers(self, index, station_name, install_power, output_flow, commodity_tag, variable_costs):
+                    group_options = {
+                    'index': index,
+                    'station_name': station_opions['station_name'],
+                    'station_type': station_opions['station_type'],
+                    'block': self.block_type['эк'],
+                    'block_type': self.block_type['эк'],
+                    'heat_demand_type': heat_demand_type,
+                    'station_order': plot_options['station_order'],
+                    'block_order': plot_options['block_order'].index(self.block_type['эк'])
+                    })
+            
+        def get_gas_boilers(self, index, station_opions, install_power, output_flow, variable_costs, plot_options = None):
+            plot_options = {'station_order':0, 'block_order':self.block_type['эк']} if not plot_options else plot_options
             return self.g_block_creator.create_simple_transformer(
-                    index = index,
-                    station_name = station_name,
-                    station_type = None,
-                    block_name = set_label('ЭК', commodity_tag),
-                    block_type =  set_label('ЭК', commodity_tag),
-                    commodity_tag = commodity_tag,
                     nominal_value = install_power,
                     input_flow = self.global_natural_gas_flow ,
                     output_flow = output_flow,
                     efficiency = 0.90,
                     variable_costs = variable_costs,
+                    group_options = {
+                    'index': index,
+                    'station_name': station_opions['station_name'],
+                    'station_type': station_opions['station_type'],
+                    'block': self.block_type['эк'],
+                    'block_type': self.block_type['эк'],
+                    'heat_demand_type': output_flow.heat_demand_group_name,
+                    'station_order': plot_options['station_order'],
+                    'block_order': plot_options['block_order'].index(self.block_type['эк'])
+                    }
             )
             
             
@@ -146,7 +168,7 @@ class Specific_blocks:
                 boiler_efficiency = 0.9  
             )
                         #  минимум?  
-        def get_k_315(self, index,station_name, planning_outage = None):
+        def get_k_315(self, index, station_opions, planning_outage = None):
             return self.g_block_creator.create_offset_transformer(
                 index = index,
                 station_name = station_name,
@@ -186,11 +208,6 @@ class Specific_blocks:
         def get_ccgt_427(self, index, station_name, planning_outage = None):
             return self.g_block_creator.create_offset_transformer(
                 index = index,
-                station_name = station_name,
-                station_type = 'КЭС',
-                block_name = 'ПГУ-427',
-                block_type = 'ПГУ-КЭС',
-                commodity_tag = None,
                 nominal_value = 427,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
@@ -199,11 +216,35 @@ class Specific_blocks:
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 1  
+                group_options = {
+                'станция': station_name,
+                'тип станции': 'кэс',
+                'блок': block_name,
+                'тип блока: ПГУ-КЭС',
+                'вид тепла': None
+                }
             )
+             
             
-            
-        def get_ccgt_сhp_222(self, index, station_name, output_flow_T, planning_outage = None, ):
-            pass
+        # def get_ccgt_сhp_222(self, index, station_name, output_flow_T, planning_outage = None, ):
+        #     return self.g_block_creator.create_chp_T_turbine(
+        #         index = index,
+        #         station_name = station_name,
+        #         block_name = 'ПГУ-Т',
+        #         nominal_el_value = 250,
+        #         max_el_value = 300,
+        #         min_power_fraction = 0.5,
+        #         nominal_input_T = 750,
+        #         input_flow = self.global_natural_gas_flow,
+        #         output_flow_el = self.global_el_flow,
+        #         output_flow_T = output_flow_T,
+        #         efficiency_T = 0.9,
+        #         heat_to_el_T = 1.6767,
+        #         efficiency_full_condensing_mode = 0.41,
+        #         variable_costs = 0,
+        #         boiler_efficiency = 1
+                
+        #     )
             
         def get_ocgt_chp_121(self, index, station_name, output_flow_T, output_flow_P, planning_outage = None):
             pass

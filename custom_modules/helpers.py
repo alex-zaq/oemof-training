@@ -40,6 +40,9 @@ def find_first_monday(year, month, day):
     offset = -d.weekday() #weekday = 0 means monday
     return d + dt.timedelta(offset) 
   
+def set_bus_group(group_name, bus_list):
+    for bus in bus_list:
+        bus.heat_demand_group_name = group_name
   
   
 class Custom_counter:

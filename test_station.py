@@ -57,7 +57,6 @@ es_creator = Energy_system_creator(es, gas_bus, el_bus)
 
 es_creator.add_Bel_npp()
 es_creator.add_Lukomolskay_gres()
-
 es_creator.add_Minskay_tec_4(heat_water_demand_data = hw_minskay_tec_4)
 es_creator.add_Novopockay_tec(heat_water_demand_data = hw_novopolockay_tec, steam_demand_data = steam_novopolockay_tec)
 
@@ -72,6 +71,11 @@ es_creator.add_Novopockay_tec(heat_water_demand_data = hw_novopolockay_tec, stea
 # т-250
 # т-110
 # т-255
+
+
+
+
+# 
 
 
 # model = solph.Model(es)

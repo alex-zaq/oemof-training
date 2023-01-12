@@ -34,24 +34,165 @@ class Specific_stations:
             pass
         def get_blocks_by_block_type(self):
             pass
-        
-        def get_hw_buses_for_model_stations(self):
-            all_hw_buses = []
-            for k, _ in self.active_stations_data:
-                if self.active_stations_data[k]['гвс'] != None:
-                    all_hw_buses += [self.active_stations_data[k]['гвс']]
+
                 
-        def get_steam_buses_for_model_stations(self):
-            all_steam_buses = []
-            for k, _ in self.active_stations_data:
-                if self.active_stations_data[k]['пар'] != None:
-                    all_steam_buses += [self.active_stations_data[k]['пар']]
+        def get_install_power_blocklist(self, block_list):
+            'возвращает установленную мощность списка блоков'
+            return block_list.reduce(lambda x: x.group_options['nominal_value'], block_list)
                 
-        def get_station_el_install_power(self, block_lst):
-            return reduce(lambda a, b: a.nominal_power + b.nominal_power, block_lst)
+                
+        def get_station_el_install_power(self):
+            'возращает полную установленную мощность'
+            install_power = 0
+            for station_name, _ in self.active_stations_data:
+                res += self.active_stations_data[station_name]['установленная мощность']
+      
+
         
 
-        def add_Minskay_tec_4(self, heat_water_demand_data, steam_demand_data = None, planning_outage = None):
+        def set_station_type(self, station_type, station_name_list):
+            'устанавливает тип станции для группы станций'
+            for station_name in station_name_list:
+                blocks = self.get_all_blocks_by_station(station_name)
+                for block in blocks:
+                    block.group_options['station_type'] = station_type
+                
+
+ 
+        def set_heat_water_groupname_all_stations(self, hw_group_name):
+            hw_all_blocks = self.get_all_heat_water_blocks()
+            for block in hw_all_blocks:
+                block.group_options['heat_demand_type'] = hw_group_name
+ 
+        def set_steam_groupname_all_stations(self, steam_group_name):
+            hw_all_blocks = self.get_all_steam_blocks()
+            for block in hw_all_blocks:
+                block.group_options['heat_demand_type'] = steam_group_name
+            
+        
+        
+        
+        
+        
+        def get_all_blocks_by_station(self, station_name):
+            'получить все блоки все видов для указанной станции'
+            res = []
+            blocks_data = self.active_stations_data[station_name]
+            for block_type, data in blocks_data:
+                if isinstance(data, list):
+                   res.append(*data)
+                elif data:
+                    res.append(data)
+            return res
+        
+        
+        def get_all_el_blocks(self):
+            'получить все блоки(электроэнергия) все станции '
+            res = []
+            for station_name, _ in self.active_stations_data:
+                res += self.get_el_blocks_by_station(station_name)
+                
+                
+        def get_all_blocks(self):
+            'получить все блоки всех видов со всех станций'
+            res = []
+            for station_name, _ in self.active_stations_data:
+                  res += self.get_all_blocks_by_station(station_name)
+            return res
+           
+   
+        def get_el_blocks_by_station(self, station_name):
+            'получить все блоки(электроэнергия) для указанной станции'
+            return self.active_stations_data[station_name]['э-источники']
+      
+        def get_heat_water_blocks_by_station(self, station_name):
+            'получить все блоки(гвс) для указанной станции'
+            res = []
+            hw_blocks_dict = self.active_stations_data[station_name]['гвс-источники']
+            for part, data in hw_blocks_dict:
+                if isinstance(data, list):
+                   res.append(*data)
+                elif data:
+                    res.append(data)
+            return res
+               
+              
+        def get_steam_blocks_by_station(self, station_name):
+            'получить все блоки(пар) для указанной станции'
+            res = []
+            hw_blocks_dict = self.active_stations_data[station_name]['пар-источники']
+            for part, data in hw_blocks_dict:
+                if isinstance(data, list):
+                   res.append(*data)
+                elif data:
+                    res.append(data)
+            return res
+                
+        
+        def get_all_heat_water_blocks(self):
+            res = []
+            for station_name, _ in self.active_stations_data:
+                res += self.get_heat_water_blocks_by_station(station_name)
+            return res
+                
+        
+        def get_all_steam_blocks(self):
+            res = []
+            for station_name, _ in self.active_stations_data:
+                res += self.get_steam_blocks_by_station(station_name)
+            return res
+
+        def get_blocks_by_station_type(self, station_type):
+            res = []
+            all_blocks = self.get_all_blocks()
+            for block in all_blocks:
+                if block.group_options['station_type'] == station_type:
+                   res.append(block) 
+            return res
+        
+        
+        def get_blocks_by_block_type(self, block_type):
+            res = []
+            all_blocks = self.get_all_blocks()
+            for block in all_blocks:
+                if block.group_options['block_type'] == block_type:
+                   res.append(block) 
+            return res
+              
+
+                
+        def set_station_order(self, order_list):
+            'устанавливает порядок отображения отдельных станции'
+            order_dict = { station_name: order for order,station_name in enumerate(order_list) }
+            for station_name, order in order_dict:
+                station_blocks = self.get_all_blocks_by_station(station_name)
+                for block in station_blocks:
+                    block.group_options['station_order'] = order
+        
+        
+        def set_station_type_order(self, station_type_order_list):
+            'устанавливает порядок отображения типов станций'
+            order_dict = { station_type: order for order,station_type in enumerate(station_type_order_list) }
+            for station_type, order in order_dict:
+               station_blocks = self.get_blocks_by_station_type(station_type)
+            for block in station_blocks:
+               block.group_options['station_order'] = order
+
+
+        def set_block_type_order(self, block_order_list):
+            'устанавливает порядок отображения типов блоков'
+            order_dict = { block_type: order for order,block_type in enumerate(block_order_list) }
+            for block_type, order in order_dict:
+               block_by_type = self.get_blocks_by_block_type(block_type)
+            for block in block_by_type:
+               block.group_options['block_order'] = order
+
+
+
+
+
+
+        def add_Minskay_tec_4(self, heat_water_demand_data, steam_demand_data = None):
             station_name = 'Минская ТЭЦ-4'
             ###############################################################
             create_buses = self.bus_creator.create_buses
@@ -70,11 +211,14 @@ class Specific_stations:
             # ПТ-60-130/13    # Т-110/120-130   # Т-110/120-130
             # Т-250/300-240-2 # Т-250/300-240-2 # Т-255/305-240-5
             # эк - 137 гкал/ч  пвк - нет
+            # group_options = {'station_order': 0, 'station_type': 'ТЭЦ' }
+            ###############################################################
+            # плановые остановки могут определеться здесь
             ###############################################################
             pt_t_60 = block_creator.get_pt_60_t(next(), station_name, hw_bus)
             t_250_1 = block_creator.get_t_250(next(), station_name, hw_bus)
             t_250_2 = block_creator.get_t_250(next(), station_name, hw_bus)
-            t_255_1 = block_creator.get_t_255 (next(), station_name, hw_bus)
+            t_255_1 = block_creator.get_t_250 (next(), station_name, hw_bus)
             t_110_1 = block_creator.get_t_110 (next(), station_name, hw_bus)
             t_110_2 = block_creator.get_t_110 (next(), station_name, hw_bus)
             el_boilers_hw = block_creator.get_el_boilers(next(), station_name, 1.163 * 137.6, hw_bus, 'гвс' , 0)
@@ -104,20 +248,24 @@ class Specific_stations:
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
-                'э-тэц-источник': el_turb,
-                'гвс-тэц-источник': hw_chp_turb,
-                'гвс-кот-источник': hw_gas_boilers,
-                'гвс-эк-источник': hw_el_boilers,
-                'пар-тэц-источник': steam_chp_turb,
-                'пар-кот-источник': steam_gas_boilers,
-                'пар-эк-источник': steam_el_boilers,
+                'э-источники': el_turb,
+                'гвс-источники': {
+                    'гвс-тэц-источник': hw_chp_turb,
+                    'гвс-кот-источник': hw_gas_boilers,
+                    'гвс-эк-источник': hw_el_boilers
+                    },
+                'пар-источники': {
+                    'пар-тэц-источник': steam_chp_turb,
+                    'пар-кот-источник': steam_gas_boilers,
+                    'пар-эк-источник': steam_el_boilers,
+                },
                 'гвс-поток': hw_bus, 
                 'пар-поток': steam_bus,
                 'гвс-потребитель': hw_sink,
                 'пар-потребитель': steam_sink
-                }  
-        
-        def add_Novopockay_tec(self, heat_water_demand_data,steam_demand_data = None, planning_outage = None):
+                } 
+            
+        def add_Novopockay_tec(self, heat_water_demand_data, steam_demand_data = None):
             station_name = 'Новополоцкая ТЭЦ'
             ###############################################################
             create_buses = self.bus_creator.create_buses
@@ -165,21 +313,27 @@ class Specific_stations:
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
-                'э-тэц-источник': el_turb,
-                'гвс-тэц-источник': hw_chp_turb,
-                'гвс-кот-источник': hw_gas_boilers,
-                'гвс-эк-источник': hw_el_boilers,
-                'пар-тэц-источник': steam_chp_turb,
-                'пар-кот-источник': steam_gas_boilers,
-                'пар-эк-источник': steam_el_boilers,
+                'э-источники': el_turb,
+                'гвс-источники': {
+                    'гвс-тэц-источник': hw_chp_turb,
+                    'гвс-кот-источник': hw_gas_boilers,
+                    'гвс-эк-источник': hw_el_boilers
+                    },
+                'пар-источники': {
+                    'пар-тэц-источник': steam_chp_turb,
+                    'пар-кот-источник': steam_gas_boilers,
+                    'пар-эк-источник': steam_el_boilers,
+                },
                 'гвс-поток': hw_bus, 
                 'пар-поток': steam_bus,
                 'гвс-потребитель': hw_sink,
                 'пар-потребитель': steam_sink
                 } 
-        def add_Lukomolskay_gres(self, station_type, heat_water_demand_data = None, planning_outage = None,
-                                 plot_options = {'station_order': 1, 'block_type_order': ['пгу-кэс','к','эк','кот']}):
+            
+            
+        def add_Lukomolskay_gres(self, station_type, heat_water_demand_data = None):
             station_name = 'Лукомольская ГРЭС'
+            plot_options =  {'station_order': 1, 'block_type_order': ['пгу-кэс','к','эк','кот']}
             ###############################################################
             create_buses = self.bus_creator.create_buses
             block_creator = self.block_creator
@@ -236,22 +390,27 @@ class Specific_stations:
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
-                'э-тэц-источник': el_turb,
-                'гвс-тэц-источник': hw_chp_turb,
-                'гвс-кот-источник': hw_gas_boilers,
-                'гвс-эк-источник': hw_el_boilers,
-                'пар-тэц-источник': steam_chp_turb,
-                'пар-кот-источник': steam_gas_boilers,
-                'пар-эк-источник': steam_el_boilers,
+                'э-источники': el_turb,
+                'гвс-источники': {
+                    'гвс-тэц-источник': hw_chp_turb,
+                    'гвс-кот-источник': hw_gas_boilers,
+                    'гвс-эк-источник': hw_el_boilers
+                    },
+                'пар-источники': {
+                    'пар-тэц-источник': steam_chp_turb,
+                    'пар-кот-источник': steam_gas_boilers,
+                    'пар-эк-источник': steam_el_boilers,
+                },
                 'гвс-поток': hw_bus, 
                 'пар-поток': steam_bus,
                 'гвс-потребитель': hw_sink,
                 'пар-потребитель': steam_sink
-                }  
+                } 
+            
             
             
 
-        def add_Bel_npp(self,planning_outage = None):
+        def add_Bel_npp(self):
             station_name = 'Белорусская АЭС'
             ###############################################################
             create_buses = self.bus_creator.create_buses
@@ -286,18 +445,23 @@ class Specific_stations:
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
-                'э-тэц-источник': el_turb,
-                'гвс-тэц-источник': hw_chp_turb,
-                'гвс-кот-источник': hw_gas_boilers,
-                'гвс-эк-источник': hw_el_boilers,
-                'пар-тэц-источник': steam_chp_turb,
-                'пар-кот-источник': steam_gas_boilers,
-                'пар-эк-источник': steam_el_boilers,
+                'э-источники': el_turb,
+                'гвс-источники': {
+                    'гвс-тэц-источник': hw_chp_turb,
+                    'гвс-кот-источник': hw_gas_boilers,
+                    'гвс-эк-источник': hw_el_boilers
+                    },
+                'пар-источники': {
+                    'пар-тэц-источник': steam_chp_turb,
+                    'пар-кот-источник': steam_gas_boilers,
+                    'пар-эк-источник': steam_el_boilers,
+                },
                 'гвс-поток': hw_bus, 
                 'пар-поток': steam_bus,
                 'гвс-потребитель': hw_sink,
                 'пар-потребитель': steam_sink
-                }  
+                } 
+            
                      
 
 

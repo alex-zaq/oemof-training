@@ -1,15 +1,22 @@
 import sys
-sys.path.insert(0, './modules')
+sys.path.insert(0, './')
 from collections import namedtuple
-from wrapper_excel_operations import *
+from custom_modules.helpers import *
+# from wrapper_excel_operations import *
 # group_options = namedtuple("group_options", "station_name turb_name")
 
 
-def set_group(*items, separator = '_'):
-  return separator.join(items)
+a = Custom_counter()
+
+# a.popod = 'fsdaf'
+
+print(a.popod)
+
+# def set_group(*items, separator = '_'):
+#   return separator.join(items)
 
 
-print(set_group('aad', 'sasdf'))
+# print(set_group('aad', 'sasdf'))
 
 
 # g = group_options("минская тэц-4","Т-250")

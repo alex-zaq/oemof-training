@@ -30,7 +30,7 @@ class Specific_blocks:
                                'гту':'гту','гту-тэц':'гту-тэц', 'эк':'эк',
                                'кот':'кот', 'ввэр':'ввэр', 'ммр':'ммр',
                                'виэ-солнце':'виэ-солнце','виэ-вода':'виэ-вода',
-                               'виэ-ветер':'виэ-ветер'
+                               'виэ-ветер':'виэ-ветер', 'фейк':'фейк', 'ресурс':'ресурс'
                                }
 
 
@@ -65,7 +65,7 @@ class Specific_blocks:
             'nominal_value': nominal_value
             })
             
-        def get_gas_boilers(self, index, station_name, nominal_value, output_flow, variable_costs, group_options):
+        def get_gas_boilers(self, index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
             block_type = self.block_type['кот']
             return self.g_block_creator.create_simple_transformer(
             nominal_value = nominal_value,
@@ -320,7 +320,7 @@ class Specific_blocks:
                 heat_to_el_T = 1.6767,
                 efficiency_full_condensing_mode = 0.41,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -549,7 +549,7 @@ class Specific_blocks:
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
-                boiler_efficiency = 1, 
+                boiler_efficiency = 0.9, 
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -576,7 +576,7 @@ class Specific_blocks:
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -603,14 +603,12 @@ class Specific_blocks:
                 output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
-                nominal_input_P = 300,
-                nominal_input_t = 150,
                 efficiency_P = 0.91,
                 efficiency_T = 0.91,
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -633,11 +631,10 @@ class Specific_blocks:
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
-                nominal_input_P = 300,
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -660,11 +657,10 @@ class Specific_blocks:
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
-                nominal_input_T = 200,
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -690,14 +686,12 @@ class Specific_blocks:
                 output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
-                nominal_input_P = 300,
-                nominal_input_t = 150,
                 efficiency_P = 0.91,
                 efficiency_T = 0.91,
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -720,11 +714,10 @@ class Specific_blocks:
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
-                nominal_input_P = 300,
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -747,11 +740,10 @@ class Specific_blocks:
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
-                nominal_input_T = 200,
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -777,14 +769,12 @@ class Specific_blocks:
                 output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
                 output_flow_T = output_flow_T,
-                nominal_input_P = 300,
-                nominal_input_t = 150,
                 efficiency_P = 0.91,
                 efficiency_T = 0.91,
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -807,11 +797,10 @@ class Specific_blocks:
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_P = output_flow_P,
-                nominal_input_P = 300,
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -834,11 +823,10 @@ class Specific_blocks:
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
                 output_flow_T = output_flow_T,
-                nominal_input_T = 200,
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
-                boiler_efficiency = 1,
+                boiler_efficiency = 0.9,
                 group_options = {
                 'index': str(index),
                 'station_name': station_name,
@@ -864,7 +852,7 @@ class Specific_blocks:
             efficiency_P = 0.91,
             heat_to_el_P = 3.8,
             variable_costs = 0,
-            boiler_efficiency = 1,
+            boiler_efficiency = 0.9,
             group_options = {
             'index': str(index),
             'station_name': station_name,
@@ -971,29 +959,57 @@ class Specific_blocks:
             } 
             )
 
+        def get_natural_gas_source(self, label, usd_per_1000_m3):
+            return self.g_source_creator.create_resource(
+                label = label,
+                output_flow = self.global_natural_gas_flow,
+                variable_costs= set_natural_gas_price(usd_per_1000_m3),
+            )
 
 
-
-
-        # def get_dummy_source(self, index, station_name, label ,output_flow, variable_costs = 9999):
-        #     return self.g_source_creator.create_source(
-        #             label=set_label(station_name ,'Dummy', label, str(index)),
-        #             output_flow=output_flow,
-        #             variable_costs = variable_costs,
-        #             group_options = {
-        #             'index': index,
-        #             'station_name': station_name,
-        #             'station_type': None,
-        #             'block': 'ПТ-60_П',
-        #             'block_type': block_type,
-        #             'heat_demand_type_hw': None,
-        #             'heat_demand_type_steam': None,
-        #             'station_order': None,
-        #             'block_order': None,
-        #             'nominal_value': None   
-        #     })
-            
         
+        def get_electricity_source(self, index, nominal_value, station_name, usd_per_Mwth):
+            block_type =self.block_type['фейк']
+            return self.g_source_creator.create_source(
+                nominal_value = nominal_value,
+                output_flow = self.global_el_flow,
+                variable_costs= usd_per_Mwth,
+                group_options = {
+                    'index': str(index),
+                    'station_name': station_name,
+                    'station_type': None,
+                    'block_name': 'источник_электроэнергии',
+                    'block_type': block_type,
+                    'heat_demand_type_hw': None,
+                    'heat_demand_type_steam': None,
+                    'station_order': None,
+                    'block_order': None,
+                    'nominal_value': nominal_value   
+                }
+            )
+
+
+        
+
+        def get_custom_dummy_source(self, index, station_name, block_name, output_flow, variable_costs):
+            block_type = self.block_type['фейк']
+            return self.g_source_creator.create_source(
+                    output_flow=output_flow,
+                    variable_costs = variable_costs,
+                    group_options = {
+                    'index': str(index),
+                    'station_name': station_name,
+                    'station_type': None,
+                    'block_name': block_name,
+                    'block_type': block_type,
+                    'heat_demand_type_hw': None,
+                    'heat_demand_type_steam': None,
+                    'station_order': None,
+                    'block_order': None,
+                    'nominal_value': None   
+                } )
+                
+            
         
 
    

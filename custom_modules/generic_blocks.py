@@ -266,7 +266,9 @@ class Generic_blocks:
             # print(hw_eff/el_eff)
             efficiency_full_condensing_mode = efficiency_full_condensing_mode - efficiency_full_condensing_mode * (1- boiler_efficiency)
             # print(efficiency_full_condensing_mode)
-            nominal_input_T = max_el_value/efficiency_full_condensing_mode
+            print((nominal_el_value + nominal_el_value * heat_to_el_T) / (el_eff + hw_eff))
+            # nominal_input_T = max_el_value/efficiency_full_condensing_mode
+            nominal_input_T = (nominal_el_value + nominal_el_value * heat_to_el_T) / (el_eff + hw_eff)
             # print(nominal_input_T)
                        
             p = nominal_el_value * min_power_fraction
@@ -314,24 +316,7 @@ class Generic_blocks:
                  self.block_collection.append(tr)
             return tr
 
-        # def create_ccgt(
-        #     self,
-        #     index,
-        #     station_name,
-        #     block_name,
-        #     nominal_el_value,
-        #     max_el_value,
-        #     min_power_fraction,
-        #     input_flow,
-        #     output_flow_el,
-        #     output_flow_T,
-        #     nominal_input_T,
-        #     efficiency_T,
-        #     heat_to_el_T,
-        #     efficiency_full_condensing_mode,
-        #     variable_costs = 0,
-        #     boiler_efficiency = 1
-        # ):
+ 
         
 
         
@@ -358,12 +343,26 @@ class Generic_sources:
             self.block_collection = block_collection
             self.es = es
         
-        def create_source(self, label, output_flow, variable_costs):
-            source = solph.components.Source(label=label, outputs = {output_flow: solph.Flow(variable_costs = variable_costs)} )
+        def create_source(self, nominal_value, output_flow, variable_costs, group_options):
+            source = solph.components.Source(
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']), 
+            outputs = {output_flow: solph.Flow(nominal_value=nominal_value,  variable_costs = variable_costs)} 
+            )
+            source.group_options = group_options
             self.es.add(source)
             if isinstance(self.block_collection, list):
                  self.block_collection.append(source)
             return source
+
+        def create_resource(self, label, output_flow, variable_costs):
+            source = solph.components.Source(
+            label= label, 
+            outputs = {output_flow: solph.Flow(variable_costs = variable_costs)} )
+            self.es.add(source)
+            if isinstance(self.block_collection, list):
+                 self.block_collection.append(source)
+            return source
+            
 
       
       

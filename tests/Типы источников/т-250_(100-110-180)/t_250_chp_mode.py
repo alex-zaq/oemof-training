@@ -12,7 +12,7 @@ from custom_modules.specific_stations import Specific_stations
 from custom_modules.specific_blocks import Specific_blocks
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, Custom_counter
-from custom_modules.plot import get_dataframe_by_output_bus, get_dataframe_by_input_bus
+from custom_modules.plot import get_dataframe_by_output_bus_all, get_dataframe_by_input_bus_all
 
 # template
 ##########################################################################################################
@@ -74,14 +74,14 @@ model.solve(solver="cplex")
 results = solph.processing.results(model)
 
 # сделать метод извлечения для определенного источника и потока
-df_el = get_dataframe_by_output_bus(results, block_collection, el_bus)
+df_el = get_dataframe_by_output_bus_all(results, block_collection, el_bus)
 
 df_el = df_el.loc[:, (df_el > 0.1).any(axis=0)]
 df_el = df_el[df_el>0]
 print(df_el)
-df_hw = get_dataframe_by_output_bus(results, block_collection, hw_bus)
+df_hw = get_dataframe_by_output_bus_all(results, block_collection, hw_bus)
 print(df_hw)
-df_gas = get_dataframe_by_input_bus(results, block_collection, gas_bus)
+df_gas = get_dataframe_by_input_bus_all(results, block_collection, gas_bus)
 print(df_gas)
 df_eff = (df_el+df_hw) / df_gas
 print(df_eff)

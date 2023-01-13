@@ -32,33 +32,141 @@ current_start_date = data_time_options['selected_interval']['start_date']
 date_time_index = pd.date_range(current_start_date, periods=number_of_time_steps, freq="H")
 es = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= False)
 
-excel_reader_power = get_excel_reader(folder ='./data_excel', file = 'power_by_year_2020.xlsx' )
-excel_reader_heat = get_excel_reader(folder ='./data_excel', file = 'heat_data_by_year_2020.xlsx' )
+# excel_reader_power = get_excel_reader(folder ='./data_excel', file = 'power_by_year_2020.xlsx' )
+# excel_reader_heat = get_excel_reader(folder ='./data_excel', file = 'heat_data_by_year_2020.xlsx' )
 
-power_loads_by_hour_sheet = excel_reader_power('электроэнергия 2020')
-heat_water_loads_by_hour_sheet = excel_reader_heat('гвс 2020')
-steam_loads_by_hour_sheet = excel_reader_heat('пар 2020')
+# power_loads_by_hour_sheet = excel_reader_power('электроэнергия 2020')
+# heat_water_loads_by_hour_sheet = excel_reader_heat('гвс 2020')
+# steam_loads_by_hour_sheet = excel_reader_heat('пар 2020')
 
-power_selected_info = get_time_slice(power_loads_by_hour_sheet, data_time_options['selected_interval'])[['date','day-type-name','power-abs']]
-hw_selected_info = get_time_slice(heat_water_loads_by_hour_sheet, data_time_options['selected_interval'])[['date','day-type-name', 'Минская ТЭЦ-4', 'Новополоцкая ТЭЦ']]
-steam_selected_info = get_time_slice(steam_loads_by_hour_sheet, data_time_options['selected_interval'])[['date','day-type-name', 'Минская ТЭЦ-4', 'Новополоцкая ТЭЦ']]
+# power_selected_info = get_time_slice(power_loads_by_hour_sheet, data_time_options['selected_interval'])[['date','day-type-name','power-abs']]
+# hw_selected_info = get_time_slice(heat_water_loads_by_hour_sheet, data_time_options['selected_interval'])[['date','day-type-name', 'Минская ТЭЦ-4', 'Новополоцкая ТЭЦ']]
+# steam_selected_info = get_time_slice(steam_loads_by_hour_sheet, data_time_options['selected_interval'])[['date','day-type-name', 'Минская ТЭЦ-4', 'Новополоцкая ТЭЦ']]
 
-power_loads = power_selected_info['power-abs']
-hw_minskay_tec_4 = hw_selected_info['Минская ТЭЦ-4']
-hw_novopolockay_tec, steam_novopolockay_tec = hw_selected_info['Новополоцкая ТЭЦ'], steam_selected_info['Новополоцкая ТЭЦ']
+# power_loads = power_selected_info['power-abs']
+# hw_minskay_tec_4 = hw_selected_info['Минская ТЭЦ-4']
+# hw_novopolockay_tec, steam_novopolockay_tec = hw_selected_info['Новополоцкая ТЭЦ'], steam_selected_info['Новополоцкая ТЭЦ']
 
+
+power_loads = 5000
+hw_minskay_tec_4 = 5000
+hw_novopolockay_tec, steam_novopolockay_tec = 5000, 5000
 
 [el_bus, gas_bus] = Generic_buses(es).create_buses('электричество_поток','природный_газ_поток')
-
-gas_source = Generic_sources(es).create_source('природный_газ_источник', gas_bus, 0)
 el_sink = Generic_sinks(es).create_sink_absolute_demand('электричество_потребитель', el_bus, demand_absolute_data = power_loads)
 
-es_creator = Specific_stations(es, gas_bus, el_bus)
 
-es_creator.add_Bel_npp()
-es_creator.add_Lukomolskay_gres()
-es_creator.add_Minskay_tec_4(heat_water_demand_data = hw_minskay_tec_4)
-es_creator.add_Novopockay_tec(heat_water_demand_data = hw_novopolockay_tec, steam_demand_data = steam_novopolockay_tec)
+custom_es = Specific_stations(es, gas_bus, el_bus)
+
+custom_es.add_natural_gas_source(usd_per_1000_m3 = 200)
+
+bel_npp = custom_es.add_Bel_npp()
+minskay_tec_4 = custom_es.add_Minskay_tec_4(heat_water_demand_data = hw_minskay_tec_4)
+novopockay_tec = custom_es.add_Novopockay_tec(heat_water_demand_data = hw_novopolockay_tec, steam_demand_data = steam_novopolockay_tec)
+lukomolskay_gres= custom_es.add_Lukomolskay_gres()
+fake_el_source = custom_es.add_electricity_source(10000, usd_per_Mwth = 9999)
+
+#########################################################
+# Отображение 1 - по блокам в пределах станции
+#########################################################
+custom_es.set_block_type_in_station_order({
+    bel_npp: ['ввэр'],
+    minskay_tec_4: ['пт','т','эк','кот'],
+    novopockay_tec: ['р','пт', 'кот'],
+    lukomolskay_gres: ['пгу-кэс','к'],
+    fake_el_source: ['фейк']
+})
+
+#########################################################
+# Отображение 2 - показ по блокам в пределах типа станции
+#########################################################
+custom_es.set_station_type({
+    'аэс':[bel_npp],
+    'тэц':[minskay_tec_4, novopockay_tec],
+    'кэс':[lukomolskay_gres],
+    'фейки': [fake_el_source]
+})
+
+custom_es.set_block_type_in_station_type_order({
+    'аэс': ['ввэр'],
+    'тэц': ['р','пт','т', 'эк', 'кот'],
+    'кэс': ['пгу-кэс','к'],
+    'фейки': ['фейк'],
+})
+block_list = custom_es.get_all_blocks()
+#########################################################
+# Отображение 3 - показ по станциям
+#########################################################
+# нужно объединить в фрейме
+custom_es.set_station_order([
+    bel_npp,
+    minskay_tec_4,
+    novopockay_tec,
+    lukomolskay_gres,
+    fake_el_source
+])
+#########################################################
+# Отображение 4 - показ по типам станций
+#########################################################
+# добавить приоритет, нужно объединить в фрейме
+custom_es.set_station_type({
+    'аэс':[bel_npp],
+    'тэц':[minskay_tec_4, novopockay_tec],
+    'кэс':[lukomolskay_gres],
+    'фейки': [fake_el_source]
+})
+#########################################################
+# Отображение 5 - по типам блоков в пределах станций
+#########################################################
+custom_es.set_station_order([
+    bel_npp,
+    minskay_tec_4,
+    novopockay_tec,
+    lukomolskay_gres,
+    fake_el_source
+])
+
+# объединить в фрейме
+custom_es.set_block_type_in_station_order({
+    bel_npp: ['ввэр'],
+    minskay_tec_4: ['пт','т','эк','кот'],
+    novopockay_tec: ['р','пт', 'кот'],
+    lukomolskay_gres: ['пгу-кэс','к'],
+    fake_el_source: ['фейк']
+})
+
+#########################################################
+# Отображение 5 - по типам блоков в пределах типов станций
+#########################################################
+custom_es.set_station_type({
+    'аэс':[bel_npp],
+    'тэц':[minskay_tec_4, novopockay_tec],
+    'кэс':[lukomolskay_gres],
+    'фейки': [fake_el_source]
+})
+# объединить в фрейме
+custom_es.set_station_type({
+    'аэс':['ввэр'],
+    'тэц':['р','пт','т','эк','кот'],
+    'кэс':['пгу-кэс','к'],
+    'фейки': ['фейк']
+})
+#########################################################
+ 
+
+block_list = custom_es.get_all_blocks()
+print('')
+
+# custom_es.set_station_order(
+#     bel_npp,
+#     novopockay_tec,
+#     minskay_tec_4,
+    
+    
+# )
+
+
+
 
 # турбины для проверки
 # к-315

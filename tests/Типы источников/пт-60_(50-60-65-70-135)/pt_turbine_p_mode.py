@@ -58,15 +58,16 @@ counter = Custom_counter()
 station_name = 'Тестовая станция'
 block_creator = Specific_blocks(es, gas_bus, el_bus, [])
 
-# dummy_source = block_creator.get_dummy_source(counter.next(), station_name, 'электричество_источик', el_bus, 9999)
-# dummy_source = block_creator.get_dummy_source(counter.next(), station_name, 'гвс_источик', hw_bus, 9999)
-dummy_source_steam = block_creator.get_dummy_source(counter.next(), station_name, 'пар_источик', steam_bus, 9999)
-[pt_60_el, pt_60_p, pt_60_t] = block_creator.get_pt_60(counter.next(), station_name, steam_bus ,hw_bus)
+dummy_source_steam = block_creator.get_gas_boilers(counter.next(), station_name, 10_000, steam_bus, 9999)
+
+[pt_60_el, pt_60_p, pt_60_t] = block_creator.get_pt_60(counter.next(), station_name, steam_bus, hw_bus)
+# [pt_60_el, pt_60_p, pt_60_t] = block_creator.get_pt_135(counter.next(), station_name, steam_bus, hw_bus)
+
 
 
 block_collection = block_creator.get_block_collection()
 block_collection.append(gas_source)
-# block_collection.remove(dummy_source)
+
 
 model = solph.Model(es)
 model.solve(solver="cplex")

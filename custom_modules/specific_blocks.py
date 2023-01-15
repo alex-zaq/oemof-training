@@ -45,7 +45,7 @@ class Specific_blocks:
                     'station_type': 'нет типа станции'
             }
    
-        def get_el_boilers(self, index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
+        def get_el_hw_boilers(self, global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
             block_type = self.block_type['эк']
             return self.g_block_creator.create_simple_transformer(
             nominal_value = nominal_value,
@@ -54,18 +54,44 @@ class Specific_blocks:
             efficiency = 0.99,
             variable_costs = variable_costs,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': block_type,
             'block_type': block_type,
             'heat_demand_type': None,
+            'heat_water_bus_ref': output_flow,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': nominal_value
+            })
+                       
+               
+        def get_el_steam_boilers(self, global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
+            block_type = self.block_type['эк']
+            return self.g_block_creator.create_simple_transformer(
+            nominal_value = nominal_value,
+            input_flow = self.global_el_flow,
+            output_flow = output_flow,
+            efficiency = 0.99,
+            variable_costs = variable_costs,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': block_type,
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'steam_bus_ref': output_flow,
             'station_order': None,
             'block_order': None,
             'nominal_value': nominal_value
             })
             
-        def get_gas_boilers(self, index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
+            
+        def get_gas_hw_boilers(self,global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
             block_type = self.block_type['кот']
             return self.g_block_creator.create_simple_transformer(
             nominal_value = nominal_value,
@@ -74,7 +100,8 @@ class Specific_blocks:
             efficiency = 0.90,
             variable_costs = variable_costs,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': block_type,
@@ -87,7 +114,7 @@ class Specific_blocks:
             )
             
             
-        def get_ocgt_120(self, index,station_name, group_options = None, planning_outage = None):
+        def get_ocgt_120(self,global_index, local_index,station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['гту']
             return self.g_block_creator.create_offset_transformer(
             nominal_value = 120,
@@ -99,7 +126,8 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,  
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': 'ГТУ-120',
@@ -112,7 +140,7 @@ class Specific_blocks:
             
             
             
-        def get_k_160(self, index, station_name, group_options = None, planning_outage = None):
+        def get_k_160(self,global_index, local_index, station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 160,
@@ -124,7 +152,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'К-160',
@@ -137,7 +166,7 @@ class Specific_blocks:
             )
             
             
-        def get_k_175(self, index,station_name, group_options = None, planning_outage = None):
+        def get_k_175(self,global_index, local_index,station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 175,
@@ -149,7 +178,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'К-175',
@@ -160,7 +190,7 @@ class Specific_blocks:
                 'nominal_value': 175   
                 }   
             )
-        def get_k_300(self, index, station_name, group_options = None, planning_outage = None):
+        def get_k_300(self,global_index, local_index, station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 300,
@@ -172,7 +202,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'К-300',
@@ -184,7 +215,7 @@ class Specific_blocks:
                 }    
             )
                
-        def get_k_310(self, index,station_name, group_options = None, planning_outage = None):
+        def get_k_310(self,global_index, local_index,station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 310,
@@ -196,7 +227,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'К-310',
@@ -208,7 +240,7 @@ class Specific_blocks:
                 }      
             )
                         #  минимум?  
-        def get_k_315(self, index, station_name, group_options = None, planning_outage = None):
+        def get_k_315(self,global_index, local_index, station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 315,
@@ -220,7 +252,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'К-315',
@@ -234,7 +267,7 @@ class Specific_blocks:
                        
             
             
-        def get_ccgt_399(self, index, station_name,  group_options = None, planning_outage = None):
+        def get_ccgt_399(self,global_index, local_index, station_name,  group_options = None, planning_outage = None):
             block_type = self.block_type['пгу-кэс']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 399,
@@ -246,7 +279,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПГУ-399',
@@ -257,7 +291,7 @@ class Specific_blocks:
                 'nominal_value': 399   
                 }    
             )
-        def get_ccgt_427(self, index, station_name,  group_options = None, planning_outage = None):
+        def get_ccgt_427(self,global_index, local_index, station_name,  group_options = None, planning_outage = None):
             block_type = self.block_type['пгу-кэс']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 427,
@@ -269,7 +303,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 1,  
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПГУ-427',
@@ -302,11 +337,11 @@ class Specific_blocks:
                 
         #     )
             
-        def get_ocgt_chp_121(self, index, station_name, output_flow_T, output_flow_P, planning_outage = None):
+        def get_ocgt_chp_121(self,global_index, local_index, station_name, output_flow_T, output_flow_P, planning_outage = None):
             pass
 
             
-        def get_t_250(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
+        def get_t_250(self,global_index, local_index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['т']
             return self.g_block_creator.create_chp_T_turbine(
                 nominal_el_value = 250,
@@ -322,7 +357,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'Т-250',
@@ -335,7 +371,7 @@ class Specific_blocks:
                 
             )
             
-        def get_t_180(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
+        def get_t_180(self,global_index, local_index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['т']
             return self.g_block_creator.create_chp_T_turbine(
             nominal_el_value = 180,
@@ -350,7 +386,8 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 0.9,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': 'Т-180',
@@ -363,7 +400,7 @@ class Specific_blocks:
             ) 
                         
             
-        def get_t_110(self, index, station_name, output_flow_T, group_options = None, planning_outage = None):
+        def get_t_110(self,global_index, local_index, station_name, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['т']
             return self.g_block_creator.create_chp_T_turbine(
                 nominal_el_value = 110,
@@ -379,7 +416,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),~
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'Т-110',
@@ -392,10 +430,10 @@ class Specific_blocks:
             )
    
                        
-        def get_t_100(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
+        def get_t_100(self,global_index, local_index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['т']
             return self.g_block_creator.create_chp_T_turbine(
-            index = index,
+            index = local_index,
             station_name = station_name,
             block_name = 'Т-100',
             nominal_el_value = 100,
@@ -410,7 +448,8 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': 'Т-110',
@@ -425,7 +464,7 @@ class Specific_blocks:
 ##################################################################################   
 # ПТ - 50
 ################################################################################## 
-        def get_pt_50(self, index, station_name, output_flow_P, output_flow_T,  group_options = None, planning_outage = None):
+        def get_pt_50(self,global_index, local_index, station_name, output_flow_P, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine(
             nominal_el_value = 50,
@@ -441,7 +480,8 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': 'ПТ-50',
@@ -454,7 +494,7 @@ class Specific_blocks:
             } 
             )     
                    
-        def get_pt_50_p(self, index, station_name, output_flow_P,  group_options = None, planning_outage = None):
+        def get_pt_50_p(self, global_index, local_index, station_name, output_flow_P,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_P_mode(
             nominal_el_value = 50,
@@ -468,7 +508,8 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': 'ПТ-50_П',
@@ -480,7 +521,7 @@ class Specific_blocks:
             } 
             )
 
-        def get_pt_50_t(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
+        def get_pt_50_t(self, global_index, local_index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
             nominal_el_value = 50,
@@ -494,7 +535,8 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 1,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': 'ПТ-50_Т',
@@ -508,7 +550,7 @@ class Specific_blocks:
 ##################################################################################   
 # ПТ - 60
 ##################################################################################   
-        def get_pt_60(self, index, station_name, output_flow_P, output_flow_T,  group_options = None, planning_outage = None):
+        def get_pt_60(self,global_index, local_index, station_name, output_flow_P, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine(
                 nominal_el_value = 60,
@@ -524,7 +566,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-60',
@@ -537,7 +580,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_60_p(self, index, station_name, output_flow_P, group_options = None, planning_outage = None):
+        def get_pt_60_p(self,global_index, local_index, station_name, output_flow_P, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_P_mode(
                 nominal_el_value = 60,
@@ -551,7 +594,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9, 
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-60_П',
@@ -564,7 +608,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_60_t(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
+        def get_pt_60_t(self,global_index, local_index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
                 nominal_el_value = 60,
@@ -578,7 +622,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-60_Т',
@@ -594,7 +639,7 @@ class Specific_blocks:
 ##################################################################################   
 # ПТ - 65
 ##################################################################################    
-        def get_pt_65(self, index, station_name, output_flow_P, output_flow_T, group_options = None, planning_outage = None):
+        def get_pt_65(self,global_index, local_index, station_name, output_flow_P, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine(
                 nominal_el_value = 65,
@@ -610,7 +655,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-65',
@@ -623,7 +669,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_65_p(self, index, station_name, output_flow_P, group_options = None, planning_outage = None):
+        def get_pt_65_p(self,global_index, local_index, station_name, output_flow_P, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_P_mode(
                 nominal_el_value = 65,
@@ -636,7 +682,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-65_П',
@@ -649,7 +696,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_65_t(self, index, station_name, output_flow_T, group_options = None, planning_outage = None):
+        def get_pt_65_t(self,global_index, local_index, station_name, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
                 nominal_el_value = 65,
@@ -662,7 +709,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-65_Т',
@@ -677,7 +725,7 @@ class Specific_blocks:
 ##################################################################################   
 # ПТ - 70
 ##################################################################################    
-        def get_pt_70(self, index, station_name, output_flow_P, output_flow_T, group_options = None, planning_outage = None):
+        def get_pt_70(self,global_index, local_index, station_name, output_flow_P, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine(
                 nominal_el_value = 70,
@@ -693,7 +741,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-70',
@@ -706,7 +755,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_70_p(self, index, station_name, output_flow_P,  group_options = None, planning_outage = None):
+        def get_pt_70_p(self,global_index, local_index, station_name, output_flow_P,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_P_mode(
                 nominal_el_value = 70,
@@ -719,7 +768,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-70_П',
@@ -732,7 +782,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_70_t(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
+        def get_pt_70_t(self,global_index, local_index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
                 nominal_el_value = 70,
@@ -745,7 +795,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-70_Т',
@@ -760,7 +811,7 @@ class Specific_blocks:
 ##################################################################################
 # ПТ - 135
 ##################################################################################   
-        def get_pt_135(self, index, station_name, output_flow_P, output_flow_T, group_options = None, planning_outage = None):
+        def get_pt_135(self,global_index, local_index, station_name, output_flow_P, output_flow_T, group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine(
                 nominal_el_value = 135,
@@ -776,7 +827,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-135',
@@ -789,7 +841,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_135_p(self, index, station_name, output_flow_P,  group_options = None, planning_outage = None):
+        def get_pt_135_p(self, global_index, local_index, station_name, output_flow_P,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_P_mode(
                 nominal_el_value = 135,
@@ -802,7 +854,8 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ПТ-135_П',
@@ -815,7 +868,7 @@ class Specific_blocks:
             } 
             )
    
-        def get_pt_135_t(self, index, station_name, output_flow_T,  group_options = None, planning_outage = None):
+        def get_pt_135_t(self, global_index, local_index, station_name, output_flow_T,  group_options = None, planning_outage = None):
             block_type = self.block_type['пт']
             return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
                 nominal_el_value = 135,
@@ -828,7 +881,7 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'index': str(index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block': 'ПТ-135_Т',
@@ -841,7 +894,7 @@ class Specific_blocks:
             })
             
             
-        def get_p_50(self, index, station_name, output_flow_P,  group_options = None, planning_outage = None):
+        def get_p_50(self, global_index, local_index, station_name, output_flow_P,  group_options = None, planning_outage = None):
             block_type = self.block_type['р']
             return self.g_block_creator.create_back_pressure_turbine(
             nominal_el_value = 50,
@@ -854,7 +907,8 @@ class Specific_blocks:
             variable_costs = 0,
             boiler_efficiency = 0.9,
             group_options = {
-            'index': str(index),
+            'global_index': str(global_index),
+            'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
             'block_name': 'Р-50',
@@ -869,7 +923,7 @@ class Specific_blocks:
  ##################################################################################
  # ВВЭР-1200
  ##################################################################################
-        def get_vver_1200(self, index, station_name, variable_costs,  group_options = None, planning_outage = None):
+        def get_vver_1200(self, global_index, local_index, station_name, variable_costs,  group_options = None, planning_outage = None):
             block_type = self.block_type['ввэр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 1170,
@@ -877,7 +931,8 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ВВЭР-1200',
@@ -892,7 +947,7 @@ class Specific_blocks:
 ##################################################################################
  # ВВЭР-ТОИ
  ##################################################################################
-        def get_vver_toi(self, index, station_name, variable_costs, group_options = None, planning_outage = None):
+        def get_vver_toi(self, global_index, local_index, station_name, variable_costs, group_options = None, planning_outage = None):
             block_type = self.block_type['ввэр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 1255,
@@ -900,7 +955,8 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ВВЭР-ТОИ',
@@ -915,7 +971,7 @@ class Specific_blocks:
  ##################################################################################
  # ВВЭР-600
  ##################################################################################
-        def get_vver_600(self, index, station_name, variable_costs,  group_options = None, planning_outage = None):
+        def get_vver_600(self, global_index, local_index, station_name, variable_costs,  group_options = None, planning_outage = None):
             block_type = self.block_type['ввэр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 600,
@@ -923,7 +979,8 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'ВВЭР-600',
@@ -938,7 +995,7 @@ class Specific_blocks:
  ##################################################################################
  # РИТМ-200
  ##################################################################################
-        def get_ritm_200(self, index, station_name, variable_costs,  group_options = None, planning_outage = None):
+        def get_ritm_200(self,global_index, local_index, station_name, variable_costs,  group_options = None, planning_outage = None):
             block_type = self.block_type['ммр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 50,
@@ -946,7 +1003,8 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 group_options = {
-                'index': str(index),
+                'global_index': str(global_index),
+                'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
                 'block_name': 'РИТМ-200',
@@ -968,36 +1026,38 @@ class Specific_blocks:
 
 
         
-        def get_electricity_source(self, index, nominal_value, station_name, usd_per_Mwth):
+        def get_electricity_source(self,global_index, local_index, nominal_value, station_name, usd_per_Mwth):
             block_type =self.block_type['фейк']
             return self.g_source_creator.create_source(
                 nominal_value = nominal_value,
                 output_flow = self.global_el_flow,
                 variable_costs= usd_per_Mwth,
                 group_options = {
-                    'index': str(index),
-                    'station_name': station_name,
-                    'station_type': None,
-                    'block_name': 'источник_электроэнергии',
-                    'block_type': block_type,
-                    'heat_demand_type_hw': None,
-                    'heat_demand_type_steam': None,
-                    'station_order': None,
-                    'block_order': None,
-                    'nominal_value': nominal_value   
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'источник_электроэнергии',
+                'block_type': block_type,
+                'heat_demand_type_hw': None,
+                'heat_demand_type_steam': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': nominal_value   
                 }
             )
 
 
         
 
-        def get_custom_dummy_source(self, index, station_name, block_name, output_flow, variable_costs):
+        def get_custom_dummy_source(self, global_index, local_index, station_name, block_name, output_flow, variable_costs):
             block_type = self.block_type['фейк']
             return self.g_source_creator.create_source(
                     output_flow=output_flow,
                     variable_costs = variable_costs,
                     group_options = {
-                    'index': str(index),
+                    'global_index': str(global_index),
+                    'local_index': str(local_index),
                     'station_name': station_name,
                     'station_type': None,
                     'block_name': block_name,

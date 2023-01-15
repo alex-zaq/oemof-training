@@ -67,7 +67,7 @@ lukomolskay_gres= custom_es.add_Lukomolskay_gres()
 fake_el_source = custom_es.add_electricity_source(10000, usd_per_Mwth = 9999)
 
 #########################################################
-# Отображение 1 - по блокам в пределах станции
+# Отображение 1 - по отдельным блокам в пределах станции - ок
 #########################################################
 custom_es.set_block_type_in_station_order({
     bel_npp: ['ввэр'],
@@ -76,87 +76,90 @@ custom_es.set_block_type_in_station_order({
     lukomolskay_gres: ['пгу-кэс','к'],
     fake_el_source: ['фейк']
 })
-
+block_list = custom_es.get_all_blocks()
 #########################################################
-# Отображение 2 - показ по блокам в пределах типа станции
+# Отображение 2 - показ по блокам в пределах типа станции - ок
 #########################################################
-custom_es.set_station_type({
+custom_es.set_station_type_with_order({
     'аэс':[bel_npp],
     'тэц':[minskay_tec_4, novopockay_tec],
     'кэс':[lukomolskay_gres],
     'фейки': [fake_el_source]
 })
 
-custom_es.set_block_type_in_station_type_order({
+custom_es.set_block_type_in_station_type({
     'аэс': ['ввэр'],
     'тэц': ['р','пт','т', 'эк', 'кот'],
     'кэс': ['пгу-кэс','к'],
     'фейки': ['фейк'],
 })
-block_list = custom_es.get_all_blocks()
-#########################################################
-# Отображение 3 - показ по станциям
-#########################################################
-# нужно объединить в фрейме
-custom_es.set_station_order([
-    bel_npp,
-    minskay_tec_4,
-    novopockay_tec,
-    lukomolskay_gres,
-    fake_el_source
-])
-#########################################################
-# Отображение 4 - показ по типам станций
-#########################################################
-# добавить приоритет, нужно объединить в фрейме
-custom_es.set_station_type({
-    'аэс':[bel_npp],
-    'тэц':[minskay_tec_4, novopockay_tec],
-    'кэс':[lukomolskay_gres],
-    'фейки': [fake_el_source]
-})
-#########################################################
-# Отображение 5 - по типам блоков в пределах станций
-#########################################################
-custom_es.set_station_order([
-    bel_npp,
-    minskay_tec_4,
-    novopockay_tec,
-    lukomolskay_gres,
-    fake_el_source
-])
 
-# объединить в фрейме
-custom_es.set_block_type_in_station_order({
-    bel_npp: ['ввэр'],
-    minskay_tec_4: ['пт','т','эк','кот'],
-    novopockay_tec: ['р','пт', 'кот'],
-    lukomolskay_gres: ['пгу-кэс','к'],
-    fake_el_source: ['фейк']
-})
-
-#########################################################
-# Отображение 5 - по типам блоков в пределах типов станций
-#########################################################
-custom_es.set_station_type({
-    'аэс':[bel_npp],
-    'тэц':[minskay_tec_4, novopockay_tec],
-    'кэс':[lukomolskay_gres],
-    'фейки': [fake_el_source]
-})
-# объединить в фрейме
-custom_es.set_station_type({
-    'аэс':['ввэр'],
-    'тэц':['р','пт','т','эк','кот'],
-    'кэс':['пгу-кэс','к'],
-    'фейки': ['фейк']
-})
-#########################################################
- 
 
 block_list = custom_es.get_all_blocks()
 print('')
+#########################################################
+# Отображение 3 - показ по станциям - ок
+#########################################################
+# нужно объединить в фрейме
+# custom_es.set_station_order([
+#     bel_npp,
+#     minskay_tec_4,
+#     novopockay_tec,
+#     lukomolskay_gres,
+#     fake_el_source
+# ])
+# block_list = custom_es.get_all_blocks()
+#########################################################
+# Отображение 4 - показ по типам станций - ок
+#########################################################
+# добавить приоритет, нужно объединить в фрейме
+# custom_es.set_station_type_with_order({
+#     'аэс':[bel_npp],
+#     'тэц':[minskay_tec_4, novopockay_tec],
+#     'кэс':[lukomolskay_gres],
+#     'фейки': [fake_el_source]
+# })
+# block_list = custom_es.get_all_blocks()
+#########################################################
+# Отображение 5 - по типам блоков в пределах станций - ок
+#########################################################
+# custom_es.set_station_order([
+#     bel_npp,
+#     minskay_tec_4,
+#     novopockay_tec,
+#     lukomolskay_gres,
+#     fake_el_source
+# ])
 
+# # объединить в фрейме
+# custom_es.set_block_type_in_station_order({
+#     bel_npp: ['ввэр'],
+#     minskay_tec_4: ['пт','т','эк','кот'],
+#     novopockay_tec: ['р','пт', 'кот'],
+#     lukomolskay_gres: ['пгу-кэс','к'],
+#     fake_el_source: ['фейк']
+# })
+# block_list = custom_es.get_all_blocks()
+#########################################################
+# Отображение 6 - по типам блоков в пределах типов станций - ок
+#########################################################
+# custom_es.set_station_type_with_order({
+#     'аэс':[bel_npp],
+#     'тэц':[minskay_tec_4, novopockay_tec],
+#     'кэс':[lukomolskay_gres],
+#     'фейки': [fake_el_source]
+# })
+# # объединить в фрейме
+# custom_es.set_block_type_in_station_type({
+#     'аэс':['ввэр'],
+#     'тэц':['р','пт','т','эк','кот'],
+#     'кэс':['пгу-кэс','к'],
+#     'фейки': ['фейк']
+# })
+# block_list = custom_es.get_all_blocks()
+#########################################################
+ 
+ 
 # custom_es.set_station_order(
 #     bel_npp,
 #     novopockay_tec,

@@ -7,6 +7,7 @@ import os
 import datetime as dt
 from enum import Enum
 from custom_modules.helpers import set_label
+from copy import deepcopy
 
 class Generic_buses:
   
@@ -156,7 +157,7 @@ class Generic_blocks:
             conversion_factors = {input_flow: (1 + heat_to_el_P) / (efficiency_P * boiler_efficiency), el_inner_bus: 1, output_flow_P: heat_to_el_P},
 
             )
-            P_mode_tr.group_options = group_options
+            P_mode_tr.group_options = deepcopy(group_options)
 
             T_mode_tr = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['index'], 'Т_режим'),
@@ -166,7 +167,7 @@ class Generic_blocks:
                                 },
             conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), el_inner_bus: 1, output_flow_T: heat_to_el_T},
             )
-            T_mode_tr.group_options = group_options
+            T_mode_tr.group_options = deepcopy(group_options)
             
             main_output_tr = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']),
@@ -174,7 +175,7 @@ class Generic_blocks:
             outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)},
             group_options = group_options
             )
-            main_output_tr.group_options = group_options
+            main_output_tr.group_options = deepcopy(group_options)
             self.es.add(P_mode_tr, T_mode_tr, main_output_tr)
             if isinstance(self.block_collection, list):
                 self.block_collection.append(P_mode_tr)

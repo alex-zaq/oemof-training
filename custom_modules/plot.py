@@ -51,231 +51,365 @@ def get_dataframe_by_input_bus_single(results, block, input_bus):
 
 
 
-
-
-
-
-
-class io_result_extractor:
-    def __init__(self, processed_results):
+class Custom_result_processor:
+    
+    
+    def __init__(self, custom_es, processed_results):
         self.processed_results = processed_results
-
-    def get_result_by_output_bus(self, output_bus_data):  
-        if isinstance(output_bus_data, list):
-            for output_bus in output_bus_data:
-                pass # последовательное извлечение
-        else:
-            return solph.views.node(self.processed_results, output_bus_data.label)["sequences"].dropna()
-
-    def get_result_by_input_bus(self, input_bus_data):
-        if isinstance(input_bus_data, list):
-            for output_bus in input_bus_data:
-                pass # последовательное извлечение
-        else:
-            return solph.views.node(self.processed_results, input_bus_data.label)["sequences"].dropna()       
-
-    
-
-
-class Result_processor_el:
-    def __init__(self, all_block_el, processed_results, el_output_bus):
-        self.all_block_el = all_block_el
-        self.el_output_bus = el_output_bus
-        self.all_block_el_dict = { block.label:block for block in all_block_el}
-        self.processed_results = processed_results
-        self.df_station_block_sorted = self.__get_df_station_block()
-    
-
-    def get_df_station(self):
-        pass
-        # создать фрейм с учетом последоватльного объединения в станции (есть порядок - быстро)
-        # block_dict = self.all_block_el_dict
-        # for block_name in self.df_station_block_sorted:
-        #     current_station_name = block_dict[block_name].group_options['станция']
-            
+        self.custom_es = custom_es
+        self.custom_es.set_heat_water_groupname_all_stations('гвс')
+        self.custom_es.set_steam_groupname_all_stations('пар')
+        self.select_plot_type = 0
         
-    # def get_df_station_block_type(self):
-    #     # создать фрейм с учетом последоватльного объединения в станции типы блоков (есть порядок - быстро)
-    #     pass  
-                      
-    def get_df_block_type(self):
-        # создать фрейм с учетом последоватльного объединения в типы блоков (нет порядка - медленно)
-        pass
-                                  
-    def get_df_station_type(self):
-        # создать фрейм с учетом последоватльного объединения в типы станции (есть порядок - быстро)
-        pass
-                                              
-    def get_station_type_block_type(self):
-        # создать фрейм с учетом последоватльного объединения в типы станции и типы блоков (нет порядка - медленно)
-        pass
-            
-    def __get_df_station_block(self):
-        self.block_list.sort(key = self.__comparator_station_block)   
-        all_block_list = self.all_block_list        
-        el_output_bus = self.el_output_bus
-        results_electricity_output = io_result_extractor(self.processed_results, el_output_bus)
-        res = pd.DataFrame()
-        for block in all_block_list:
-            outputs = [str(output) for output in block.outputs]  
-            if el_output_bus in outputs:
-                res[block.label] = results_electricity_output[((block.label, el_output_bus.label), 'flow')]
-        self.df_station_block_sorted = res
-
-    def __comparator_station_block(b1, b2):
-        b1_station_order = b1.group_options['порядок станции']
-        b2_station_order = b2.group_options['порядок станции']
-        if b1_station_order == b2_station_order:
-            b1_block_type_order = b1.group_options['порядок типа блока']
-            b2_block_type_order = b2.group_options['порядок типа блока']
-            if b1_block_type_order == b2_block_type_order:
-                b1_power = b1.group_options['мощность']
-                b2_power = b2.group_options['мощность']
-                if b1_power == b2_power:
-                    return 0
-                elif b1_power > b2_power:
-                    return 1
-                else:
-                    return -1
-            elif b1_block_type_order > b2_block_type_order:
-                return 1
-            else:
-                return -1
-        elif b2_station_order > b2_station_order:
-            return 1
-        else:
-            return -1
-            
-    
-    
-class Result_processor_heat:
-  def __init__(self, all_block_list_heat, processed_results, heat_bus_list):
-    self.processed_results = processed_results
-    self.heat_bus_list = heat_bus_list # bus список для всех станций
-    self.all_block_list_heat = all_block_list_heat
-    self.station_block = self.__get_df_station_block()
-    # отсортировать компоратором однократно
-    
-    def get_df_station(self):
-        # создать фрейм с учетом последоватльного объединения в станции (есть порядок - быстро)
-        pass    
         
-    def get_df_station_block(self):
-        # oemof.solph.views.filter_nodes(results, option=<NodeOption.All: 'all'>, exclude_busses=False)
-        res = pd.DataFrame()
-        for heat_bus in self.heat_bus_list:
-            result_by_heat_bus = solph.views.node(self.processing, heat_bus.label)["sequences"].dropna()
-            loc_res = pd.DataFrame()
-            for heat_block in self.all_block_list_heat:
-                outputs = [str(output) for output in heat_block.outputs]
-                if heat_bus in outputs:
-                   res[heat_block.label] = result_by_heat_bus[((heat_block.label, heat_bus.label), 'flow')]
-            res.union(loc_res)
+    def get_dataframe_by_commodity_type(self, commodity_type):
+        'общий метод расчета результирующего датарфрейма' 
+        '(commodite_type = электроэнергия, гвс, пар)'
+        if self.select_plot_type == 1:
+            res = self.__get_dataframe_block_station_plot_1(commodity_type)
+        elif self.select_plot_type == 2:
+            res = self.__get_dataframe_block_station_type_plot_2(commodity_type)
+        elif self.select_plot_type == 3:
+            res = self.__get_dataframe_station_plot_3(commodity_type)
+        elif self.select_plot_type == 4:
+            res = self.__get_dataframe_station_type_plot_4(commodity_type)
+        elif self.select_plot_type == 5:
+            res = self.__get_dataframe_block_type_station_plot_5(commodity_type)
+        elif self.select_plot_type == 6:
+            res = self.__get_dataframe_block_type_station_type_plot_6(commodity_type)
+        elif self.select_plot_type == 0:
+            raise Exception('Не выбран тип графика')
         return res
-                
-            
-        # self.block_list.sort(key = self.comparator)
-        # block_list = self.block_list
-        # res = pd.DataFrame()
-        # results_by_hw = io_result_extractor(self.processed_results, heat_bus_list)
-        # # print(results_by_hw)
-        # for heat_block in all_block_list_heat:
-        #     outputs_node = [str(output) for output in heat_block.outputs]  
-        #     if output_bus.label in outputs_node:
-        #     res[node.label] = results_by_commodity[((node.label, output_bus.label),'flow')]
-        # return res
-        
-        # содать фрейм согласно сортировке - конец (быстро)
         
         
-    def get_df_station_block_type(self):
-        # создать фрейм с учетом последоватльного объединения в станции типы блоков (есть порядок - быстро)
-        pass  
-                      
-    def get_df_block_type(self):
-        # создать фрейм с учетом последоватльного объединения в типы блоков (нет порядка - медленно)
-        pass
-                                  
-    def get_df_station_type(self):
-        # создать фрейм с учетом последоватльного объединения в типы станции (есть порядок - быстро)
-        pass
-                                              
-    def get_station_type_block_type(self):
-        # создать фрейм с учетом последоватльного объединения в типы станции и типы блоков (нет порядка - медленно)
-        pass
-            
+    def get_dataframe_from_dict(self,data):
+        res = pd.DataFrame()
+        stations_names = data.keys()
+        
 
-    def comparator_station_block(b1, b2):
-        b1_station_order = b1.group_options['порядок станции']
-        b2_station_order = b2.group_options['порядок станции']
-        if b1_station_order == b2_station_order:
-            b1_block_type_order = b1.group_options['порядок типа блока']
-            b2_block_type_order = b2.group_options['порядок типа блока']
-            if b1_block_type_order == b2_block_type_order:
-                b1_power = b1.group_options['мощность']
-                b2_power = b2.group_options['мощность']
-                if b1_power == b2_power:
-                    return 0
-                elif b1_power > b2_power:
+        
+        
+        
+        
+    def get_dataframe_orig_electricity_demand(self, el_bus, el_sink):
+        'возвращает исходный профиль электрической нагрузки'        
+        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
+        res = pd.DataFrame()
+        res[el_sink.label] = results[((el_bus.label, el_sink.label),'flow')]
+        return res      
+        
+    def __get_block_by_commodity_type(self, commodity_type):
+        if commodity_type == 'электроэнергия':
+            res = self.custom_es.get_all_el_blocks()
+        elif commodity_type == 'гвс':
+            res = self.custom_es.get_all_heat_water_blocks()
+        elif commodity_type == 'пар':
+            res = self.custom_es.get_all_steam_blocks()
+        return res
+            
+        
+    def __get_dataframe_block_station_plot_1(self, commodity_type):
+        def __comparator_block_station_plot_1(b1, b2):
+            b1_station_order = b1.group_options['station_order']
+            b2_station_order = b2.group_options['station_order']
+            if b1_station_order == b2_station_order:
+                b1_block_type_order = b1.group_options['block_type_order']
+                b2_block_type_order = b2.group_options['block_type_order']
+                if b1_block_type_order == b2_block_type_order:
+                    b1_power = b1.group_options['nominal_value']
+                    b2_power = b2.group_options['nominal_value']
+                    if b1_power == b2_power:
+                        return 0
+                    elif b1_power > b2_power:
+                        return 1
+                    elif b1_power < b2_power:
+                        return -1
+                elif b1_block_type_order > b2_block_type_order:
                     return 1
-                else:
+                elif b1_block_type_order < b2_block_type_order:
                     return -1
-            elif b1_block_type_order > b2_block_type_order:
+            elif b2_station_order > b2_station_order:
                 return 1
             else:
                 return -1
-        elif b2_station_order > b2_station_order:
-            return 1
-        else:
-            return -1
-            
+        
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        blocks.sort(key = __comparator_block_station_plot_1)
+        el_bus = self.custom_es.get_global_output_flow
+        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
+        res = pd.DataFrame()
+        for block in blocks:
+            pd[block.label] = results[((block.label, el_bus.label),'flow')]
+        return res      
+    
+    
+    def __get_dataframe_block_station_type_plot_2(self, commodity_type):
+        def __comparator_block_station_type_plot_2(b1, b2):
+            b1_station_type = b1.group_options['station_type']
+            b2_station_type = b2.group_options['station_type']
+            if b1_station_type == b2_station_type:
+                b1_block_type_order = b1.group_options['block_type_order']
+                b2_block_type_order = b2.group_options['block_type_order']
+                if b1_block_type_order == b2_block_type_order:
+                    b1_power = b1.group_options['nominal_value']
+                    b2_power = b2.group_options['nominal_value']
+                    if b1_power == b2_power:
+                        return 0
+                    elif b1_power > b2_power:
+                        return 1
+                    elif b1_power < b2_power:
+                        return -1
+                elif b1_block_type_order > b2_block_type_order:
+                    return 1
+                elif b1_block_type_order < b2_block_type_order:
+                    return -1
+            elif b2_station_type > b2_station_type:
+                return 1
+            else:
+                return -1        
+        def get_dataframe_plot_1_by_commodity(sorted_blocks, commodite_type):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.global_el_flow
+                results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                res = pd.DataFrame()
+                for el_block in sorted_blocks:
+                     pd[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+                return res    
+            elif commodity_type == 'гвс':
+                for hw_block in sorted_blocks:
+                    
+                    current_station_name = hw_block.group_options['station_name']
+                    current_hw_bus = self.custom_es.get_heat_water_bus_by_station(current_station_name)
+                    hw_proccessed_results = solph.views.node(self.processed_results, current_hw_bus.label)["sequences"].dropna()
+                    
+                
+                            
+    
+        
+        
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        blocks.sort(key = __comparator_block_station_type_plot_2)
+        res = get_dataframe_plot_1_by_commodity(sorted_blocks, commodity_type)
+        return res
+        
+        
+        
+        
+        
+        
+        
+        
+
      
+    def __get_dataframe_station_plot_3(self, commodity_type):
+        def __comparator_station_plot_3(b1, b2):
+            b1_station_order = b1.group_options['station_order']
+            b2_station_order = b2.group_options['station_order']
+            if b1_station_order == b2_station_order:
+                return 0
+            elif b1_station_order > b2_station_order:
+                return 1
+            elif  b1_station_order < b2_station_order:
+                return -1
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        blocks.sort(key = __comparator_station_plot_3)
+        el_bus = self.custom_es.get_global_output_flow
+        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
+        i = 0 
+        data = {}
+        while i < len(blocks):
+            current_station_outer = blocks[i].group_options['station_name']
+            current_station_inner = current_station_inner
+            data[current_station_inner] = []
+            while (current_station_inner == current_station_outer) and (i < len(blocks)):
+                current_station_inner = blocks[i].group_options['station_name']
+                block_data = results[((blocks[i].label, el_bus.label),'flow')]
+                data[current_station_inner].append(blocks[i]) # collect data
+                i = i + 1
+        res = get_dataframe_from_dict(data)
+        return res
+           
+        
+    def __get_dataframe_station_type_plot_4(self, commodity_type):
+        def __comparator_station_type_plot_4(b1, b2):
+            b1_station_type = b1.group_options['station_type']
+            b2_station_type = b2.group_options['station_type']
+            if b1_station_type == b2_station_type:
+                return 0
+            elif b1_station_type > b2_station_type:
+                return 1
+            elif b1_station_type < b2_station_type:
+                return -1
+
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        blocks.sort(key = __comparator_station_type_plot_4)
+        el_bus = self.custom_es.get_global_output_flow
+        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
+        res = pd.DataFrame()
+        i = 0 
+        data_inner = []
+        data_outer = []
+        while i < len(blocks):
+            current_station_type_outer = blocks[i].group_options['station_type']
+            current_station_type_inner = current_station_type_inner
+            while (current_station_type_inner == current_station_type_outer) and (i < len(blocks)):
+                current_station_type_inner = blocks[i].group_options['station_type']
+                data_inner.append(current_station_type_inner)
+                # collect data
+                i = i + 1
+            # process data
     
-    	# 	графики электричество: 
-        #         показ по блокам в пределах станции, (БелАЭС(ВВЭР-1200 ...), Лукомольская ГРЭС (ПГУ-427 ...))
-        #         показ по станциям, (БелАЭС, Минская ТЭЦ-4, Лукомольская ГРЭС и т.д.)
-        #         показ по типам станций, (АЭС, блок-станции, малые ТЭЦ, крупные ТЭЦ, КЭС, ВИЭ)
-        #         показ по типам турбин а пределах станций (БелАЭС(ВВЭР), Минская ТЭЦ-4(ПТ,Т,Р), Лукомольская ГРЭС(ПГУ,К,ГТУ))
-        #         показ по типам турбин а пределах типов станций (АЭС(ВВЭР), ТЭЦ(ПТ,Т,Р), КЭС(ПГУ,К,ГТУ))
-                
-		# графики гвс: 
-        #         показ по блокам в пределах станций, (Минская ТЭЦ-4 (ПТ-60, Т-250, ЭК, КОТ) Минская ТЭЦ-3(...))
-        #         показ по станциям, (Минская ТЭЦ-4, Минская ТЭЦ-3, районные котельные, Лукомольская ГРЭС)
-        #         по типам станции (ТЭЦ, котельные, КЭС,)
-        #         показ по типам источников тепла в пределах станций (Минская ТЭЦ-4(ТЭЦ,ЭК,КОТ))
-        #         показ по типам источников тепла ()
-                
+    
+    def __get_dataframe_block_type_station_plot_5(self, commodity_type):
+        def __comparator_block_type_station_plot_5(b1, b2):
+            b1_station_order = b1.group_options['station_order']
+            b2_station_order = b2.group_options['station_order']
+            if b1_station_order == b2_station_order:
+                b1_block_type_order = b1.group_options['block_type_order']
+                b2_block_type_order = b2.group_options['block_type_order']
+                if b1_block_type_order == b2_block_type_order:
+                    return 0
+                elif b1_block_type_order > b2_block_type_order:
+                    return 1
+                elif b1_block_type_order < b2_block_type_order:
+                    return -1
+            elif b2_station_order > b2_station_order:
+                return 1
+            elif b2_station_order < b2_station_order:
+                return -1        
+                # нужно объединенеие
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        blocks.sort(key = __comparator_block_type_station_plot_5)
+        el_bus = self.custom_es.get_global_output_flow
+        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
+        res = pd.DataFrame()
+        i = 0 
+        data_inner = {}
+        data_outer = []
+        while i < len(blocks):
+            current_block_type_outer = blocks[i].group_options['block_type']
+            current_station = blocks[i].group_options['station_name']
+            data_inner[current_station] = []  
+            current_block_type_inner = current_block_type_inner
+            while (current_block_type_inner == current_block_type_outer) and (i < len(blocks)):
+                current_block_type_inner = blocks[i].group_options['block_type']
+                data_inner[current_station].append(current_block_type_inner)
+                # collect data
+                i = i + 1
+            # process data
+    
+    
+    def __get_dataframe_block_type_station_type_plot_6(self, commodity_type):
+        def __comparator_block_type_station_type_plot_6(b1, b2):
+            b1_station_type = b1.group_options['station_type']
+            b2_station_type = b2.group_options['station_type']
+            if b1_station_type == b2_station_type:
+                b1_block_type_order = b1.group_options['block_type_order']
+                b2_block_type_order = b2.group_options['block_type_order']
+                if b1_block_type_order == b2_block_type_order:
+                    return 0
+                elif b1_block_type_order > b2_block_type_order:
+                    return 1
+                elif b1_block_type_order < b2_block_type_order:
+                    return -1
+            elif b2_station_type > b2_station_type:
+                return 1
+            elif  b2_station_type < b2_station_type:
+                return -1        
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        blocks.sort(key = __comparator_block_type_station_type_plot_6)
+        el_bus = self.custom_es.get_global_output_flow
+        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
+        res = pd.DataFrame()
+        i = 0 
+        data_inner = {}
+        data_outer = []
+        while i < len(blocks):
+            current_block_type_outer = blocks[i].group_options['block_type']
+            current_station = blocks[i].group_options['station_type']
+            data_inner[current_station] = []  
+            current_block_type_inner = current_block_type_inner
+            while (current_block_type_inner == current_block_type_outer) and (i < len(blocks)):
+                current_block_type_inner = blocks[i].group_options['block_type']
+                data_inner[current_station].append(current_block_type_inner)
+                # collect data
+                i = i + 1
+            # process data
+    
+    
+        
+    def set_block_station_plot_1(self, data):
+        self.custom_es.set_block_type_in_station_order(data)
+        self.select_plot_type = 1
+       
+    
+    def set_block_station_type_plot_2(self, data_station_type, data_bloc_type_station_order):
+        self.custom_es.set_station_type(data_station_type)
+        self.custom_es.set_block_type_in_station_type_order(data_bloc_type_station_order)
+        self.select_plot_type = 2
+    
+        
+    def set_station_plot_3(self, data):
+        self.custom_es.set_station_order(data)
+        self.select_plot_type = 3
+        
+    def set_station_type_plot_4(self, data):
+        self.custom_es.set_station_type(data)
+        self.select_plot_type = 4
+        
+            
+    def set_block_type_station_plot_5(self, data_station_order, data_block_type_in_station):
+        self.custom_es.set_station_order(data_station_order)
+        self.custom_es.set_block_type_in_station_order(data_block_type_in_station)
+        self.select_plot_type = 5
+        
+    def set_block_type_station_type_plot_6(self, data_station_type, data_block_type_in_station_type):
+        self.custom_es.set_station_type_with_order(data_station_type)
+        self.custom_es.set_block_type_in_station_type(data_block_type_in_station_type)
+        self.select_plot_type = 6
+  
+  
+  
+  
+    class Custom_color_setter:
+        def __init__(self, custom_es) -> None:
+            self.custom_es = custom_es
             
             
-        # информация для сортировки для блока
-                # мощность блока
-                # порядок отображения станции
-                # порядок отображения типа станции
-                # порядок отображения типа блока в пределах станции и в ее пределов
-                # порядок типа источника тепла
-
-                # признак источника электричества
+        def set_color_by_block_type(self, block_type, color):
+            pass
                 
-                # тип источника тепла
-                # тип блока
-                # тип станции
-                # название станции
-                # название блока
+        def set_color_by_station(self, station_name, color):
+            pass
+        
+        def set_color_by_station_type(self, station_type, color):
+            pass
+        
+        def set_color_by_id(self, color):
+            pass
 
-
-
-
-	
+        def set_color_by_station_block_type(self, station, block_type, color):
+            pass
+        
+        def set_color_by_station_type_block_type(self, station_type, block_type, color):
+            pass
+        
+        
+              
     
-  
 
-
-  
-  
-
-  
-    
-  
-  
-  
- 
+    class Custom_plotter_el_hw_steam:
+        def __init__(self, df_el, df_hw, df_steam):
+            pass
+                                               
+        def set_max_value(self, max_value):
+            pass
+         
+        def set_X_label(self, plot_type):
+           pass
+                    
+        def set_Y_label(self, plot_type):
+           pass
+            
+        def set_label(self, plot_type):
+            pass    

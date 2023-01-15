@@ -17,7 +17,6 @@ months = {
     'декабрь':12,
 }
 
-
 def set_label(*items, sep = '_'):
   return sep.join(items)
 
@@ -26,6 +25,17 @@ def set_natural_gas_price(usd_per_1000_m3):
 
 def convert_Mwth_to_1000_m3(Mwth):
     return Mwth * 0.108
+
+def get_peak_load_by_energy_2020(billion_kWth):
+    return billion_kWth * 157.1275 
+# (абс. мощность в часе /полная выработк)/(отн.мощн в часе)
+
+
+
+
+def get_peak_load_by_energy_2021(billion_kWth):
+    return billion_kWth * 156.529
+
 
 def set_XY_label(ax, x_label, y_label):
   ax.set_xlabel(x_label)

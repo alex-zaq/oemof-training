@@ -1,5 +1,6 @@
 
-
+import sys
+sys.path.insert(0, './')
 # from errno import EHOSTDOWN
 # from tkinter import E
 from oemof import solph
@@ -10,7 +11,7 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 from oemof_visio import ESGraphRenderer
-from modules.excel_operations import *
+from custom_modules.excel_operations import *
 # import oemof_visio as oev
  
 #  
@@ -34,7 +35,7 @@ from modules.excel_operations import *
 
 
 number_of_time_steps = 24
-data_folder = os.getcwd()+'/data'
+data_folder = os.getcwd()+'/data_excel'
 el_global_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='electric_demand_2021_odu')
 el_chp_data = pd.read_excel(os.path.join(data_folder,'data_by_day.xlsx'), sheet_name='chp_el_winter_workday_abs')
 #################################################################################
@@ -596,6 +597,11 @@ tec5_TK_330_block_1 = solph.components.Transformer(
     outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1,startup_costs = startupOptions,shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 330, variable_costs=50)},
 		conversion_factors = {b_gas_bus:1, b_el_global_bus: 0.40}
     )
+
+tec5_TK_330_block_1.group_options = {
+    'asdfasd':'asdfasdfs'
+}
+
 energysystem.add(tec5_TK_330_block_1)
 #################################################################################
 # #################################################################################
@@ -715,10 +721,10 @@ ax1.set_ylabel("Мощность, МВт (э)")
 plt.show()
 
 
-import_dataframe_to_excel(
-  dataframe = res,
-  path = './results/day_winter/', 
-  file = 'zaq.xlsx')
+# import_dataframe_to_excel(
+#   dataframe = res,
+#   path = './results/day_winter/', 
+#   file = 'zaq.xlsx')
 
 
 

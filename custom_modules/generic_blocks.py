@@ -40,7 +40,7 @@ class Generic_blocks:
             group_options
             ):
             tr = solph.components.Transformer(
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']), 
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
             inputs = {input_flow: solph.Flow()},
             outputs = {output_flow: solph.Flow(nominal_value = nominal_value, variable_costs = variable_costs)},
             conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
@@ -61,7 +61,7 @@ class Generic_blocks:
             variable_costs,
             group_options):
             tr = solph.components.Transformer(
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']), 
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
             inputs = {input_flow: solph.Flow()},
             outputs = {output_flow: solph.Flow( nominal_value = nominal_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex())},
             conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
@@ -92,7 +92,7 @@ class Generic_blocks:
             c0 = P_out_max - c1 * P_in_max
 
             tr = solph.components.OffsetTransformer(
-                label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']), 
+                label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
                 inputs = {input_flow: solph.Flow(
                 nominal_value = P_in_max,
                 max = 1,
@@ -116,7 +116,7 @@ class Generic_blocks:
             variable_costs,
             group_options):
             npp_block = solph.components.Source(
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']), 
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
             outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)},
             group_options = group_options
             )
@@ -146,10 +146,10 @@ class Generic_blocks:
 
         # кпд котла?
             el_inner_bus = Generic_buses(self.es).create_buses(set_label(group_options['station_name'],
-                group_options['block_name'], group_options['index'], 'электричество-промежуточное'))
+                group_options['block_name'], group_options['local_index'], 'электричество-промежуточное'))
 
             P_mode_tr = solph.components.Transformer (
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index'], 'П_режим'),
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'П_режим'),
             inputs = {input_flow: solph.Flow()},
             outputs = {el_inner_bus: solph.Flow(nominal_el_value = nominal_el_value),
                                     output_flow_P: solph.Flow()
@@ -160,7 +160,7 @@ class Generic_blocks:
             P_mode_tr.group_options = deepcopy(group_options)
 
             T_mode_tr = solph.components.Transformer (
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index'], 'Т_режим'),
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'Т_режим'),
             inputs = {input_flow: solph.Flow()},
             outputs = {output_flow_T: solph.Flow(),
                                     el_inner_bus: solph.Flow(nominal_el_value = nominal_el_value)
@@ -170,7 +170,7 @@ class Generic_blocks:
             T_mode_tr.group_options = deepcopy(group_options)
             
             main_output_tr = solph.components.Transformer (
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']),
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {el_inner_bus: solph.Flow()},
             outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)},
             group_options = group_options
@@ -199,7 +199,7 @@ class Generic_blocks:
             
             # кпд котла?
             pt_full_P_mode = solph.components.Transformer (
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index'], 'электроэнергия_чистый_П_режим'),
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'электроэнергия_чистый_П_режим'),
 
             inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P)},
             outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
@@ -228,7 +228,7 @@ class Generic_blocks:
             group_options):
         # кпд котла?
             pt_full_T_mode = solph.components.Transformer (
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index'], 'электроэнергия_чистый_Т_режим'),
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'электроэнергия_чистый_Т_режим'),
             inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
             outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
                                 output_flow_T: solph.Flow()
@@ -278,7 +278,7 @@ class Generic_blocks:
             
             
             T_turbine = solph.components.ExtractionTurbineCHP (
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']),
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
             outputs = {output_flow_el: solph.Flow(nominal_value = max_el_value, min = update_min_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
                                     output_flow_T: solph.Flow()
@@ -305,7 +305,7 @@ class Generic_blocks:
             variable_costs,
             group_options):
             tr = solph.components.Transformer(
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']),
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {input_flow: solph.Flow()},
             outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
                             output_flow_P: solph.Flow()},
@@ -346,7 +346,7 @@ class Generic_sources:
         
         def create_source(self, nominal_value, output_flow, variable_costs, group_options):
             source = solph.components.Source(
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['index']), 
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
             outputs = {output_flow: solph.Flow(nominal_value=nominal_value,  variable_costs = variable_costs)} 
             )
             source.group_options = group_options

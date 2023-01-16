@@ -38,14 +38,9 @@ class Specific_blocks:
             return self.block_collection
         
         
-        def get_default_group_options_by_block_type (self, block_type):
-            return {
-                    'station_order':0,
-                    'block_order':self.block_type[block_type],
-                    'station_type': 'нет типа станции'
-            }
+ 
    
-        def get_el_hw_boilers(self, global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
+        def get_el_boilers(self, global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
             block_type = self.block_type['эк']
             return self.g_block_creator.create_simple_transformer(
             nominal_value = nominal_value,
@@ -61,37 +56,35 @@ class Specific_blocks:
             'block_name': block_type,
             'block_type': block_type,
             'heat_demand_type': None,
-            'heat_water_bus_ref': output_flow,
             'station_order': None,
             'block_order': None,
             'nominal_value': nominal_value
             })
                        
                
-        def get_el_steam_boilers(self, global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
-            block_type = self.block_type['эк']
-            return self.g_block_creator.create_simple_transformer(
-            nominal_value = nominal_value,
-            input_flow = self.global_el_flow,
-            output_flow = output_flow,
-            efficiency = 0.99,
-            variable_costs = variable_costs,
-            group_options = {
-            'global_index': str(global_index),
-            'local_index': str(local_index),
-            'station_name': station_name,
-            'station_type': None,
-            'block_name': block_type,
-            'block_type': block_type,
-            'heat_demand_type': None,
-            'steam_bus_ref': output_flow,
-            'station_order': None,
-            'block_order': None,
-            'nominal_value': nominal_value
-            })
+        # def get_el_steam_boilers(self, global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
+        #     block_type = self.block_type['эк']
+        #     return self.g_block_creator.create_simple_transformer(
+        #     nominal_value = nominal_value,
+        #     input_flow = self.global_el_flow,
+        #     output_flow = output_flow,
+        #     efficiency = 0.99,
+        #     variable_costs = variable_costs,
+        #     group_options = {
+        #     'global_index': str(global_index),
+        #     'local_index': str(local_index),
+        #     'station_name': station_name,
+        #     'station_type': None,
+        #     'block_name': block_type,
+        #     'block_type': block_type,
+        #     'heat_demand_type': None,
+        #     'station_order': None,
+        #     'block_order': None,
+        #     'nominal_value': nominal_value
+        #     })
             
             
-        def get_gas_hw_boilers(self,global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
+        def get_gas_boilers(self,global_index, local_index, station_name, nominal_value, output_flow, variable_costs, group_options = None):
             block_type = self.block_type['кот']
             return self.g_block_creator.create_simple_transformer(
             nominal_value = nominal_value,
@@ -416,7 +409,7 @@ class Specific_blocks:
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
-                'global_index': str(global_index),~
+                'global_index': str(global_index),
                 'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,

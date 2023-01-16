@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import datetime as dt
+from functools import cmp_to_key
 
 
 
@@ -100,12 +101,12 @@ class Custom_result_processor:
         
     def __get_block_by_commodity_type(self, commodity_type):
         if commodity_type == 'электроэнергия':
-            res = self.custom_es.get_all_el_blocks()
+            data = self.custom_es.get_all_el_blocks()
+            return data
         elif commodity_type == 'гвс':
-            res = self.custom_es.get_all_heat_water_blocks()
+            return  self.custom_es.get_all_heat_water_blocks()
         elif commodity_type == 'пар':
-            res = self.custom_es.get_all_steam_blocks()
-        return res
+            return self.custom_es.get_all_steam_blocks()
             
         
     def __get_dataframe_block_station_plot_1(self, commodity_type):
@@ -128,18 +129,39 @@ class Custom_result_processor:
                     return 1
                 elif b1_block_type_order < b2_block_type_order:
                     return -1
-            elif b2_station_order > b2_station_order:
+            elif b1_station_order > b2_station_order:
                 return 1
-            else:
+            elif b1_station_order < b2_station_order:
                 return -1
+        def get_dataframe_plot_1_by_commodity(sorted_blocks, commodite_type):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.global_el_flow
+                results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                res = pd.DataFrame()
+                for el_block in sorted_blocks:
+                     pd[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+                return res    ;
+            elif commodity_type == 'гвс':
+                i = 0
+                length = len(sorted_blocks)
+                res = pd.DataFrame()
+                while i < length:
+                    current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                    current_station_name_inner = current_station_name_outer
+                    current_hw_bus = self.custom_es.get_heat_water_bus_by_station(current_station_name_inner)
+                    hw_proccessed_results = solph.views.node(self.processed_results, current_hw_bus.label)["sequences"].dropna()
+                    while current_station_name_inner == current_station_name_outer and i < length:
+                        res[sorted_blocks[i].label] = hw_proccessed_results[((sorted_blocks[i].label, current_hw_bus.label), 'flow')]
+                        i = i + 1
+        
+        
         
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        blocks.sort(key = __comparator_block_station_plot_1)
-        el_bus = self.custom_es.get_global_output_flow
-        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
-        res = pd.DataFrame()
         for block in blocks:
-            pd[block.label] = results[((block.label, el_bus.label),'flow')]
+            print(block.group_options['station_order'], block.group_options['block_type_order'], block.group_options['nominal_value'])
+        sorted(blocks, key = cmp_to_key(__comparator_block_station_plot_1))
+        # blocks.sort(key = __comparator_block_station_plot_1)
+        res = get_dataframe_plot_1_by_commodity(blocks, commodity_type)
         return res      
     
     
@@ -167,7 +189,7 @@ class Custom_result_processor:
                 return 1
             else:
                 return -1        
-        def get_dataframe_plot_1_by_commodity(sorted_blocks, commodite_type):
+        def get_dataframe_plot_2_by_commodity(sorted_blocks, commodite_type):
             if commodity_type == 'электроэнергия':
                 output_bus = self.custom_es.global_el_flow
                 results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
@@ -189,7 +211,7 @@ class Custom_result_processor:
         
         blocks = self.__get_block_by_commodity_type(commodity_type)
         blocks.sort(key = __comparator_block_station_type_plot_2)
-        res = get_dataframe_plot_1_by_commodity(sorted_blocks, commodity_type)
+        res = get_dataframe_plot_2_by_commodity(sorted_blocks, commodity_type)
         return res
         
         

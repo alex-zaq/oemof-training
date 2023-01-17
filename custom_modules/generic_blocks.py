@@ -267,7 +267,7 @@ class Generic_blocks:
             # print(hw_eff/el_eff)
             efficiency_full_condensing_mode = efficiency_full_condensing_mode - efficiency_full_condensing_mode * (1- boiler_efficiency)
             # print(efficiency_full_condensing_mode)
-            print((nominal_el_value + nominal_el_value * heat_to_el_T) / (el_eff + hw_eff))
+            # print((nominal_el_value + nominal_el_value * heat_to_el_T) / (el_eff + hw_eff))
             # nominal_input_T = max_el_value/efficiency_full_condensing_mode
             nominal_input_T = (nominal_el_value + nominal_el_value * heat_to_el_T) / (el_eff + hw_eff)
             # print(nominal_input_T)

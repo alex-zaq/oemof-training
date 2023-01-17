@@ -4,23 +4,24 @@ import os
 
 
 data_folder = os.getcwd() + "/data_excel"
-data1 = pd.read_excel(os.path.join(data_folder,'test.xlsx'), sheet_name='1')
-data2 = pd.read_excel(os.path.join(data_folder,'test.xlsx'), sheet_name='2')
+data1 = pd.read_excel(os.path.join(data_folder,'test_df.xlsx'), sheet_name='1')
+data2 = pd.read_excel(os.path.join(data_folder,'test_df.xlsx'), sheet_name='2')
 
 
 # print(date)
 
-data11 = data1.iloc[:,1:].sum(axis=1)
-data22 = data2.iloc[:,1:].sum(axis=1)
+# data11 =pd.concat( [data1.iloc[:,0 ],data1.iloc[:,0:].sum(axis=1)], axis= 1)
+data11 =pd.concat( [data1['Data'],data1.iloc[:,0:].sum(axis=1)], axis= 1)
+data22 = data2.iloc[:,0:].sum(axis=1)
 
 data11.name = 'sdf'
 data22.name = 'sdf'
 
-date = data1.iloc[:,0 ]
-lst = [date, data11, data22]
+# date = data1.iloc[:,0 ]
+lst = [data11, data22]
 
 res = pd.concat(lst, axis=1)
-res.columns = ['asdf','asdf', 'dsf']
+res.columns = ['asdf', 'dsf']
 
 
 print(res)

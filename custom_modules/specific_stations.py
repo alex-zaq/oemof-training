@@ -42,7 +42,7 @@ class Specific_stations:
 
                
         def get_global_output_flow(self):
-            return self.__global_output_flow_flow
+            return self.__global_output_flow
 
 
         def get_heat_water_bus_by_station(self, station_name):
@@ -116,7 +116,7 @@ class Specific_stations:
             for station in stations:
                 order_dict = { block_type: order for order,block_type in enumerate(data[station])}
                 for block_type, order in order_dict.items():
-                    blocks = self.get_all_blocks_by_block_type(block_type)
+                    blocks = self.get_all_block_by_station_name_block_type(station, block_type)
                     for block in blocks:
                         block.group_options['block_type_order'] = order
 
@@ -242,6 +242,15 @@ class Specific_stations:
                 if block.group_options['block_type'] == block_type:
                    res.append(block) 
             return res
+              
+        def get_all_block_by_station_name_block_type(self, station_name, block_type):
+            station_blocks = self.get_all_blocks_by_station(station_name)
+            res = []
+            for block in station_blocks:
+                if block.group_options['block_type'] == block_type:
+                    res.append(block)
+            return res
+            
               
                 
         def set_station_order(self, order_list):

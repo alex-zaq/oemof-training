@@ -135,41 +135,61 @@ class Custom_result_processor:
                 return -1
         def get_dataframe_plot_1_by_commodity(sorted_blocks, commodite_type):
             if commodity_type == 'электроэнергия':
-                output_bus = self.custom_es.global_el_flow
+                output_bus = self.custom_es.get_global_output_flow()
                 results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
                 res = pd.DataFrame()
                 for el_block in sorted_blocks:
-                     pd[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
-                return res    ;
-            elif commodity_type == 'гвс':
+                     res[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res    
+            elif commodity_type in ['гвс', 'пар']:
                 i = 0
                 length = len(sorted_blocks)
                 res = pd.DataFrame()
+                bus_getter = self.custom_es.get_heat_water_bus_by_station if commodite_type == 'гвс' else self.custom_es.get_steam_bus_by_station
                 while i < length:
                     current_station_name_outer = sorted_blocks[i].group_options['station_name']
                     current_station_name_inner = current_station_name_outer
-                    current_hw_bus = self.custom_es.get_heat_water_bus_by_station(current_station_name_inner)
-                    hw_proccessed_results = solph.views.node(self.processed_results, current_hw_bus.label)["sequences"].dropna()
+                    current_energy_bus = bus_getter(current_station_name_inner) 
+                    hw_proccessed_results = solph.views.node(self.processed_results, current_energy_bus.label)["sequences"].dropna()
                     while current_station_name_inner == current_station_name_outer and i < length:
-                        res[sorted_blocks[i].label] = hw_proccessed_results[((sorted_blocks[i].label, current_hw_bus.label), 'flow')]
+                        res[sorted_blocks[i].label] = hw_proccessed_results[((sorted_blocks[i].label, current_energy_bus.label), 'flow')]
                         i = i + 1
-        
+                        if i < length:
+                           current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                        else:
+                            break
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res
         
         
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        for block in blocks:
-            print(block.group_options['station_order'], block.group_options['block_type_order'], block.group_options['nominal_value'])
-        sorted(blocks, key = cmp_to_key(__comparator_block_station_plot_1))
+        # for block in blocks:
+        #     print(block.group_options['station_name'],
+        #           block.group_options['station_order'],
+        #           block.group_options['block_type'],
+        #           block.group_options['block_type_order'],
+        #           block.group_options['nominal_value'])
+        # print('----------------------------------------------')
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_station_plot_1))
+        # sorted(blocks, key = __comparator_block_station_plot_1)
+        # blocks.sort(key = __comparator_block_station_plot_1 )
+        # for block in blocks:
+        #     print(block.group_options['station_name'],
+        #           block.group_options['station_order'],
+        #           block.group_options['block_type'],
+        #           block.group_options['block_type_order'],
+        #           block.group_options['nominal_value'])
         # blocks.sort(key = __comparator_block_station_plot_1)
-        res = get_dataframe_plot_1_by_commodity(blocks, commodity_type)
+        res = get_dataframe_plot_1_by_commodity(sorted_blocks, commodity_type)
         return res      
     
     
     def __get_dataframe_block_station_type_plot_2(self, commodity_type):
         def __comparator_block_station_type_plot_2(b1, b2):
-            b1_station_type = b1.group_options['station_type']
-            b2_station_type = b2.group_options['station_type']
-            if b1_station_type == b2_station_type:
+            b1_station_type_order = b1.group_options['station_type_order']
+            b2_station_type_order = b2.group_options['station_type_order']
+            if b1_station_type_order == b2_station_type_order:
                 b1_block_type_order = b1.group_options['block_type_order']
                 b2_block_type_order = b2.group_options['block_type_order']
                 if b1_block_type_order == b2_block_type_order:
@@ -178,46 +198,50 @@ class Custom_result_processor:
                     if b1_power == b2_power:
                         return 0
                     elif b1_power > b2_power:
-                        return 1
-                    elif b1_power < b2_power:
                         return -1
+                    elif b1_power < b2_power:
+                        return 1
                 elif b1_block_type_order > b2_block_type_order:
                     return 1
                 elif b1_block_type_order < b2_block_type_order:
                     return -1
-            elif b2_station_type > b2_station_type:
+            elif b1_station_type_order > b2_station_type_order:
                 return 1
-            else:
+            elif b1_station_type_order < b2_station_type_order: 
                 return -1        
         def get_dataframe_plot_2_by_commodity(sorted_blocks, commodite_type):
             if commodity_type == 'электроэнергия':
-                output_bus = self.custom_es.global_el_flow
+                output_bus = self.custom_es.get_global_output_flow()
                 results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
                 res = pd.DataFrame()
                 for el_block in sorted_blocks:
-                     pd[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+                     res[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+                res = res.loc[:, (res > 0.1).any(axis=0)]
                 return res    
-            elif commodity_type == 'гвс':
-                for hw_block in sorted_blocks:
-                    
-                    current_station_name = hw_block.group_options['station_name']
-                    current_hw_bus = self.custom_es.get_heat_water_bus_by_station(current_station_name)
-                    hw_proccessed_results = solph.views.node(self.processed_results, current_hw_bus.label)["sequences"].dropna()
-                    
-                
-                            
-    
-        
+            elif commodity_type in ['гвс', 'пар']:
+                i = 0
+                length = len(sorted_blocks)
+                res = pd.DataFrame()
+                bus_getter = self.custom_es.get_heat_water_bus_by_station if commodite_type == 'гвс' else self.custom_es.get_steam_bus_by_station
+                while i < length:
+                    current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                    current_station_name_inner = current_station_name_outer
+                    current_energy_bus = bus_getter(current_station_name_inner) 
+                    hw_proccessed_results = solph.views.node(self.processed_results, current_energy_bus.label)["sequences"].dropna()
+                    while current_station_name_inner == current_station_name_outer and i < length:
+                        res[sorted_blocks[i].label] = hw_proccessed_results[((sorted_blocks[i].label, current_energy_bus.label), 'flow')]
+                        i = i + 1
+                        if i < length:
+                           current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                        else:
+                            break
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res
         
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        blocks.sort(key = __comparator_block_station_type_plot_2)
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_station_type_plot_2))
         res = get_dataframe_plot_2_by_commodity(sorted_blocks, commodity_type)
         return res
-        
-        
-        
-        
-        
         
         
         
@@ -233,29 +257,84 @@ class Custom_result_processor:
                 return 1
             elif  b1_station_order < b2_station_order:
                 return -1
+        def get_dataframe_plot_3_by_commodity(sorted_blocks, commodite_type):
+             if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.get_global_output_flow()
+                results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                length = len(sorted_blocks)
+                i = 0
+                data_to_union = {}
+                while i < length:
+                    current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                    current_station_name_inner = current_station_name_outer
+                    data_to_union[current_station_name_inner] = []
+                    while current_station_name_inner == current_station_name_outer and i < length:
+                        data = results[((sorted_blocks[i].label, output_bus.label), 'flow')]
+                        data_to_union[current_station_name_inner].append(data) 
+                        i = i + 1
+                        if i < length:
+                            current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                        else:
+                            break
+                res = []
+                station_names = []
+                for station_name, blocks in data_to_union.items():
+                    df = pd.concat(blocks, axis=1)
+                    df2  = df.sum(axis = 1)
+                    res.append(df2) 
+                    station_names.append(station_name)
+                res = pd.concat(res, axis=1)
+                res.columns = station_names
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res    
+             elif commodity_type in ['гвс', 'пар']:
+                i = 0
+                length = len(sorted_blocks)
+                res = pd.DataFrame()
+                bus_getter = self.custom_es.get_heat_water_bus_by_station if commodite_type == 'гвс' else self.custom_es.get_steam_bus_by_station
+                data_to_union = {}
+                while i < length:
+                    current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                    current_station_name_inner = current_station_name_outer
+                    current_energy_bus = bus_getter(current_station_name_inner) 
+                    data_to_union[current_station_name_inner] = []
+                    hw_proccessed_results = solph.views.node(self.processed_results, current_energy_bus.label)["sequences"].dropna()
+                    while current_station_name_inner == current_station_name_outer and i < length:
+                        data = hw_proccessed_results[((sorted_blocks[i].label, current_energy_bus.label), 'flow')]
+                        data_to_union[current_station_name_inner].append(data)
+                        i = i + 1
+                        if i < length:
+                           current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                        else:
+                            break
+                        
+                res = []
+                station_names = []
+                for station_name, blocks in data_to_union.items():
+                    df = pd.concat(blocks, axis=1)
+                    df2  = df.sum(axis = 1)
+                    res.append(df2) 
+                    station_names.append(station_name)
+                res = pd.concat(res, axis=1)
+                res.columns = station_names        
+                        
+                        
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res
+            
+            
+
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        blocks.sort(key = __comparator_station_plot_3)
-        el_bus = self.custom_es.get_global_output_flow
-        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
-        i = 0 
-        data = {}
-        while i < len(blocks):
-            current_station_outer = blocks[i].group_options['station_name']
-            current_station_inner = current_station_inner
-            data[current_station_inner] = []
-            while (current_station_inner == current_station_outer) and (i < len(blocks)):
-                current_station_inner = blocks[i].group_options['station_name']
-                block_data = results[((blocks[i].label, el_bus.label),'flow')]
-                data[current_station_inner].append(blocks[i]) # collect data
-                i = i + 1
-        res = get_dataframe_from_dict(data)
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_station_plot_3))          
+        res = get_dataframe_plot_3_by_commodity(sorted_blocks, commodity_type)
         return res
            
         
+        
     def __get_dataframe_station_type_plot_4(self, commodity_type):
         def __comparator_station_type_plot_4(b1, b2):
-            b1_station_type = b1.group_options['station_type']
-            b2_station_type = b2.group_options['station_type']
+            b1_station_type = b1.group_options['station_type_order']
+            b2_station_type = b2.group_options['station_type_order']
             if b1_station_type == b2_station_type:
                 return 0
             elif b1_station_type > b2_station_type:
@@ -263,23 +342,77 @@ class Custom_result_processor:
             elif b1_station_type < b2_station_type:
                 return -1
 
+        def get_dataframe_plot_4_by_commodity(sorted_blocks, commodite_type):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.get_global_output_flow()
+                results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                length = len(sorted_blocks)
+                i = 0
+                data_to_union = {}
+                while i < length:
+                    current_station_type_outer = sorted_blocks[i].group_options['station_type']
+                    current_station_type_inner = current_station_type_outer
+                    data_to_union[current_station_type_inner] = []
+                    while current_station_type_inner == current_station_type_outer and i < length:
+                        data = results[((sorted_blocks[i].label, output_bus.label), 'flow')]
+                        data_to_union[current_station_type_inner].append(data) 
+                        i = i + 1
+                        if i < length:
+                            current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                        else:
+                            break
+                res = []
+                station_types = []
+                for station_name, blocks in data_to_union.items():
+                    df = pd.concat(blocks, axis=1)
+                    df2  = df.sum(axis = 1)
+                    res.append(df2) 
+                    station_types.append(station_name)
+                res = pd.concat(res, axis=1)
+                res.columns = station_types
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res    
+            elif  commodity_type in ['гвс', 'пар']:
+                i = 0
+                length = len(sorted_blocks)
+                bus_getter = self.custom_es.get_heat_water_bus_by_station if commodite_type == 'гвс' else self.custom_es.get_steam_bus_by_station
+                data_to_union = {}
+                while i < length:
+                    current_station_type_outer = sorted_blocks[i].group_options['station_type']
+                    current_station_type_inner = current_station_type_outer
+                    data_to_union[current_station_type_inner] = []
+                    while current_station_type_inner == current_station_type_outer and i < length:
+                        current_station = sorted_blocks[i].group_options['station_name']
+                        current_energy_bus = bus_getter(current_station) 
+                        hw_proccessed_results = solph.views.node(self.processed_results, current_energy_bus.label)["sequences"].dropna()
+                        data = hw_proccessed_results[((sorted_blocks[i].label, current_energy_bus.label), 'flow')]
+                        data_to_union[current_station_type_inner].append(data)
+                        i = i + 1
+                        if i < length:
+                           current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                        else:
+                            break
+                        
+                res = []
+                station_names = []
+                for station_name, blocks in data_to_union.items():
+                    df = pd.concat(blocks, axis=1)
+                    df2  = df.sum(axis = 1)
+                    res.append(df2) 
+                    station_names.append(station_name)
+                res = pd.concat(res, axis=1)
+                res.columns = station_names        
+                        
+                        
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res
+
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        blocks.sort(key = __comparator_station_type_plot_4)
-        el_bus = self.custom_es.get_global_output_flow
-        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
-        res = pd.DataFrame()
-        i = 0 
-        data_inner = []
-        data_outer = []
-        while i < len(blocks):
-            current_station_type_outer = blocks[i].group_options['station_type']
-            current_station_type_inner = current_station_type_inner
-            while (current_station_type_inner == current_station_type_outer) and (i < len(blocks)):
-                current_station_type_inner = blocks[i].group_options['station_type']
-                data_inner.append(current_station_type_inner)
-                # collect data
-                i = i + 1
-            # process data
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_station_type_plot_4))          
+        res = get_dataframe_plot_4_by_commodity(sorted_blocks, commodity_type)
+        return res
+    
+    
     
     
     def __get_dataframe_block_type_station_plot_5(self, commodity_type):
@@ -295,37 +428,121 @@ class Custom_result_processor:
                     return 1
                 elif b1_block_type_order < b2_block_type_order:
                     return -1
-            elif b2_station_order > b2_station_order:
+            elif b1_station_order > b2_station_order:
                 return 1
-            elif b2_station_order < b2_station_order:
-                return -1        
-                # нужно объединенеие
+            elif b1_station_order < b2_station_order:
+                return -1       
+        def get_dataframe_plot_5_by_commodity(sorted_blocks, commodite_type):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.get_global_output_flow()
+                results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                length = len(sorted_blocks)
+                i = 0
+                data_to_union = {}
+                while i < length:
+                    current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                    current_station_name_inner = current_station_name_outer
+
+                    while current_station_name_inner == current_station_name_outer and i < length:
+                        current_block_type_outer = sorted_blocks[i].group_options['block_type']
+                        current_block_type_inner = current_block_type_outer
+                        data_to_union[(current_station_name_inner, current_block_type_inner)] = []
+
+                        while current_block_type_inner == current_block_type_outer and i < length and current_station_name_inner == current_station_name_outer:
+                           
+                            data = results[((sorted_blocks[i].label, output_bus.label), 'flow')]
+                            data_to_union[(current_station_name_inner, current_block_type_inner)].append(data) 
+                            i = i + 1
+                            if i < length:
+                                current_block_type_inner = sorted_blocks[i].group_options['block_type']
+                                current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                                # current_station_name_inner = current_station_name_outer
+                            else:
+                                break
+                        # i = i + 1
+                        if i < length:
+                                current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                        else:
+                            break
+                items = {}
+                for key in data_to_union.keys():
+                    item = data_to_union[key]
+                    df = pd.concat(item, axis=1)
+                    df2 = df.sum(axis=1)
+                    items[key[0] +'_'+ key[1]] = df2
+
+                names = items.keys()
+                values = list(items.values())
+                res = pd.concat(values, axis=1)
+                res.columns = names
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res  
+            elif  commodity_type in ['гвс', 'пар']:
+                    output_bus = self.custom_es.get_global_output_flow()
+                    bus_getter = self.custom_es.get_heat_water_bus_by_station if commodite_type == 'гвс' else self.custom_es.get_steam_bus_by_station
+                    length = len(sorted_blocks)
+                    i = 0
+                    data_to_union = {}
+                    while i < length:
+                        current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                        current_station_name_inner = current_station_name_outer
+
+                        while current_station_name_inner == current_station_name_outer and i < length:
+                            current_block_type_outer = sorted_blocks[i].group_options['block_type']
+                            current_block_type_inner = current_block_type_outer
+                            current_hw_bus = bus_getter(current_station_name_inner)
+                            data_to_union[(current_station_name_inner, current_block_type_inner)] = []
+                            results = solph.views.node(self.processed_results, current_hw_bus.label)["sequences"].dropna()      
+
+
+                            while current_block_type_inner == current_block_type_outer and i < length and current_station_name_inner == current_station_name_outer:
+                            
+                                data = results[((sorted_blocks[i].label, current_hw_bus.label), 'flow')]
+                                data_to_union[(current_station_name_inner, current_block_type_inner)].append(data) 
+                                i = i + 1
+                                if i < length:
+                                    current_block_type_inner = sorted_blocks[i].group_options['block_type']
+                                    current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                                    # current_station_name_inner = current_station_name_outer
+                                else:
+                                    break
+                            # i = i + 1
+                            if i < length:
+                                    current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                            else:
+                                break  
+                    items = {}
+                    for key in data_to_union.keys():
+                        item = data_to_union[key]
+                        df = pd.concat(item, axis=1)
+                        df2 = df.sum(axis=1)
+                        items[key[0] +'_'+ key[1]] = df2
+
+                    names = items.keys()
+                    values = list(items.values())
+                    res = pd.concat(values, axis=1)
+                    res.columns = names
+                    res = res.loc[:, (res > 0.1).any(axis=0)]
+                    return res
+    
+             
+        
+        
+        
+
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        blocks.sort(key = __comparator_block_type_station_plot_5)
-        el_bus = self.custom_es.get_global_output_flow
-        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
-        res = pd.DataFrame()
-        i = 0 
-        data_inner = {}
-        data_outer = []
-        while i < len(blocks):
-            current_block_type_outer = blocks[i].group_options['block_type']
-            current_station = blocks[i].group_options['station_name']
-            data_inner[current_station] = []  
-            current_block_type_inner = current_block_type_inner
-            while (current_block_type_inner == current_block_type_outer) and (i < len(blocks)):
-                current_block_type_inner = blocks[i].group_options['block_type']
-                data_inner[current_station].append(current_block_type_inner)
-                # collect data
-                i = i + 1
-            # process data
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_type_station_plot_5))          
+        res = get_dataframe_plot_5_by_commodity(sorted_blocks, commodity_type)
+        return res
+     
+    
     
     
     def __get_dataframe_block_type_station_type_plot_6(self, commodity_type):
         def __comparator_block_type_station_type_plot_6(b1, b2):
-            b1_station_type = b1.group_options['station_type']
-            b2_station_type = b2.group_options['station_type']
-            if b1_station_type == b2_station_type:
+            b1_station_type_order = b1.group_options['station_type_order']
+            b2_station_type_order = b2.group_options['station_type_order']
+            if b1_station_type_order == b2_station_type_order:
                 b1_block_type_order = b1.group_options['block_type_order']
                 b2_block_type_order = b2.group_options['block_type_order']
                 if b1_block_type_order == b2_block_type_order:
@@ -334,30 +551,119 @@ class Custom_result_processor:
                     return 1
                 elif b1_block_type_order < b2_block_type_order:
                     return -1
-            elif b2_station_type > b2_station_type:
+            elif b1_station_type_order > b2_station_type_order:
                 return 1
-            elif  b2_station_type < b2_station_type:
+            elif  b1_station_type_order < b2_station_type_order:
                 return -1        
+        def get_dataframe_plot_6_by_commodity(sorted_blocks, commodite_type):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.get_global_output_flow()
+                results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                length = len(sorted_blocks)
+                i = 0
+                data_to_union = {}
+                while i < length:
+                    current_station_type_outer = sorted_blocks[i].group_options['station_type']
+                    current_station_type_inner = current_station_type_outer
+
+                    while current_station_type_inner == current_station_type_outer and i < length:
+                        current_block_type_outer = sorted_blocks[i].group_options['block_type']
+                        current_block_type_inner = current_block_type_outer
+                        data_to_union[(current_station_type_inner, current_block_type_inner)] = []
+
+                        while current_block_type_inner == current_block_type_outer and i < length and current_station_type_inner == current_station_type_outer:
+                           
+                            data = results[((sorted_blocks[i].label, output_bus.label), 'flow')]
+                            data_to_union[(current_station_type_inner, current_block_type_inner)].append(data) 
+                            i = i + 1
+                            if i < length:
+                                current_block_type_inner = sorted_blocks[i].group_options['block_type']
+                                current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                                # current_station_name_inner = current_station_name_outer
+                            else:
+                                break
+                        # i = i + 1
+                        if i < length:
+                                current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                        else:
+                            break
+                items = {}
+                for key in data_to_union.keys():
+                    item = data_to_union[key]
+                    df = pd.concat(item, axis=1)
+                    df2 = df.sum(axis=1)
+                    items[key[0] +'_'+ key[1]] = df2
+
+                names = items.keys()
+                values = list(items.values())
+                res = pd.concat(values, axis=1)
+                res.columns = names
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res  
+            elif  commodity_type in ['гвс', 'пар']:
+                    output_bus = self.custom_es.get_global_output_flow()
+                    bus_getter = self.custom_es.get_heat_water_bus_by_station if commodite_type == 'гвс' else self.custom_es.get_steam_bus_by_station
+                    length = len(sorted_blocks)
+                    i = 0
+                    data_to_union = {}
+                    while i < length:
+                        current_station_type_outer = sorted_blocks[i].group_options['station_type']
+                        current_station_type_inner = current_station_type_outer
+
+                        while current_station_type_inner == current_station_type_outer and i < length:
+                            
+                            
+                            current_block_type_outer = sorted_blocks[i].group_options['block_type']
+                            current_block_type_inner = current_block_type_outer
+                            data_to_union[(current_station_type_inner, current_block_type_inner)] = []
+
+
+                            while current_block_type_inner == current_block_type_outer and i < length and current_station_type_inner == current_station_type_outer:
+                            
+                                
+                                current_station_outer = sorted_blocks[i].group_options['station_name']
+                                current_station_inner = current_station_outer
+                                current_hw_bus = bus_getter(current_station_inner)
+                                results = solph.views.node(self.processed_results, current_hw_bus.label)["sequences"].dropna()      
+                                while current_station_inner == current_station_outer and i < length:
+                                  data = results[((sorted_blocks[i].label, current_hw_bus.label), 'flow')]
+                                  data_to_union[(current_station_type_inner, current_block_type_inner)].append(data) 
+                                  i = i + 1
+                                  if i < length:
+                                      current_block_type_inner = sorted_blocks[i].group_options['block_type']
+                                      current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                                      current_station_inner = sorted_blocks[i].group_options['station_name']
+                                  else:
+                                        break
+                            # i = i + 1
+                            if i < length:
+                                    current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                            else:
+                                break  
+                            
+                            
+                            
+                            
+                    items = {}
+                    for key in data_to_union.keys():
+                        item = data_to_union[key]
+                        df = pd.concat(item, axis=1)
+                        df2 = df.sum(axis=1)
+                        items[key[0] +'_'+ key[1]] = df2
+
+                    names = items.keys()
+                    values = list(items.values())
+                    res = pd.concat(values, axis=1)
+                    res.columns = names
+                    res = res.loc[:, (res > 0.1).any(axis=0)]
+                    return res
+            
+        
+
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        blocks.sort(key = __comparator_block_type_station_type_plot_6)
-        el_bus = self.custom_es.get_global_output_flow
-        results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
-        res = pd.DataFrame()
-        i = 0 
-        data_inner = {}
-        data_outer = []
-        while i < len(blocks):
-            current_block_type_outer = blocks[i].group_options['block_type']
-            current_station = blocks[i].group_options['station_type']
-            data_inner[current_station] = []  
-            current_block_type_inner = current_block_type_inner
-            while (current_block_type_inner == current_block_type_outer) and (i < len(blocks)):
-                current_block_type_inner = blocks[i].group_options['block_type']
-                data_inner[current_station].append(current_block_type_inner)
-                # collect data
-                i = i + 1
-            # process data
-    
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_type_station_type_plot_6))          
+        res = get_dataframe_plot_6_by_commodity(sorted_blocks, commodity_type)
+        return res
     
         
     def set_block_station_plot_1(self, data):
@@ -366,8 +672,8 @@ class Custom_result_processor:
        
     
     def set_block_station_type_plot_2(self, data_station_type, data_bloc_type_station_order):
-        self.custom_es.set_station_type(data_station_type)
-        self.custom_es.set_block_type_in_station_type_order(data_bloc_type_station_order)
+        self.custom_es.set_station_type_with_order(data_station_type)
+        self.custom_es.set_block_type_in_station_type(data_bloc_type_station_order)
         self.select_plot_type = 2
     
         
@@ -376,13 +682,14 @@ class Custom_result_processor:
         self.select_plot_type = 3
         
     def set_station_type_plot_4(self, data):
-        self.custom_es.set_station_type(data)
+        self.custom_es.set_station_type_with_order(data)
         self.select_plot_type = 4
         
             
-    def set_block_type_station_plot_5(self, data_station_order, data_block_type_in_station):
-        self.custom_es.set_station_order(data_station_order)
-        self.custom_es.set_block_type_in_station_order(data_block_type_in_station)
+    def set_block_type_station_plot_5(self, data):
+        # self.custom_es.set_station_order(data_station_order)
+        # self.custom_es.set_block_type_in_station_order(data_block_type_in_station)
+        self.custom_es.set_block_type_in_station_order(data)
         self.select_plot_type = 5
         
     def set_block_type_station_type_plot_6(self, data_station_type, data_block_type_in_station_type):

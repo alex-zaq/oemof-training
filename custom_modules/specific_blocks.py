@@ -216,7 +216,7 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 efficiency_min = 0.42,
                 efficiency_max = 0.48,
-                min_power_fraction = 0.4,
+                min_power_fraction = 0.36,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
@@ -241,7 +241,7 @@ class Specific_blocks:
                 output_flow = self.global_el_flow,
                 efficiency_min = 0.42,
                 efficiency_max = 0.49,
-                min_power_fraction = 0.4,
+                min_power_fraction = 0.36,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
                 group_options = {
@@ -910,7 +910,7 @@ class Specific_blocks:
             'heat_demand_type_steam': None,
             'station_order': None,
             'block_order': None,
-            'nominal_value': 135   
+            'nominal_value': 50   
             } 
             )
  ##################################################################################
@@ -919,7 +919,7 @@ class Specific_blocks:
         def get_vver_1200(self, global_index, local_index, station_name, variable_costs,  group_options = None, planning_outage = None):
             block_type = self.block_type['ввэр']
             return self.g_block_creator.create_NPP_block(
-                nominal_el_value = 1170,
+                nominal_el_value = 1200,
                 min_power_fraction = 0.75,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
@@ -934,7 +934,7 @@ class Specific_blocks:
                 'heat_demand_type_steam': None,
                 'station_order': None,
                 'block_order': None,
-                'nominal_value': 1170   
+                'nominal_value': 1200   
             } 
             )
 ##################################################################################

@@ -140,22 +140,18 @@ el_df = result_processor.get_dataframe_by_commodity_type('электроэнер
 
 hw_df = result_processor.get_dataframe_by_commodity_type('гвс')
 
-# steam_df = result_processor.get_dataframe_by_commodity_type('пар')
+steam_df = result_processor.get_dataframe_by_commodity_type('пар')
 
 el_demand_orig = result_processor.get_dataframe_orig_electricity_demand(el_bus, el_sink)
 
-
-# fig, axes = plt.subplots(nrows=2, ncols=2)
-# (first_pos,second_pos) = (axes[0], axes[1])
-# (first_pos,second_pos, third_pos) = (axes[0,0], axes[1,0], axes[0,1])
 
 
 maxY = 7000
 ax_el = el_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство электричества')
 ax_el_demand = el_demand_orig.plot(kind="line", ax = ax_el ,color = 'black', ylim=(0, maxY), style='.-' , legend = 'reverse')
 # # .legend(fontsize=7, loc="upper right")
-# ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'Производство гвс' )
-# ax_steam = steam_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство пара' )
+ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'Производство гвс' )
+ax_steam = steam_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство пара' )
 
 
 plt.show()

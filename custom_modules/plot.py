@@ -625,7 +625,8 @@ class Custom_result_processor:
                                 current_station_inner = current_station_outer
                                 current_hw_bus = bus_getter(current_station_inner)
                                 results = solph.views.node(self.processed_results, current_hw_bus.label)["sequences"].dropna()      
-                                while current_station_inner == current_station_outer and i < length:
+
+                                while current_station_inner == current_station_outer and i < length and current_block_type_inner == current_block_type_outer and current_station_type_inner == current_station_type_outer:
                                   data = results[((sorted_blocks[i].label, current_hw_bus.label), 'flow')]
                                   data_to_union[(current_station_type_inner, current_block_type_inner)].append(data) 
                                   i = i + 1

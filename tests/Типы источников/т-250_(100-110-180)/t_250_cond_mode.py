@@ -12,7 +12,7 @@ from custom_modules.specific_stations import Specific_stations
 from custom_modules.specific_blocks import Specific_blocks
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, Custom_counter
-from custom_modules.plot import get_dataframe_by_output_bus, get_dataframe_by_input_bus
+from custom_modules.result_proccessing import get_dataframe_by_output_bus, get_dataframe_by_input_bus
 
 # template
 ##########################################################################################################

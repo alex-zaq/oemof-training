@@ -10,7 +10,7 @@ from custom_modules.excel_operations import import_dataframe_to_excel, create_re
 from custom_modules.specific_stations import Specific_stations
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, get_peak_load_by_energy_2020
-from custom_modules.plot import Custom_result_processor
+from custom_modules.result_proccessing import Custom_result_grouper
 
 winter_work_day_2020 = dict(
             start_date = find_first_monday(2020, months['февраль'], None),
@@ -66,15 +66,15 @@ model.solve(solver="cplex")
 results = solph.processing.results(model)
 
 
-result_processor = Custom_result_processor(custom_es, results)
+result_processor = Custom_result_grouper(custom_es, results)
 
-# result_processor.set_block_station_plot_1({
-#     bel_npp: ['ввэр'],
-#     minskay_tec_4: ['пт','т','эк','кот'],
-#     novopockay_tec: ['р','пт', 'кот'],
-#     lukomolskay_gres: ['пгу-кэс','к'],
-#     fake_el_source: ['фейк']
-# })
+result_processor.set_block_station_plot_1({
+    bel_npp: ['ввэр'],
+    minskay_tec_4: ['пт','т','эк','кот'],
+    novopockay_tec: ['р','пт', 'кот'],
+    lukomolskay_gres: ['пгу-кэс','к'],
+    fake_el_source: ['фейк']
+})
 
 
 # result_processor.set_block_station_type_plot_2(
@@ -118,23 +118,23 @@ result_processor = Custom_result_processor(custom_es, results)
 #     fake_el_source: ['фейк']
 # } )
 
-result_processor.set_block_type_station_type_plot_6(
-{
-    'аэс':[bel_npp],
-    'тэц':[minskay_tec_4, novopockay_tec],
-    'кэс':[lukomolskay_gres],
-    'фейки': [fake_el_source]
-},
+# result_processor.set_block_type_station_type_plot_6(
+# {
+#     'аэс':[bel_npp],
+#     'тэц':[minskay_tec_4, novopockay_tec],
+#     'кэс':[lukomolskay_gres],
+#     'фейки': [fake_el_source]
+# },
 
-{
-    'аэс':['ввэр'],
-    'тэц':['р','пт','т','эк','кот'],
-    'кэс':['пгу-кэс','к'],
-    'фейки': ['фейк']
-})
+# {
+#     'аэс':['ввэр'],
+#     'тэц':['р','пт','т','эк','кот'],
+#     'кэс':['пгу-кэс','к'],
+#     'фейки': ['фейк']
+# })
 
 
-block_list = custom_es.get_all_blocks()
+# block_list = custom_es.get_all_blocks()
 
 el_df = result_processor.get_dataframe_by_commodity_type('электроэнергия')
 

@@ -28,7 +28,7 @@ class Specific_blocks:
             self.block_type = {'р':'р', 'т':'т', 'пт':'пт', 'к':'к',
                                'пгу-кэс':'пгу-кэс', 'пгу-тэц':'пгу-тэц',
                                'гту':'гту','гту-тэц':'гту-тэц', 'эк':'эк',
-                               'кот':'кот', 'ввэр':'ввэр', 'ммр':'ммр',
+                               'кот':'кот', 'ввэр':'ввэр', 'ммр':'ммр','блок-станции-газ':'блок-станции-газ',
                                'виэ-солнце':'виэ-солнце','виэ-вода':'виэ-вода',
                                'виэ-ветер':'виэ-ветер', 'фейк':'фейк', 'ресурс':'ресурс'
                                }
@@ -1009,6 +1009,31 @@ class Specific_blocks:
                 'nominal_value': 50   
             } 
             )
+
+        def get_block_station_natural_gas(self, global_index, local_index, nominal_value, station_name, fixed_el_load_data_rel, variable_costs = 0):
+            block_type = self.block_type['блок-станции-газ']
+            return self.g_block_creator.create_simple_transformer_with_fixed_load(
+            nominal_value = nominal_value,
+            input_flow = self.global_natural_gas_flow ,
+            output_flow = self.global_el_flow,
+            efficiency = 0.90,
+            variable_costs = variable_costs,
+            fixed_el_load_data_rel = fixed_el_load_data_rel,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': block_type,
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': nominal_value
+            }
+            )
+
+
 
         def get_natural_gas_source(self, label, usd_per_1000_m3):
             return self.g_source_creator.create_resource(

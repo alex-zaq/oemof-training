@@ -50,9 +50,92 @@ def get_dataframe_by_input_bus_single(results, block, input_bus):
         res[block.label] = results_by_commodity[((input_bus.label, block.label),'flow')]
     return res
 
+class Custom_result_extractor:
+    def __init__(self, custom_es, processed_results):
+        self.custom_es = custom_es
+        self.processed_results = processed_results
+        pass
+
+            
+    def get_natural_gas_price(self):
+        return self.custom_es.natural_gas_price
+
+    def get_install_energy_system_power(self):
+        return self.custom_es.get_install_energy_system_power()   
+
+    def get_total_gas_consumtion_by_block_type(self, block_type):
+        pass
+
+    def get_total_gas_consumption_value(self):
+        pass
+    
+    def get_total_gas_consumption_by_station_type(self):
+        pass
+    
+    def get_total_gas_consumption_by_station_value(self, station_name, commodity_type):
+        pass
+    
+    
+    def get_max_el_boilers_consumption_by_station_value(self, station_name, commodite_type):
+        pass
+    
+    
+    def get_dataframe_el_boilers_consumption(self, commodite_type):
+        pass
+    
+    def get_total_el_boilers_consumption_value(self, commodite_type):
+        pass
+  
+
+    def get_dataframe_online_power(self):
+        pass
+    
+    def get_dataframe_online_power_by_station(self):
+        pass
 
 
-class Custom_result_processor:
+    def get_dataframe_load_fraction(self):
+        pass
+    
+    
+    def get_el_energy_by_block_type(self, block_type):
+        pass
+    
+    
+    def get_el_energy_by_station(self, station_name):
+        pass
+    
+        
+    def get_el_energy_by_station_type(self, station_type):
+        pass
+    
+    
+    def get_dataframe_spinning_reserve(self):
+        # включенная мощность - полная мощность в часу
+        pass
+    
+    
+    def load_factor_by_station(self, station_name):
+        pass
+        
+    
+    def get_chp_electricity_by_station(self):
+        pass
+    
+    
+    def get_usd_MWth_by_station(self, station):
+        pass
+    
+    
+    def get_usd_MWth_total(self):
+        pass
+    
+    
+    def get_object_value(self):
+        pass
+
+
+class Custom_result_grouper:
     
     
     def __init__(self, custom_es, processed_results):
@@ -87,10 +170,6 @@ class Custom_result_processor:
         res = pd.DataFrame()
         stations_names = data.keys()
         
-
-        
-        
-        
         
     def get_dataframe_orig_electricity_demand(self, el_bus, el_sink):
         'возвращает исходный профиль электрической нагрузки'        
@@ -108,6 +187,14 @@ class Custom_result_processor:
         elif commodity_type == 'пар':
             return self.custom_es.get_all_steam_blocks()
             
+
+    
+    
+    
+    
+    
+    
+        
         
     def __get_dataframe_block_station_plot_1(self, commodity_type):
         def __comparator_block_station_plot_1(b1, b2):
@@ -242,9 +329,6 @@ class Custom_result_processor:
         sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_station_type_plot_2))
         res = get_dataframe_plot_2_by_commodity(sorted_blocks, commodity_type)
         return res
-        
-        
-        
 
      
     def __get_dataframe_station_plot_3(self, commodity_type):
@@ -701,45 +785,45 @@ class Custom_result_processor:
   
   
   
-    class Custom_color_setter:
-        def __init__(self, custom_es) -> None:
-            self.custom_es = custom_es
+    # class Custom_color_setter:
+    #     def __init__(self, custom_es) -> None:
+    #         self.custom_es = custom_es
             
             
-        def set_color_by_block_type(self, block_type, color):
-            pass
+    #     def set_color_by_block_type(self, block_type, color):
+    #         pass
                 
-        def set_color_by_station(self, station_name, color):
-            pass
+    #     def set_color_by_station(self, station_name, color):
+    #         pass
         
-        def set_color_by_station_type(self, station_type, color):
-            pass
+    #     def set_color_by_station_type(self, station_type, color):
+    #         pass
         
-        def set_color_by_id(self, color):
-            pass
+    #     def set_color_by_id(self, color):
+    #         pass
 
-        def set_color_by_station_block_type(self, station, block_type, color):
-            pass
+    #     def set_color_by_station_block_type(self, station, block_type, color):
+    #         pass
         
-        def set_color_by_station_type_block_type(self, station_type, block_type, color):
-            pass
+    #     def set_color_by_station_type_block_type(self, station_type, block_type, color):
+    #         pass
         
         
               
     
 
-    class Custom_plotter_el_hw_steam:
-        def __init__(self, df_el, df_hw, df_steam):
-            pass
+    # class Custom_plotter_el_hw_steam:
+    #     def __init__(self, df_el, df_hw, df_steam):
+    #         pass
                                                
-        def set_max_value(self, max_value):
-            pass
+    #     def set_max_value(self, max_value):
+    #         pass
          
-        def set_X_label(self, plot_type):
-           pass
+    #     def set_X_label(self, plot_type):
+    #        pass
                     
-        def set_Y_label(self, plot_type):
-           pass
+    #     def set_Y_label(self, plot_type):
+    #        pass
             
-        def set_label(self, plot_type):
-            pass    
+    #     def set_label(self, plot_type):
+    #         pass    

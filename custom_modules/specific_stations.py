@@ -282,6 +282,7 @@ class Specific_stations:
 
 
         def add_Minskay_tec_4(self, heat_water_demand_data, steam_demand_data = None):
+            # добавить паровую нагрзука для пт-60
             station_name = 'Минская ТЭЦ-4'
             ###############################################################
             create_buses = self.bus_creator.create_buses
@@ -528,6 +529,72 @@ class Specific_stations:
                 }} 
             return station_name
             
+            
+        def add_Mogilevskay_tec_2(self):
+            station_name = 'Могилевская ТЭЦ-2'
+            
+                        
+            
+        def add_Bobryskay_tec_2(self):
+            station_name = 'Бобруйская ТЭЦ-2'
+            
+        def add_Grodnenskay_tec_2(self):
+            station_name = 'Гродненская ТЭЦ-2'
+            
+            
+                        
+        def add_Minskay_tec_3(self):
+            station_name = 'Минская ТЭЦ-3'
+            
+                        
+                        
+        def add_Gomelskay_tec_2(self):
+            station_name = 'Гомельская ТЭЦ-2'
+            
+            
+        def add_Mozyrskay_tec_2(self):
+            station_name = 'Мозырская ТЭЦ-2'
+
+            
+        def add_Svetlogorskay_tec(self):
+            station_name = 'Cветлогорская ТЭЦ'
+
+        def add_Minskay_tec_2(self):
+            station_name = 'Минская ТЭЦ-2'
+            
+            
+        def add_district_boilers(self):
+            station_name = 'Районные котельные'
+        
+        
+                    
+        def add_block_staion_natural_gas(self, fixed_el_load_data_rel):
+            station_name = 'Блок-станции(газ)'
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+            block_station = self.block_creator.get_block_station_natural_gas(
+                nominal_value = 620,
+                station_name = station_name,
+                fixed_el_load_data_rel= fixed_el_load_data_rel
+            )
+                                
+        def add_renewables(self, fixed_el_load_data_rel):
+            station_name = 'ВИЭ'
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+            # block_station = self.block_creator.
+            
+            
+        def add_small_chp(self):
+            station_name = 'Малые ТЭЦ'
+            
+            
+            
+            
+            
+            
                         
 
         def add_Bel_npp(self):
@@ -552,6 +619,7 @@ class Specific_stations:
             ###############################################################
             vver_1200_1 = block_creator.get_vver_1200(global_id(), local_id(), station_name, -999)
             vver_1200_2 = block_creator.get_vver_1200(global_id(), local_id(), station_name, -999)
+            # новый блок аэс
             ###############################################################
             hw_sink = steam_sink = None
             ###############################################################
@@ -651,6 +719,7 @@ class Specific_stations:
 
         def add_natural_gas_source(self, usd_per_1000_m3):
             self.block_creator.get_natural_gas_source('природный_газ_источник', usd_per_1000_m3)
+            self.natural_gas_price = usd_per_1000_m3
             
             
         def add_electricity_source(self, nominal_value ,usd_per_Mwth):

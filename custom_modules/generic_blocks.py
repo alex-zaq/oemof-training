@@ -51,6 +51,29 @@ class Generic_blocks:
                 self.block_collection.append(tr) 
             return tr
     
+        def create_simple_transformer_with_fixed_load(
+            self,
+            nominal_value,
+            input_flow,
+            output_flow,
+            efficiency,
+            variable_costs,
+            group_options,
+            fixed_el_load_data_rel
+        ):
+            tr = solph.components.Transformer(
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
+            inputs = {input_flow: solph.Flow()},
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, fix = fixed_el_load_data_rel, variable_costs = variable_costs)},
+            conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
+            )
+            tr.group_options = group_options
+            self.es.add(tr)
+            if isinstance(self.block_collection, list):
+                self.block_collection.append(tr) 
+            return tr
+    
+    
         def create_simple_transformer_nonconvex(
             self,
             nominal_value,

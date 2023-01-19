@@ -86,7 +86,7 @@ class Generic_blocks:
             tr = solph.components.Transformer(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
             inputs = {input_flow: solph.Flow()},
-            outputs = {output_flow: solph.Flow( nominal_value = nominal_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex())},
+            outputs = {output_flow: solph.Flow( nominal_value = nominal_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999))},
             conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
             )
             tr.group_options = group_options
@@ -105,6 +105,7 @@ class Generic_blocks:
             min_power_fraction,
             boiler_efficiency ,
             variable_costs,
+            initial_status,
             group_options
             ):
             P_out_max = nominal_value     										 # absolute nominal output power
@@ -121,7 +122,7 @@ class Generic_blocks:
                 max = 1,
                 min = P_in_min/P_in_max,
                 # fix = fixedGenerationData,
-                nonconvex = solph.NonConvex())},
+                nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status))},
                 outputs = {output_flow: solph.Flow(variable_costs = variable_costs)},
                 coefficients = [c0, c1],
             )
@@ -140,7 +141,7 @@ class Generic_blocks:
             group_options):
             npp_block = solph.components.Source(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
-            outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)},
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999), variable_costs = variable_costs)},
             group_options = group_options
             )
             npp_block.group_options = group_options
@@ -195,7 +196,7 @@ class Generic_blocks:
             main_output_tr = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {el_inner_bus: solph.Flow()},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(), variable_costs = variable_costs)},
+            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999), variable_costs = variable_costs)},
             group_options = group_options
             )
             main_output_tr.group_options = deepcopy(group_options)
@@ -225,7 +226,7 @@ class Generic_blocks:
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'электроэнергия_чистый_П_режим'),
 
             inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P)},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
+            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999)),
                                     output_flow_P: solph.Flow()
                                 },
             conversion_factors = {input_flow: (1 + heat_to_el_P) / (efficiency_P * boiler_efficiency), output_flow_el: 1, output_flow_P: heat_to_el_P},
@@ -253,7 +254,7 @@ class Generic_blocks:
             pt_full_T_mode = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'электроэнергия_чистый_Т_режим'),
             inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs),
+            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs,  nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999)),
                                 output_flow_T: solph.Flow()
                                 },
             conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
@@ -303,7 +304,7 @@ class Generic_blocks:
             T_turbine = solph.components.ExtractionTurbineCHP (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
-            outputs = {output_flow_el: solph.Flow(nominal_value = max_el_value, min = update_min_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
+            outputs = {output_flow_el: solph.Flow(nominal_value = max_el_value, min = update_min_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999)),
                                     output_flow_T: solph.Flow()
                                     },
             conversion_factors = {output_flow_el: el_eff, output_flow_T: hw_eff},
@@ -330,7 +331,7 @@ class Generic_blocks:
             tr = solph.components.Transformer(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {input_flow: solph.Flow()},
-            outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex()),
+            outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999)),
                             output_flow_P: solph.Flow()},
             conversion_factors = {input_flow: (1 + heat_to_el_P) /(efficiency_P * boiler_efficiency), output_flow_el: 1, output_flow_P: heat_to_el_P},
             ) 
@@ -377,6 +378,25 @@ class Generic_sources:
             if isinstance(self.block_collection, list):
                  self.block_collection.append(source)
             return source
+        
+        def create_source_with_fixed_load(
+            self,
+            nominal_value,
+            output_flow,
+            variable_costs,
+            group_options,
+            fixed_el_load_data_rel
+        ):
+            tr = solph.components.Source(
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, fix = fixed_el_load_data_rel, variable_costs = variable_costs)},
+            )
+            tr.group_options = group_options
+            self.es.add(tr)
+            if isinstance(self.block_collection, list):
+                self.block_collection.append(tr) 
+            return tr
+    
 
         def create_resource(self, label, output_flow, variable_costs):
             source = solph.components.Source(

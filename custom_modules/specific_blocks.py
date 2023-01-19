@@ -133,7 +133,7 @@ class Specific_blocks:
             
             
             
-        def get_k_160(self,global_index, local_index, station_name, group_options = None, planning_outage = None):
+        def get_k_160(self,global_index, local_index, station_name, variable_costs, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 160,
@@ -144,6 +144,8 @@ class Specific_blocks:
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
+                # variable_costs = variable_costs,
+                initial_status= 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -170,6 +172,7 @@ class Specific_blocks:
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
+                initial_status= 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -194,6 +197,7 @@ class Specific_blocks:
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
+                initial_status= 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -219,6 +223,7 @@ class Specific_blocks:
                 min_power_fraction = 0.36,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
+                initial_status= 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -244,6 +249,7 @@ class Specific_blocks:
                 min_power_fraction = 0.36,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
+                initial_status= 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -271,6 +277,7 @@ class Specific_blocks:
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 1,
+                initial_status= 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -295,6 +302,7 @@ class Specific_blocks:
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 1,  
+                initial_status= 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -1032,6 +1040,72 @@ class Specific_blocks:
             'nominal_value': nominal_value
             }
             )
+            
+            
+        def get_wind_renewables(self, global_index, local_index, nominal_value, station_name, fixed_el_load_data_rel, variable_costs = 0):
+            block_type = self.block_type['виэ-ветер']
+            return self.g_source_creator.create_source_with_fixed_load(
+            nominal_value = nominal_value,
+            output_flow = self.global_el_flow,
+            variable_costs = variable_costs,
+            fixed_el_load_data_rel = fixed_el_load_data_rel,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': block_type,
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': nominal_value
+            })
+            
+        def get_solar_renewables(self, global_index, local_index, nominal_value, station_name, fixed_el_load_data_rel, variable_costs = 0):
+            block_type = self.block_type['виэ-солнце']
+            return self.g_source_creator.create_source_with_fixed_load(
+            nominal_value = nominal_value,
+            output_flow = self.global_el_flow,
+            variable_costs = variable_costs,
+            fixed_el_load_data_rel = fixed_el_load_data_rel,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': block_type,
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': nominal_value
+            })
+            
+        def get_hydro_renewables(self, global_index, local_index, nominal_value, station_name, fixed_el_load_data_rel, variable_costs = 0):
+            block_type = self.block_type['виэ-вода']
+            return self.g_source_creator.create_source_with_fixed_load(
+            nominal_value = nominal_value,
+            output_flow = self.global_el_flow,
+            variable_costs = variable_costs,
+            fixed_el_load_data_rel = fixed_el_load_data_rel,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': block_type,
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': nominal_value
+            })
+
+
+
+
+
 
 
 

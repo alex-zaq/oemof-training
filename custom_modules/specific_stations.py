@@ -312,7 +312,7 @@ class Specific_stations:
             t_255_1 = block_creator.get_t_250 (global_id(), local_id(), station_name, hw_bus)
             t_110_1 = block_creator.get_t_110 (global_id(), local_id(), station_name, hw_bus)
             t_110_2 = block_creator.get_t_110 (global_id(), local_id(), station_name, hw_bus)
-            el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 1.163 * 137.6, hw_bus , 0)
+            el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 1.163 * 137.6 * 10, hw_bus , 0)
             # фейковые дорогие источники тепла
             back_hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 10_000, hw_bus, 9999)
             # back_steam_gas_boilers = block_creator.get_gas_boilers(next(),station_name, 10_000, hw_bus, 9999)
@@ -447,7 +447,6 @@ class Specific_stations:
             
         def add_Lukomolskay_gres(self, heat_water_demand_data = None):
             station_name = 'Лукомольская ГРЭС'
-            plot_options =  {'station_order': 1, 'block_type_order': ['пгу-кэс','к','эк','кот']}
             ###############################################################
             create_buses = self.bus_creator.create_buses
             block_creator = self.block_creator
@@ -573,18 +572,131 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
-            block_station = self.block_creator.get_block_station_natural_gas(
-                nominal_value = 620,
+            block_stations = self.block_creator.get_block_station_natural_gas(
+                global_index = global_id(),
+                local_index = local_id(),
+                nominal_value = 762.4,
                 station_name = station_name,
                 fixed_el_load_data_rel= fixed_el_load_data_rel
             )
+            
+            ###############################################################
+            hw_bus  = steam_bus = None
+            hw_sink = steam_sink = None
+            ###############################################################
+            el_turb = [block_stations]
+            hw_chp_turb = None
+            hw_gas_boilers = None
+            hw_el_boilers = None
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
+        
                                 
-        def add_renewables(self, fixed_el_load_data_rel):
+        def add_renewables_fixed(self, fixed_wind_rel, fixed_solar_rel, fixed_hydro_rel):
+            station_name = 'ВИЭ'
+            counter = Custom_counter()
+            global_id = self.inc_global_id
+            local_id = counter.next
+                        
+            hydro_renewables = self.block_creator.get_hydro_renewables(
+                global_index = global_id(),
+                local_index = local_id(),
+                nominal_value = 95.3,
+                station_name = station_name,
+                fixed_el_load_data_rel= fixed_hydro_rel
+            )
+            
+            wind_renewables = self.block_creator.get_wind_renewables(
+                global_index = global_id(),
+                local_index = local_id(),
+                nominal_value = 125.8,
+                station_name = station_name,
+                fixed_el_load_data_rel= fixed_wind_rel
+            )
+            
+            solar_renewables = self.block_creator.get_solar_renewables(
+                global_index = global_id(),
+                local_index = local_id(),
+                nominal_value = 160.7,
+                station_name = station_name,
+                fixed_el_load_data_rel= fixed_solar_rel
+            )
+            ###############################################################
+            hw_bus  = steam_bus = None
+            hw_sink = steam_sink = None
+            ###############################################################
+            el_turb = [wind_renewables, solar_renewables, hydro_renewables]
+            hw_chp_turb = None
+            hw_gas_boilers = None
+            hw_el_boilers = None
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
+                                   
+                                            
+        def add_renewables_var(self):
             station_name = 'ВИЭ'
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
             # block_station = self.block_creator.
+            
+            
+            
+            
             
             
         def add_small_chp(self):

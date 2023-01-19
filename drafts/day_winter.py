@@ -479,7 +479,7 @@ shutdownOptions = 24 * [2 * 10000000006]
 lukomol_ccgt_427_block_9 = solph.components.Transformer(
     label="lukomol_ccgt_427_block_9",
 		inputs = {b_gas_bus:solph.Flow()},
-    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(maximum_startups = 1, startup_costs = startupOptions, shutdown_costs =shutdownOptions), min=0.4, max = 1, nominal_value= 427, variable_costs=35)},
+    outputs={b_el_global_bus:solph.Flow(nonconvex = solph.NonConvex(initial_status = 1 ,startup_costs = startupOptions, shutdown_costs =999999), min=0.4, max = 1, nominal_value= 427, variable_costs=35)},
 		conversion_factors = {b_gas_bus:1, b_el_global_bus: 0.57}
     )
 energysystem.add(lukomol_ccgt_427_block_9)
@@ -487,7 +487,7 @@ energysystem.add(lukomol_ccgt_427_block_9)
 lukomol_K_300__block_1 = solph.components.Transformer(
     label="lukomol_K_300_block_1",
 		inputs = {b_gas_bus:solph.Flow()},
-    outputs={b_el_global_bus:solph.Flow(min=0.4, nominal_value = 300, variable_costs= 50, nonconvex = solph.NonConvex(maximum_startups = 1, startup_costs = startupOptions,shutdown_costs =shutdownOptions))},
+    outputs={b_el_global_bus:solph.Flow(min=0.4, nominal_value = 300, variable_costs= 50, nonconvex = solph.NonConvex(initial_status = 1, startup_costs = startupOptions,shutdown_costs =99999))},
 		conversion_factors = {b_gas_bus:1, b_el_global_bus: 0.40}
     )
 energysystem.add(lukomol_K_300__block_1)

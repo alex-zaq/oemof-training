@@ -227,7 +227,10 @@ class Custom_result_grouper:
                 res = pd.DataFrame()
                 for el_block in sorted_blocks:
                      res[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+                res[res < 0] = 0     
                 res = res.loc[:, (res > 0.1).any(axis=0)]
+                
+                # res = res[(res > 0).all()]
                 return res    
             elif commodity_type in ['гвс', 'пар']:
                 i = 0
@@ -246,6 +249,7 @@ class Custom_result_grouper:
                            current_station_name_inner = sorted_blocks[i].group_options['station_name']
                         else:
                             break
+                res[res < 0] = 0   
                 res = res.loc[:, (res > 0.1).any(axis=0)]
                 return res
         

@@ -11,6 +11,7 @@ from custom_modules.specific_stations import Specific_stations
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, get_peak_load_by_energy_2020
 from custom_modules.result_proccessing import Custom_result_grouper
+from custom_modules.scenario_builder import Scenario_builder
 
 winter_work_day_2020 = dict(
             start_date = find_first_monday(2020, months['февраль'], None),
@@ -31,6 +32,8 @@ number_of_time_steps = data_time_options['number_of_time_steps']
 current_start_date = data_time_options['selected_interval']['start_date']
 date_time_index = pd.date_range(current_start_date, periods=number_of_time_steps, freq="H")
 es = solph.EnergySystem(timeindex=date_time_index, infer_last_interval= True)
+
+
 
 excel_reader = get_excel_reader(folder ='./data_excel', file = 'test_data.xlsx' )
 
@@ -59,12 +62,22 @@ el_sink = Generic_sinks(es).create_sink_fraction_demand('электричест�
 custom_es = Specific_stations(es, gas_bus, el_bus)
 custom_es.add_natural_gas_source(usd_per_1000_m3 = 10)
 
-bel_npp = custom_es.add_Bel_npp()
+
+
+scen_builder = Scenario_builder(custom_es)
+scen_builder.set_electricity_level(profile = power_rel, level_in_billion_kWth = 37.3)
+scen_builder.set_natural_gas_price(usd_per_1000_m3 = 250)
+
+
+
+    
+
+renewables = custom_es.add_renewables_fixed(wind_load_data, solar_load_data, hydro_load_data)
+lukomolskay_gres= custom_es.add_Lukomolskay_gres()
 minskay_tec_4 = custom_es.add_Minskay_tec_4(heat_water_demand_data = minskay_tec_4_hw_abs)
 novopockay_tec = custom_es.add_Novopockay_tec(heat_water_demand_data = novopockay_tec_hw_abs, steam_demand_data = novopockay_tec_steam_abs)
-lukomolskay_gres= custom_es.add_Lukomolskay_gres()
 block_station = custom_es.add_block_staion_natural_gas(fixed_el_load_data_rel = block_station_load_data)
-renewables = custom_es.add_renewables_fixed(wind_load_data, solar_load_data, hydro_load_data)
+bel_npp = custom_es.add_Bel_npp()
 fake_el_source = custom_es.add_electricity_source(10000, usd_per_Mwth = 9999)
 
 

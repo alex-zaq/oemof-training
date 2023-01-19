@@ -132,11 +132,11 @@ class Specific_blocks:
             })    
             
             
-            
+            # мощность повышена на 5 МВт
         def get_k_160(self,global_index, local_index, station_name, variable_costs, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
-                nominal_value = 160,
+                nominal_value = 165,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
                 efficiency_min = 0.378,
@@ -156,19 +156,19 @@ class Specific_blocks:
                 'heat_demand_type': None,
                 'station_order': None,
                 'block_order': None,
-                'nominal_value': 160              
+                'nominal_value': 165              
                 }  
             )
             
-            
+            # мощность повышена на 5 МВт
         def get_k_175(self,global_index, local_index,station_name, group_options = None, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
-                nominal_value = 175,
+                nominal_value = 180,
                 input_flow = self.global_natural_gas_flow,
                 output_flow = self.global_el_flow,
                 efficiency_min = 0.39,
-                efficiency_max = 0.42,
+                efficiency_max = 0.43,
                 min_power_fraction = 0.4,
                 variable_costs = 0,
                 boiler_efficiency = 0.9,
@@ -183,7 +183,7 @@ class Specific_blocks:
                 'heat_demand_type': None,
                 'station_order': None,
                 'block_order': None,
-                'nominal_value': 175   
+                'nominal_value': 180   
                 }   
             )
         def get_k_300(self,global_index, local_index, station_name, group_options = None, planning_outage = None):

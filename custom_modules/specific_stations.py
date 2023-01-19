@@ -25,6 +25,7 @@ class Specific_stations:
             self.sink_creator = Generic_sinks(es)
             self.bus_creator = Generic_buses(es)
             self.active_stations_data = {}
+            self.allowSiemens = True
 			
         def inc_global_id(self):
             self.__global_id +=1
@@ -529,38 +530,115 @@ class Specific_stations:
             return station_name
             
             
+        def add_Berezovskay_gres(self):
+            station_name = 'Березовская ГРЭС'
+            
+            # К-160-130 (165)
+            # ГТЭ-25НГ80
+            # ГТЭ-25НГ80
+            # К-160-130-2ПР1 (165)
+            # SGT-700 (29.06)
+            # К-175/180-12,8 (180)
+            # SGT5-4000F (285,87)
+            # LZN140-12,78/2,937/ 0,391  (141,13)
+            # В/о ЭК	25.8	Гкал/час
+            # турбины	1095.12	МВт
+
+
+            
+        def add_Minskay_tec_5(self):
+            station_name = 'Минская ТЭЦ-5'
+            # ТК-330-240-3М
+            # M701F  (270)
+            # TC2F  (129.6)
+            # турбины	719.6	МВт	
+            # в/о котлы	100	Гкал/час	
+
+            
+            
         def add_Mogilevskay_tec_2(self):
             station_name = 'Могилевская ТЭЦ-2'
+
+            # ПТ-65-130/21 (60 - ограничение)
+            # ПТ-50-130/7
+            # Р-50-130/22/8
+            # ПТ-135/165-130/21
+            # SST-060 (2.3 МВт)
+            # турбины	302.3	МВт
+            # в/о котлы	400	Гкал/час	
+            # В/о ЭК	34.4	Гкал/час	
             
                         
             
         def add_Bobryskay_tec_2(self):
             station_name = 'Бобруйская ТЭЦ-2'
+            # ПТ-60-130/22
+            # ПТ-60-130/13
+            # ПТ-60-130/22
+            # SST-110 (2,6)
+            # турбины	182.6	МВт
+            #   в/о котлы	460	Гкал/час	
+            # В/о ЭК	25.8	Гкал/час	
+
+            
+
             
         def add_Grodnenskay_tec_2(self):
             station_name = 'Гродненская ТЭЦ-2'
+            # ПТ-70-12,8/1,28
+            # ПТ-70-12,8/1,28
+            # Р-50-130/13
+            # ТГ-0,75 ПА/6,3Р14/4
+            # PG 9171E
+            # турбины	312.45	МВт
+            # в/о котлы	380	Гкал/час	
+            # в/о ЭК	51.6	Гкал/час	
+
+
+        def add_Svetlogorskay_tec(self):
+            station_name = 'Cветлогорская ТЭЦ'
             
-            
-                        
-        def add_Minskay_tec_3(self):
-            station_name = 'Минская ТЭЦ-3'
-            
-                        
-                        
-        def add_Gomelskay_tec_2(self):
-            station_name = 'Гомельская ТЭЦ-2'
+            # Р-15-90/10
+            # ТР-16-10
+            # Т-14/25-10
+            # ПТ-60-130/13
+            # Р-50-130-1ПР1
+            # турбины	155	МВт
+
             
             
         def add_Mozyrskay_tec_2(self):
             station_name = 'Мозырская ТЭЦ-2'
+            # ПТ-70-130/40/13
+            # ПТ-135/165-130/15
+            # турбины	205	МВт
 
-            
-        def add_Svetlogorskay_tec(self):
-            station_name = 'Cветлогорская ТЭЦ'
 
-        def add_Minskay_tec_2(self):
-            station_name = 'Минская ТЭЦ-2'
-            
+                        
+        def add_Minskay_tec_3(self):
+            station_name = 'Минская ТЭЦ-3'
+            # ПТ-60-130/13
+            # ПТ-60-130/13
+            # Т-100-130
+            # GT 13E2
+            # Т-53/67-8,0
+            # турбины	442	МВт	
+            # в/о котлы	940	Гкал/час	
+            # В/о ЭК	86	Гкал/час	
+
+
+                        
+                        
+        def add_Gomelskay_tec_2(self):
+            station_name = 'Гомельская ТЭЦ-2'
+            # Т-180/210-130-1
+            # Т-180/210-130-1
+            # Т-180/210-130-1
+            # в/о котлы	540	Гкал/час	
+            # В/о ЭК	68.8	Гкал/час	
+
+
+
             
         def add_district_boilers(self):
             station_name = 'Районные котельные'
@@ -620,6 +698,7 @@ class Specific_stations:
         
                                 
         def add_renewables_fixed(self, fixed_wind_rel, fixed_solar_rel, fixed_hydro_rel):
+            # сделать варинат без фиксированной нагрузки
             station_name = 'ВИЭ'
             counter = Custom_counter()
             global_id = self.inc_global_id
@@ -687,23 +766,10 @@ class Specific_stations:
             return station_name
                                    
                                             
-        def add_renewables_var(self):
-            station_name = 'ВИЭ'
-            counter = Custom_counter()
-            local_id = counter.next
-            global_id = self.inc_global_id
-            # block_station = self.block_creator.
             
             
-            
-            
-            
-            
-        def add_small_chp(self):
+        def add_small_chp_fixed(self):
             station_name = 'Малые ТЭЦ'
-            
-            
-            
             
             
             
@@ -772,7 +838,8 @@ class Specific_stations:
             
             
             
-            
+        def add_new_block_group(self):
+            station_name = 'Новые энергоисточники'
             
             
             
@@ -867,3 +934,6 @@ class Specific_stations:
                                 'пар-потребитель': None
                 }} 
             return station_name
+
+
+

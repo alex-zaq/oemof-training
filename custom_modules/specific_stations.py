@@ -10,6 +10,7 @@ from custom_modules.helpers import set_label
 from custom_modules.specific_blocks import Specific_blocks
 from custom_modules.generic_blocks import Generic_sinks, Generic_buses
 from custom_modules.helpers import Custom_counter, set_label
+from custom_modules.helpers import get_peak_load_by_energy_2020
 from functools import reduce
 
 
@@ -21,11 +22,30 @@ class Specific_stations:
             self.__global_input_flow = global_input_flow
             self.__global_output_flow = global_output_flow
             self.__global_id = 0
+            self.gobal_elictricity_sink = None
+            self.__get_peak_load_from_profile = None
             self.block_creator = Specific_blocks(es, global_input_flow, global_output_flow)
             self.sink_creator = Generic_sinks(es)
             self.bus_creator = Generic_buses(es)
             self.active_stations_data = {}
             self.allowSiemens = True
+            
+        
+        def set_electricity_profile(self, profile):
+            self.profile = profile
+            
+            
+        def set_electricity_level(self, level_in_billion_kWth):
+            if self.profile.empty:
+                raise Exception('Не установлен профиль электрической нагрузки')
+            self.gobal_elictricity_sink = self.sink_creator.create_sink_fraction_demand(
+                'электричество_потребитель',
+                self.__global_output_flow,
+                demand_profile = self.profile,
+                peak_load= get_peak_load_by_energy_2020(level_in_billion_kWth)
+            )
+            
+            
 			
         def inc_global_id(self):
             self.__global_id +=1

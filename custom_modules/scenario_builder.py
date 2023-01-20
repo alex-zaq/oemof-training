@@ -18,13 +18,15 @@ class Scenario_builder:
     def __init__(self, custom_es) -> None:
         self.custom_es = custom_es
     
-    def set_electricity_level(self, profile, level_in_billion_kWth):
-        # +++++++++
-        return self
+    def set_electricity_level(self,energy_level_in_billion_kWth):
+        self.custom_es.set_electricity_level(energy_level_in_billion_kWth)
+
+
+    def set_electricity_profile(self, elictricity_profile):
+        self.custom_es.set_electricity_profile(elictricity_profile)
 
     def set_natural_gas_price(self, usd_per_1000_m3):
-        # +++++++++
-        return self
+        self.custom_es.add_natural_gas_source(usd_per_1000_m3)
     
     def remove_siemens(self):
         # +++++++++

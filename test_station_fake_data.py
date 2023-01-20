@@ -39,9 +39,7 @@ excel_reader = get_excel_reader(folder ='./data_excel', file = 'test_data.xlsx' 
 
 data = excel_reader(sheet_name='test_data')
 
-energy = 37.3
 power_rel = data['Power-rel']
-peak_load = get_peak_load_by_energy_2020(energy)
 
 minskay_tec_4_hw_abs = data['Минская ТЭЦ-4-гвс']
 novopockay_tec_hw_abs = data['Новополоцкая ТЭЦ-гвс']
@@ -57,16 +55,12 @@ hydro_load_data = data['Вода']
 
 
 [el_bus, gas_bus] = Generic_buses(es).create_buses('электричество_поток','природный_газ_поток')
-el_sink = Generic_sinks(es).create_sink_fraction_demand('электричество_потребитель', el_bus, demand_profile = power_rel, peak_load= peak_load)
-
 custom_es = Specific_stations(es, gas_bus, el_bus)
-custom_es.add_natural_gas_source(usd_per_1000_m3 = 10)
-
-
 
 scen_builder = Scenario_builder(custom_es)
-scen_builder.set_electricity_level(profile = power_rel, level_in_billion_kWth = 37.3)
-scen_builder.set_natural_gas_price(usd_per_1000_m3 = 250)
+scen_builder.set_electricity_profile(elictricity_profile = power_rel)
+scen_builder.set_electricity_level(energy_level_in_billion_kWth= 37.3)
+scen_builder.set_natural_gas_price(usd_per_1000_m3=10)
 
 
 
@@ -169,7 +163,7 @@ hw_df = result_processor.get_dataframe_by_commodity_type('гвс')
 
 # steam_df = result_processor.get_dataframe_by_commodity_type('пар')
 
-el_demand_orig = result_processor.get_dataframe_orig_electricity_demand(el_bus, el_sink)
+el_demand_orig = result_processor.get_dataframe_orig_electricity_demand(el_bus, custom_es.gobal_elictricity_sink)
 
 
 

@@ -58,7 +58,7 @@ el_sink = Generic_sinks(es).create_sink_absolute_demand('электричест�
 
 custom_es = Specific_stations(es, gas_bus, el_bus)
 
-custom_es.add_natural_gas_source(usd_per_1000_m3 = 200)
+custom_es.__add_natural_gas_source(usd_per_1000_m3 = 200)
 
 bel_npp = custom_es.add_Bel_npp()
 minskay_tec_4 = custom_es.add_Minskay_tec_4(heat_water_demand_data = hw_minskay_tec_4)

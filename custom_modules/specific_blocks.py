@@ -264,6 +264,35 @@ class Specific_blocks:
                 }    
             )
                        
+        def get_tk_330(self,global_index, local_index, station_name, group_options = None, planning_outage = None):
+            block_type = self.block_type['к']
+            return self.g_block_creator.create_offset_transformer(
+                nominal_value = 330,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
+                efficiency_min = 0.42,
+                efficiency_max = 0.49,
+                min_power_fraction = 0.4,
+                variable_costs = 0,
+                boiler_efficiency = 0.9,
+                initial_status= 1,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'ТК-330',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 330   
+                }    
+            )
+                       
+            
+            
+            
             
             
         def get_ccgt_399(self,global_index, local_index, station_name,  group_options = None, planning_outage = None):
@@ -356,6 +385,7 @@ class Specific_blocks:
                 heat_to_el_T = 1.6767,
                 efficiency_full_condensing_mode = 0.41,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -385,6 +415,7 @@ class Specific_blocks:
             heat_to_el_T = 1.9,
             efficiency_full_condensing_mode = 0.4,
             variable_costs = 0,
+            initial_status = 1,
             boiler_efficiency = 0.9,
             group_options = {
             'global_index': str(global_index),
@@ -415,6 +446,7 @@ class Specific_blocks:
                 heat_to_el_T = 1.85,
                 efficiency_full_condensing_mode = 0.39,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -447,6 +479,7 @@ class Specific_blocks:
             heat_to_el_T = 1.9,
             efficiency_full_condensing_mode = 0.41,
             variable_costs = 0,
+            initial_status = 1,
             boiler_efficiency = 1,
             group_options = {
             'global_index': str(global_index),
@@ -479,6 +512,7 @@ class Specific_blocks:
             heat_to_el_P = 3.8,
             heat_to_el_T = 2.02,
             variable_costs = 0,
+            initial_status = 1,
             boiler_efficiency = 1,
             group_options = {
             'global_index': str(global_index),
@@ -507,6 +541,7 @@ class Specific_blocks:
             efficiency_P = 0.91,
             heat_to_el_P = 3.8,
             variable_costs = 0,
+            initial_status = 1,
             boiler_efficiency = 1,
             group_options = {
             'global_index': str(global_index),
@@ -534,6 +569,7 @@ class Specific_blocks:
             efficiency_T = 0.91,
             heat_to_el_T = 2.02,
             variable_costs = 0,
+            initial_status = 1,
             boiler_efficiency = 1,
             group_options = {
             'global_index': str(global_index),
@@ -565,6 +601,7 @@ class Specific_blocks:
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -593,6 +630,7 @@ class Specific_blocks:
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9, 
                 group_options = {
                 'global_index': str(global_index),
@@ -621,6 +659,7 @@ class Specific_blocks:
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -654,6 +693,7 @@ class Specific_blocks:
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -681,6 +721,7 @@ class Specific_blocks:
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -708,6 +749,7 @@ class Specific_blocks:
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -740,6 +782,7 @@ class Specific_blocks:
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -767,6 +810,7 @@ class Specific_blocks:
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -794,6 +838,7 @@ class Specific_blocks:
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -826,6 +871,7 @@ class Specific_blocks:
                 heat_to_el_P = 3.8,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -853,6 +899,7 @@ class Specific_blocks:
                 efficiency_P = 0.91,
                 heat_to_el_P = 3.8,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'global_index': str(global_index),
@@ -880,6 +927,7 @@ class Specific_blocks:
                 efficiency_T = 0.91,
                 heat_to_el_T = 2.02,
                 variable_costs = 0,
+                initial_status = 1,
                 boiler_efficiency = 0.9,
                 group_options = {
                 'local_index': str(local_index),
@@ -906,6 +954,7 @@ class Specific_blocks:
             efficiency_P = 0.91,
             heat_to_el_P = 3.8,
             variable_costs = 0,
+            initial_status = 1,
             boiler_efficiency = 0.9,
             group_options = {
             'global_index': str(global_index),
@@ -931,6 +980,7 @@ class Specific_blocks:
                 min_power_fraction = 0.75,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
+                initial_status = 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -955,6 +1005,7 @@ class Specific_blocks:
                 min_power_fraction = 0.75,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
+                initial_status = 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -979,6 +1030,7 @@ class Specific_blocks:
                 min_power_fraction = 0.65,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
+                initial_status = 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -1003,6 +1055,7 @@ class Specific_blocks:
                 min_power_fraction = 0.65,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
+                initial_status = 1,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),

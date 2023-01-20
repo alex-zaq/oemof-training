@@ -29,16 +29,13 @@ class Scenario_builder:
         self.custom_es.add_natural_gas_source(usd_per_1000_m3)
     
     def remove_siemens(self):
-        # +++++++++
-        return self
+        self.custom_es.allowSiemens = False
     
     def reduce_block_station_power_to_minimum(self):
-        # +++++++++
-        return self
+        self.custom_es.reduce_block_station_power = True
     
     def remove_renewables(self):
-        # +++++++++
-        return self
+        self.custom_es.allowRenewables = False
     
     def remove_turb_steam(self):
         # +++++++++
@@ -70,19 +67,19 @@ class Scenario_builder:
     def displace_heat_boilers_by_power(self, power):
         return self
     
-    def add_vver_toi_1255(self, allow_power_variability = False):
+    def add_vver_toi_1255(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
         # +++++++++
         return self
     
-    def add_vver_600(self, allow_power_variability = False):
+    def add_vver_600(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
         # +++++++++
         return self
 
-    def allow_bel_npp_power_changes(self):
+    def change_bel_npp_options(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
         # +++++++++
         return self
     
-    def add_ritm_200(self, allow_power_variability = False):
+    def add_ritm_200(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
         # +++++++++
         return self
     

@@ -10,7 +10,7 @@ from custom_modules.helpers import set_label
 from custom_modules.specific_blocks import Specific_blocks
 from custom_modules.generic_blocks import Generic_sinks, Generic_buses
 from custom_modules.helpers import Custom_counter, set_label
-from custom_modules.helpers import get_peak_load_by_energy_2020
+from custom_modules.helpers import get_peak_load_by_energy_2020, get_peak_load_by_energy_2021
 from functools import reduce
 
 
@@ -29,6 +29,8 @@ class Specific_stations:
             self.bus_creator = Generic_buses(es)
             self.active_stations_data = {}
             self.allowSiemens = True
+            self.allowRenewables = True
+            self.reduce_block_station_power = False
             
         
         def set_electricity_profile(self, profile):
@@ -42,7 +44,7 @@ class Specific_stations:
                 'электричество_потребитель',
                 self.__global_output_flow,
                 demand_profile = self.profile,
-                peak_load= get_peak_load_by_energy_2020(level_in_billion_kWth)
+                peak_load= get_peak_load_by_energy_2021(level_in_billion_kWth)
             )
             
             
@@ -496,7 +498,8 @@ class Specific_stations:
             k_300_6 = block_creator.get_k_300(global_id(), local_id(), station_name)
             k_300_7 = block_creator.get_k_300(global_id(), local_id(), station_name)
             k_300_8 = block_creator.get_k_300(global_id(), local_id(), station_name)
-            ccgt_427 = block_creator.get_ccgt_427(global_id(), local_id(), station_name)
+            if self.allowSiemens:
+                ccgt_427 = block_creator.get_ccgt_427(global_id(), local_id(), station_name)
             ###############################################################
             el_boilers_hw = None
             back_hw_gas_boilers = None
@@ -515,7 +518,9 @@ class Specific_stations:
             # input_flow = steam_bus,
             # demand_absolute_data = steam_demand_data)
             ###############################################################
-            el_turb = [k_315_1, k_315_2, k_315_3, k_310_4, k_300_5, k_300_6, k_300_7, k_300_8, ccgt_427]
+            el_turb_no_siemens = [k_315_1, k_315_2, k_315_3, k_310_4, k_300_5, k_300_6, k_300_7, k_300_8]
+            el_turb_siemens = [ccgt_427] if self.allowSiemens else []
+            el_turb = el_turb_no_siemens + el_turb_siemens
             hw_chp_turb = None
             hw_gas_boilers = back_hw_gas_boilers
             hw_el_boilers = el_boilers_hw
@@ -670,10 +675,11 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            block_stations_install_power = 200 if self.reduce_block_station_power else 630
             block_stations = self.block_creator.get_block_station_natural_gas(
                 global_index = global_id(),
                 local_index = local_id(),
-                nominal_value = 762.4,
+                nominal_value = block_stations_install_power,
                 station_name = station_name,
                 fixed_el_load_data_rel= fixed_el_load_data_rel
             )
@@ -723,35 +729,37 @@ class Specific_stations:
             counter = Custom_counter()
             global_id = self.inc_global_id
             local_id = counter.next
-                        
-            hydro_renewables = self.block_creator.get_hydro_renewables(
-                global_index = global_id(),
-                local_index = local_id(),
-                nominal_value = 95.3,
-                station_name = station_name,
-                fixed_el_load_data_rel= fixed_hydro_rel
-            )
             
-            wind_renewables = self.block_creator.get_wind_renewables(
-                global_index = global_id(),
-                local_index = local_id(),
-                nominal_value = 125.8,
-                station_name = station_name,
-                fixed_el_load_data_rel= fixed_wind_rel
-            )
-            
-            solar_renewables = self.block_creator.get_solar_renewables(
-                global_index = global_id(),
-                local_index = local_id(),
-                nominal_value = 160.7,
-                station_name = station_name,
-                fixed_el_load_data_rel= fixed_solar_rel
-            )
-            ###############################################################
+            if self.allowRenewables:
+                hydro_renewables = self.block_creator.get_hydro_renewables(
+                    global_index = global_id(),
+                    local_index = local_id(),
+                    nominal_value = 95.3,
+                    station_name = station_name,
+                    fixed_el_load_data_rel= fixed_hydro_rel
+                )
+                
+                wind_renewables = self.block_creator.get_wind_renewables(
+                    global_index = global_id(),
+                    local_index = local_id(),
+                    nominal_value = 125.8,
+                    station_name = station_name,
+                    fixed_el_load_data_rel= fixed_wind_rel
+                )
+                
+                solar_renewables = self.block_creator.get_solar_renewables(
+                    global_index = global_id(),
+                    local_index = local_id(),
+                    nominal_value = 160.7,
+                    station_name = station_name,
+                    fixed_el_load_data_rel= fixed_solar_rel
+                )
+                ###############################################################
             hw_bus  = steam_bus = None
             hw_sink = steam_sink = None
             ###############################################################
-            el_turb = [wind_renewables, solar_renewables, hydro_renewables]
+            el_renewables = [hydro_renewables, wind_renewables, solar_renewables] if self.allowRenewables else []
+            el_turb = [] + el_renewables
             hw_chp_turb = None
             hw_gas_boilers = None
             hw_el_boilers = None

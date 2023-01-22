@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import datetime as dt
 from functools import cmp_to_key
+from custom_modules.helpers import convert_Mwth_to_1000_m3
 
 
 
@@ -66,13 +67,42 @@ class Custom_result_extractor:
     def get_total_gas_consumtion_by_block_type(self, block_type):
         pass
 
-    def get_total_gas_consumption_value(self):
-        pass
+    def get_total_gas_consumption_value_m3(self, scale):
+        global_gas_source = self.custom_es.global_gas_source
+        global_gas_bus = self.custom_es.global_input_bus
+        results = solph.views.node(self.processed_results, global_gas_bus.label)["sequences"].dropna() 
+        res = pd.DataFrame()
+        res['потребление газа'] = results[((global_gas_source.label, global_gas_bus.label), 'flow')]
+        total_gas_consumption_Mwth =  res['потребление газа'].sum()
+        total_gas_consumption_1000_m3 = convert_Mwth_to_1000_m3(total_gas_consumption_Mwth)
+        if scale == 'млн':
+            divider = 1_000
+        elif scale == 'млрд':
+            divider = 1_000_000
+        else:
+            raise Exception('Не выбраны единицы')
+        total_gas_consumption = round(total_gas_consumption_1000_m3 / divider, 3) 
+        return total_gas_consumption
     
+    def get_total_gas_part(self):
+        pass
+
+
     def get_total_gas_consumption_by_station_type(self):
         pass
     
     def get_total_gas_consumption_by_station_value(self, station_name, commodity_type):
+        pass
+    
+    
+    
+    def get_total_el_boilers_power(self):
+        hw_blocks = self.custom_es.get_all_blocks_by_block_type('эк')
+        # el_boilers = hw_blocks[['эк-гвс']]
+        el_boilers_power = self.custom_es.get_install_power_blocklist(hw_blocks)
+        return el_boilers_power
+    
+    def get_el_boilers_power_by_station(self, station_name):
         pass
     
     
@@ -85,13 +115,44 @@ class Custom_result_extractor:
     
     def get_total_el_boilers_consumption_value(self, commodite_type):
         pass
-  
+
 
     def get_dataframe_online_power(self):
-        pass
+        output_bus = self.custom_es.global_output_bus
+        results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+        el_blocks = self.custom_es.get_all_el_blocks()
+        blocks_df = pd.DataFrame()
+        for el_block in el_blocks:
+                blocks_df[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+        blocks_df[blocks_df < 0] = 0     
+        time_length = len(blocks_df.index)
+        for el_block in el_blocks:
+            nominal_el_value = el_block.group_options['nominal_value']
+            blocks_df.loc[blocks_df[el_block.label] > 0, el_block.label] = nominal_el_value
+        blocks_df = blocks_df.loc[:, (blocks_df > 0.1).any(axis=0)]
+        blocks_df = blocks_df.sum(axis=1)
+        blocks_df = pd.DataFrame(blocks_df)
+        blocks_df.columns = ['Включенная мощность']
+        return blocks_df  
+
     
-    def get_dataframe_online_power_by_station(self):
-        pass
+    def get_dataframe_online_power_by_station(self, station_name):
+        output_bus = self.custom_es.global_output_bus
+        results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+        el_blocks = self.custom_es.get_el_blocks_by_station(station_name)
+        blocks_df = pd.DataFrame()
+        for el_block in el_blocks:
+                blocks_df[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
+        blocks_df[blocks_df < 0] = 0     
+        time_length = len(blocks_df.index)
+        for el_block in el_blocks:
+            nominal_el_value = el_block.group_options['nominal_value']
+            blocks_df.loc[blocks_df[el_block.label] > 0, el_block.label] = nominal_el_value
+        blocks_df = blocks_df.loc[:, (blocks_df > 0.1).any(axis=0)]
+        blocks_df = blocks_df.sum(axis=1)
+        blocks_df = pd.DataFrame(blocks_df)
+        blocks_df.columns = ['Включенная мощность ' + station_name]
+        return blocks_df  
 
 
     def get_dataframe_load_fraction(self):
@@ -130,9 +191,6 @@ class Custom_result_extractor:
     def get_usd_MWth_total(self):
         pass
     
-    
-    def get_object_value(self):
-        pass
 
 
 class Custom_result_grouper:
@@ -209,9 +267,9 @@ class Custom_result_grouper:
                     if b1_power == b2_power:
                         return 0
                     elif b1_power > b2_power:
-                        return 1
-                    elif b1_power < b2_power:
                         return -1
+                    elif b1_power < b2_power:
+                        return 1
                 elif b1_block_type_order > b2_block_type_order:
                     return 1
                 elif b1_block_type_order < b2_block_type_order:
@@ -229,8 +287,6 @@ class Custom_result_grouper:
                      res[el_block.label] = results[((el_block.label, output_bus.label), 'flow')]
                 res[res < 0] = 0     
                 res = res.loc[:, (res > 0.1).any(axis=0)]
-                
-                # res = res[(res > 0).all()]
                 return res    
             elif commodity_type in ['гвс', 'пар']:
                 i = 0

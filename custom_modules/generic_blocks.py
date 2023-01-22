@@ -26,8 +26,8 @@ class Generic_buses:
 
 class Generic_blocks:
 
-        def __init__(self, es, block_collection) -> None:
-            self.block_collection = block_collection
+        def __init__(self, es) -> None:
+            # self.block_collection = block_collection
             self.es = es
 
         def create_simple_transformer(
@@ -47,8 +47,8 @@ class Generic_blocks:
             )
             tr.group_options = group_options
             self.es.add(tr)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(tr) 
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(tr) 
             return tr
     
         def create_simple_transformer_with_fixed_load(
@@ -58,19 +58,20 @@ class Generic_blocks:
             output_flow,
             efficiency,
             variable_costs,
+            extra_variable_cost,
             group_options,
             fixed_el_load_data_rel
         ):
             tr = solph.components.Transformer(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
-            inputs = {input_flow: solph.Flow()},
+            inputs = {input_flow: solph.Flow(variable_costs = extra_variable_cost )},
             outputs = {output_flow: solph.Flow(nominal_value = nominal_value, fix = fixed_el_load_data_rel, variable_costs = variable_costs)},
             conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
             )
             tr.group_options = group_options
             self.es.add(tr)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(tr) 
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(tr) 
             return tr
     
     
@@ -82,18 +83,28 @@ class Generic_blocks:
             output_flow,
             efficiency,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            start_up_options,
             group_options):
             tr = solph.components.Transformer(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
-            inputs = {input_flow: solph.Flow()},
-            outputs = {output_flow: solph.Flow( nominal_value = nominal_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(initial_status = initial_status ,startup_costs = 99999, shutdown_costs = 99999))},
-            conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
+            inputs = {input_flow: solph.Flow(variable_costs = extra_variable_cost)},
+            outputs = { output_flow: solph.Flow( nominal_value = nominal_value, min = min_power_fraction, variable_costs = variable_costs, 
+            nonconvex = solph.NonConvex(
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        )
+                        )},
+                       
+            conversion_factors = {input_flow: 1 / efficiency, output_flow: 1}
             )
             tr.group_options = group_options
             self.es.add(tr)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(tr) 
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(tr) 
             return tr
 
         def create_offset_transformer(
@@ -106,7 +117,10 @@ class Generic_blocks:
             min_power_fraction,
             boiler_efficiency ,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            # minimum_uptime,
+            # minimum_downtime,
+            start_up_options,
             group_options
             ):
             P_out_max = nominal_value     										 # absolute nominal output power
@@ -119,18 +133,29 @@ class Generic_blocks:
             tr = solph.components.OffsetTransformer(
                 label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
                 inputs = {input_flow: solph.Flow(
+                variable_costs = 0,
                 nominal_value = P_in_max,
                 max = 1,
                 min = P_in_min/P_in_max,
                 # fix = fixedGenerationData,
-                nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status))},
-                outputs = {output_flow: solph.Flow(variable_costs = variable_costs)},
+                nonconvex = solph.NonConvex(
+                                        initial_status = start_up_options['initial_status'],
+                                        # initial_status = 1,
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns'],
+                                        # minimum_uptime = minimum_uptime,
+                                        # minimum_downtime = minimum_downtime
+                                        ))},
+                outputs = {output_flow: solph.Flow(variable_costs = extra_variable_cost)},
                 coefficients = [c0, c1],
             )
+            # print(tr.max_up_down())
             tr.group_options = group_options
             self.es.add(tr)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(tr) 
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(tr) 
             return tr
 
         def create_NPP_block(
@@ -139,17 +164,24 @@ class Generic_blocks:
             min_power_fraction,
             output_flow,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            start_up_options,
             group_options):
             npp_block = solph.components.Source(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
-            outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status), variable_costs = variable_costs)},
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        ), variable_costs = variable_costs + extra_variable_cost,)},
             group_options = group_options
             )
             npp_block.group_options = group_options
             self.es.add(npp_block)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(npp_block) 
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(npp_block) 
             return npp_block
 
         def create_chp_PT_turbine(
@@ -167,7 +199,8 @@ class Generic_blocks:
             heat_to_el_P,
             heat_to_el_T,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            start_up_options,
             boiler_efficiency,
             group_options):
 
@@ -198,16 +231,22 @@ class Generic_blocks:
             
             main_output_tr = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
-            inputs = {el_inner_bus: solph.Flow()},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status), variable_costs = variable_costs)},
+            inputs = {el_inner_bus: solph.Flow(variable_costs = extra_variable_cost,)},
+            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        ), variable_costs = variable_costs)},
             group_options = group_options
             )
             main_output_tr.group_options = deepcopy(group_options)
             self.es.add(P_mode_tr, T_mode_tr, main_output_tr)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(P_mode_tr)
-                self.block_collection.append(T_mode_tr)
-                self.block_collection.append(main_output_tr)
+            # if isinstance(self.block_collection, list):
+            #     self.block_collection.append(P_mode_tr)
+            #     self.block_collection.append(T_mode_tr)
+            #     self.block_collection.append(main_output_tr)
             return [main_output_tr, P_mode_tr, T_mode_tr]
    
         def create_chp_PT_turbine_full_P_mode(
@@ -221,7 +260,8 @@ class Generic_blocks:
             efficiency_P,
             heat_to_el_P,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            start_up_options,
             boiler_efficiency,
             group_options):
             
@@ -229,16 +269,23 @@ class Generic_blocks:
             pt_full_P_mode = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'электроэнергия_чистый_П_режим'),
 
-            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P)},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status)),
+            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_P, variable_costs = extra_variable_cost)},
+        outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs,
+                                        nonconvex = solph.NonConvex(
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        )),
                                     output_flow_P: solph.Flow()
                                 },
             conversion_factors = {input_flow: (1 + heat_to_el_P) / (efficiency_P * boiler_efficiency), output_flow_el: 1, output_flow_P: heat_to_el_P},
             )
             pt_full_P_mode.group_options = group_options
             self.es.add(pt_full_P_mode)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(pt_full_P_mode)
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(pt_full_P_mode)
             return pt_full_P_mode
 
         def create_chp_PT_turbine_full_T_mode(
@@ -252,25 +299,33 @@ class Generic_blocks:
             efficiency_T,
             heat_to_el_T,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            start_up_options,
             boiler_efficiency,
             group_options):
         # кпд котла?
             pt_full_T_mode = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'электроэнергия_чистый_Т_режим'),
-            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs,  nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status)),
+            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T, variable_costs = extra_variable_cost,)},
+            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs,
+                                        nonconvex = solph.NonConvex( 
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        )),
                                 output_flow_T: solph.Flow()
                                 },
             conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
             )
             pt_full_T_mode.group_options = group_options
             self.es.add(pt_full_T_mode)
-            if isinstance(self.block_collection, list):
-                 self.block_collection.append(pt_full_T_mode)
+            # if isinstance(self.block_collection, list):
+                #  self.block_collection.append(pt_full_T_mode)
             return pt_full_T_mode
 
-        def create_chp_T_turbine(
+        def create_chp_T_turbine_detail(
             self,
             nominal_el_value,
             max_el_value,
@@ -283,7 +338,8 @@ class Generic_blocks:
             heat_to_el_T,
             efficiency_full_condensing_mode,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            start_up_options,
             boiler_efficiency,
             group_options):
         # кпд котла?
@@ -309,8 +365,15 @@ class Generic_blocks:
             
             T_turbine = solph.components.ExtractionTurbineCHP (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
-            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T)},
-            outputs = {output_flow_el: solph.Flow(nominal_value = max_el_value, min = update_min_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status)),
+            inputs = {input_flow: solph.Flow(nominal_value = nominal_input_T, variable_costs = extra_variable_cost,)},
+            outputs = {output_flow_el: solph.Flow(nominal_value = max_el_value, min = update_min_fraction, variable_costs = variable_costs,
+                                        nonconvex = solph.NonConvex(   
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        )),
                                     output_flow_T: solph.Flow()
                                     },
             conversion_factors = {output_flow_el: el_eff, output_flow_T: hw_eff},
@@ -318,9 +381,69 @@ class Generic_blocks:
             )
             T_turbine.group_options = group_options
             self.es.add(T_turbine)
-            if isinstance(self.block_collection, list):
-                 self.block_collection.append(T_turbine)
+            # if isinstance(self.block_collection, list):
+                #  self.block_collection.append(T_turbine)
             return T_turbine
+        
+        
+        def create_chp_T_turbine_simple(
+            self,
+            nominal_el_value,
+            min_power_fraction, 
+            input_flow,
+            output_flow_el,
+            output_flow_T,
+            heat_to_el_T,
+            efficiency_T,
+            boiler_efficiency,
+            variable_costs,
+            extra_variable_cost,
+            start_up_options,
+            group_options):
+            tr = solph.components.Transformer(
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
+            inputs = {input_flow: solph.Flow(variable_costs = 0,)},
+            outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = extra_variable_cost,
+                                    nonconvex = solph.NonConvex(                      
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        )),
+                            output_flow_T: solph.Flow()},
+            conversion_factors = {input_flow: (1 + heat_to_el_T) /(efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+            ) 
+            tr.group_options = group_options
+            self.es.add(tr)
+            return tr
+        
+        
+        
+        def create_simple_chp_with_fixed_load(
+            self,
+            nominal_el_value,
+            input_flow,
+            output_flow_el,
+            output_flow_T,
+            heat_to_el_T,
+            efficiency_T,
+            boiler_efficiency,
+            variable_costs,
+            fixed_load_rel,
+            group_options):
+            tr = solph.components.Transformer(
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
+            inputs = {input_flow: solph.Flow()},
+            outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, variable_costs = variable_costs, fix = fixed_load_rel),
+                            output_flow_T: solph.Flow()},
+            conversion_factors = {input_flow: (1 + heat_to_el_T) /(efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+            ) 
+            tr.group_options = group_options
+            self.es.add(tr)
+            # if isinstance(self.block_collection, list):
+                #  self.block_collection.append(tr)
+            return tr
 
         def create_back_pressure_turbine(
             self,
@@ -333,19 +456,26 @@ class Generic_blocks:
             efficiency_P,
             boiler_efficiency,
             variable_costs,
-            initial_status,
+            extra_variable_cost,
+            start_up_options,
             group_options):
             tr = solph.components.Transformer(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
-            inputs = {input_flow: solph.Flow()},
-            outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(startup_costs = 99999, shutdown_costs = 99999, initial_status = initial_status)),
+            inputs = {input_flow: solph.Flow(variable_costs = extra_variable_cost,)},
+            outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = variable_costs, nonconvex = solph.NonConvex(                        
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                        )),
                             output_flow_P: solph.Flow()},
             conversion_factors = {input_flow: (1 + heat_to_el_P) /(efficiency_P * boiler_efficiency), output_flow_el: 1, output_flow_P: heat_to_el_P},
             ) 
             tr.group_options = group_options
             self.es.add(tr)
-            if isinstance(self.block_collection, list):
-                 self.block_collection.append(tr)
+            # if isinstance(self.block_collection, list):
+                #  self.block_collection.append(tr)
             return tr
 
  
@@ -371,8 +501,8 @@ class Generic_sinks:
 
 class Generic_sources:
 
-        def __init__(self, es, block_collection = None) -> None:
-            self.block_collection = block_collection
+        def __init__(self, es) -> None:
+            # self.block_collection = block_collection
             self.es = es
         
         def create_source(self, nominal_value, output_flow, variable_costs, group_options):
@@ -382,8 +512,8 @@ class Generic_sources:
             )
             source.group_options = group_options
             self.es.add(source)
-            if isinstance(self.block_collection, list):
-                 self.block_collection.append(source)
+            # if isinstance(self.block_collection, list):
+                #  self.block_collection.append(source)
             return source
         
         def create_source_with_fixed_load(
@@ -400,8 +530,8 @@ class Generic_sources:
             )
             tr.group_options = group_options
             self.es.add(tr)
-            if isinstance(self.block_collection, list):
-                self.block_collection.append(tr) 
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(tr) 
             return tr
     
 
@@ -410,8 +540,8 @@ class Generic_sources:
             label= label, 
             outputs = {output_flow: solph.Flow(variable_costs = variable_costs)} )
             self.es.add(source)
-            if isinstance(self.block_collection, list):
-                 self.block_collection.append(source)
+            # if isinstance(self.block_collection, list):
+                #  self.block_collection.append(source)
             return source
             
 

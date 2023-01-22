@@ -37,6 +37,16 @@ class Scenario_builder:
     def remove_renewables(self):
         self.custom_es.allowRenewables = False
     
+    def replace_small_chp(self, retirement_part, el_boilers = True, gas_boilers = False):
+        if el_boilers:
+            self.custom_es.small_chp_active_part = 1 - retirement_part
+            self.custom_es.small_chp_replace_el_boiler = True
+        if gas_boilers:
+            self.custom_es.small_chp_active_part = 1 - retirement_part
+            self.custom_es.small_chp_replace_gas_boiler = True
+        
+            
+    
     def remove_turb_steam(self):
         # +++++++++
         return self
@@ -64,8 +74,22 @@ class Scenario_builder:
         # +++++++++
         return self
     
+    def replace_small_chp_power_by_el_boilers(part = 0.2):
+        pass
+    
+    #  малые тэц понизить заместить 20 % электрокотлами
+    
+    # сделать в процентах
     def displace_heat_boilers_by_power(self, power):
         return self
+    
+    
+    def apply_BelEnergo_retirement_until_2025(self):
+        pass
+    
+    
+    def set_turbine_T_modelling_type(type):
+        pass
     
     def add_vver_toi_1255(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
         # +++++++++

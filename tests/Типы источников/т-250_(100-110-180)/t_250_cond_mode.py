@@ -61,7 +61,7 @@ block_creator = Specific_blocks(es, gas_bus, el_bus, [])
 
 # dummy_source = block_creator.get_dummy_source(counter.next(), station_name, 'гвс_источик', hw_bus, 9999)
 # dummy_source = block_creator.get_dummy_source(counter.next(), station_name, 'гвс_источик', el_bus, 9999)
-block_creator.get_t_250(counter.next(), station_name, hw_bus)
+block_creator.get_t_250_detail(counter.next(), station_name, hw_bus)
 
 
 block_collection = block_creator.get_block_collection()

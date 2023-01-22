@@ -14,6 +14,11 @@ data2 = pd.read_excel(os.path.join(data_folder,'test_df.xlsx'), sheet_name='2')
 data11 =pd.concat( [data1['Data'],data1.iloc[:,0:].sum(axis=1)], axis= 1)
 data22 = data2.iloc[:,0:].sum(axis=1)
 
+
+sum1 = data11.iloc[:,1:].sum(axis=1).sum(axis=0)
+
+
+
 data11.name = 'sdf'
 data22.name = 'sdf'
 

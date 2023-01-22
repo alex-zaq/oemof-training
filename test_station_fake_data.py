@@ -10,7 +10,7 @@ from custom_modules.excel_operations import import_dataframe_to_excel, create_re
 from custom_modules.specific_stations import Specific_stations
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, get_peak_load_by_energy_2020
-from custom_modules.result_proccessing import Custom_result_grouper
+from custom_modules.result_proccessing import Custom_result_grouper, Custom_result_extractor
 from custom_modules.scenario_builder import Scenario_builder
 
 winter_work_day_2020 = dict(
@@ -39,10 +39,11 @@ excel_reader = get_excel_reader(folder ='./data_excel', file = 'test_data.xlsx' 
 
 data = excel_reader(sheet_name='test_data')
 
-power_rel = data['Power-rel']
+power_rel = data['Power-rel-2']
 
 minskay_tec_4_hw_abs = data['Минская ТЭЦ-4-гвс']
 novopockay_tec_hw_abs = data['Новополоцкая ТЭЦ-гвс']
+small_tec_hw_rel = data['Малые ТЭЦ']
 
 minskay_tec_4_steam_abs = 0
 novopockay_tec_steam_abs = data['Новополоцкая ТЭЦ-пар']
@@ -56,15 +57,18 @@ hydro_load_data = data['Вода']
 
 [el_bus, gas_bus] = Generic_buses(es).create_buses('электричество_поток','природный_газ_поток')
 custom_es = Specific_stations(es, gas_bus, el_bus)
-
+shout_down_lst = 10*[0] + 14*[999999]
+custom_es.set_start_up_options(initial_status = 1, shout_down_cost = shout_down_lst , start_up_cost= 9999999, maximum_shutdowns=1, maximum_startups = 100 )
 ##################################################################################################
 # Настройка сценария
 ##################################################################################################
 scen_builder = Scenario_builder(custom_es)
-scen_builder.set_electricity_level(energy_level_in_billion_kWth = 37.3)
 scen_builder.set_electricity_profile(elictricity_profile = power_rel)
+scen_builder.set_electricity_level(energy_level_in_billion_kWth = 41)
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
-# scen_builder.remove_siemens()
+scen_builder.replace_small_chp(retirement_part = 1, el_boilers = True)
+scen_builder.remove_siemens()
+# добавить фиксированный вариант работы аэс
 # scen_builder.reduce_block_station_power_to_minimum()
 # scen_builder.remove_renewables()
 ##################################################################################################
@@ -79,42 +83,57 @@ lukomolskay_gres = custom_es.add_Lukomolskay_gres()
 minskay_tec_4 = custom_es.add_Minskay_tec_4(heat_water_demand_data = minskay_tec_4_hw_abs)
 novopockay_tec = custom_es.add_Novopockay_tec(heat_water_demand_data = novopockay_tec_hw_abs, steam_demand_data = novopockay_tec_steam_abs)
 
+small_tec = custom_es.add_small_chp(fixed_el_load_data_rel= small_tec_hw_rel)
 
 block_station = custom_es.add_block_staion_natural_gas(fixed_el_load_data_rel = block_station_load_data)
 bel_npp = custom_es.add_Bel_npp()
-fake_el_source = custom_es.add_electricity_source(10000, usd_per_Mwth = 9999)
+# fake_el_source = custom_es.add_electricity_source(nominal_value = 10000, usd_per_Mwth = -9999)
+
 ##################################################################################################
 # Выполнение расчета 
 ##################################################################################################
 model = solph.Model(es)
 model.solve(solver="cplex")
 results = solph.processing.results(model)
-result_processor = Custom_result_grouper(custom_es, results)
+result_plotter = Custom_result_grouper(custom_es, results)
+result_extractor = Custom_result_extractor(custom_es, results)
 ##################################################################################################
 # Настройка группировки результатов
 ##################################################################################################
-result_processor.set_block_station_plot_1({
-    bel_npp: ['ввэр'],
-    block_station: ['блок-станции-газ'],
-    minskay_tec_4: ['пт','т','эк','кот'],
-    novopockay_tec: ['р','пт', 'кот'],
-    lukomolskay_gres: ['пгу-кэс','к'],
-    renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
-    fake_el_source: ['фейк']
-})
+# result_plotter.set_block_station_plot_1({
+#     bel_npp: ['ввэр'],
+#     block_station: ['блок-станции-газ'],
+#     small_tec: ['малые тэц', 'эк', 'кот'],
+#     minskay_tec_4: ['пт','т','эк','кот'],
+#     novopockay_tec: ['р','пт', 'кот'],
+#     lukomolskay_gres: ['пгу-кэс','к'],
+#     renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
+#     # fake_el_source: ['фейк']
+# })
+
 ##################################################################################################
-# result_processor.set_station_plot_3(
-#   [ bel_npp,
-#     block_station,
-#     minskay_tec_4,
-#     novopockay_tec,
-#     lukomolskay_gres,
-#     renewables,
-#     fake_el_source
-# ])
+result_plotter.set_station_plot_3(
+  [ bel_npp,
+    block_station,
+    small_tec,
+    minskay_tec_4,
+    novopockay_tec,
+    lukomolskay_gres,
+    renewables,
+    # fake_el_source
+])
 
+data = custom_es.get_all_blocks()
+el_boilers_power = result_extractor.get_total_el_boilers_power()
+print('Мощность электрокотлов: ', el_boilers_power)
 
+gas_consumption = result_extractor.get_total_gas_consumption_value_m3(scale = 'млн')
+print('потребление газа: ', gas_consumption , 'млн. м3')
 
+online_power_df = result_extractor.get_dataframe_online_power()
+# online_power_tec_4 = result_extractor.get_dataframe_online_power_by_station('Минская ТЭЦ-4')
+
+print('')
 
 # result_processor.set_block_station_type_plot_2(
 #     {
@@ -166,19 +185,22 @@ result_processor.set_block_station_plot_1({
 # })
 
 
-el_df = result_processor.get_dataframe_by_commodity_type('электроэнергия')
-hw_df = result_processor.get_dataframe_by_commodity_type('гвс')
-steam_df = result_processor.get_dataframe_by_commodity_type('пар')
-el_demand_orig = result_processor.get_dataframe_orig_electricity_demand(el_bus, custom_es.gobal_elictricity_sink)
+el_df = result_plotter.get_dataframe_by_commodity_type('электроэнергия')
+# print(el_df['Минская ТЭЦ-4'])
+hw_df = result_plotter.get_dataframe_by_commodity_type('гвс')
+# steam_df = result_plotter.get_dataframe_by_commodity_type('пар')
+el_demand_orig = result_plotter.get_dataframe_orig_electricity_demand(el_bus, custom_es.gobal_elictricity_sink)
 
 
 
-maxY = 7000
+
+maxY = 9000
 ax_el = el_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство электричества')
 ax_el_demand = el_demand_orig.plot(kind="line", ax = ax_el ,color = 'black', ylim=(0, maxY), style='.-' , legend = 'reverse')
+ax_online_power = online_power_df.plot(kind="line", ax = ax_el ,color = 'red', ylim=(0, maxY), style='.-' , legend = 'reverse')
 # # .legend(fontsize=7, loc="upper right")
 ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'Производство гвс' )
-ax_steam = steam_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство пара' )
+# ax_steam = steam_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство пара' )
 
 
 plt.show()

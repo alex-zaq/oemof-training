@@ -583,62 +583,127 @@ class Specific_stations:
             
         def add_Berezovskay_gres(self):
             station_name = 'Березовская ГРЭС'
-            create_buses = self.bus_creator.create_buses
             block_creator = self.block_creator
-            create_sink_abs = self.sink_creator.create_sink_absolute_demand
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
-
-            hw_name = 'гвс'
-            # steam_name = 'пар'
-            hw_bus = create_buses(set_label(station_name, hw_name))
-            
+            ###############################################################
             # К-160-130 (165)
             # К-160-130-2ПР1 (165)
             # К-175/180-12,8 (180)
             # ГТЭ-25НГ80
             # ГТЭ-25НГ80
             # SGT-700 (29.06)
-
             # SGT5-4000F (285,87)
             # LZN140-12,78/2,937/ 0,391  (141,13)
             # В/о ЭК	25.8	Гкал/час
             # турбины	1095.12	МВт
-
-            k_160_1 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.01)
-            k_160_2 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.02)
-            k_175_1 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.01)
+            ###############################################################
+            k_160_1 = block_creator.get_k_160(global_id(), local_id(), station_name, 0.01)
+            k_160_2 = block_creator.get_k_160(global_id(), local_id(), station_name, 0.03)
+            k_175_1 = block_creator.get_k_175(global_id(), local_id(), station_name, 0)
             ocgt_25_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.01)
             ocgt_25_2 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.02)
-            ocgt_29_1 = block_creator.get_ocgt_29(global_id(), local_id(), station_name, 0)
             if self.allowSiemens:
                 ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name)
-
-            # кэс
-            # газовые котлы - дешевые; электрокотлы - дорогие ======> эк нежелательны и используеются для баланса
-            
-            # тэц
-            # электрокотлы - дорогие; газовых котлов - нет ======> эк нежелательны и используются для баланса
-            
-            # замещение тэц на эк или газовые котлы - принудительное с удалением сооветсв. части тэц
-
-
-            el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 1.163 * 25.8, hw_bus, 0)
-            # back_hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 10_000, hw_bus, 9999)
-            # back_steam_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 10_000, steam_bus, 9999)
-            
-            
+                ocgt_29_1 = block_creator.get_ocgt_29(global_id(), local_id(), station_name, 0)
+            ###############################################################
+            hw_bus = steam_bus = None
+            hw_sink = steam_sink = None
+            ###############################################################
+            el_turb_no_siemens = [k_160_1, k_160_2, k_175_1, ocgt_25_1, ocgt_25_2]
+            el_turb_siemens = [ccgt_427_1, ocgt_29_1] if self.allowSiemens else []
+            el_turb = el_turb_no_siemens + el_turb_siemens
+            hw_chp_turb = None
+            hw_gas_boilers = None
+            hw_el_boilers = None
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
+  
             
             
         def add_Minskay_tec_5(self):
             station_name = 'Минская ТЭЦ-5'
+            block_creator = self.block_creator
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+            ###############################################################
             # ТК-330-240-3М
             # M701F  (270)
             # TC2F  (129.6)
             # турбины	719.6	МВт	
             # в/о котлы	100	Гкал/час	
-
+            ###############################################################
+            tk_330_1 = block_creator.get_tk_330(global_id(), local_id(), station_name, 0)
+            if self.allowSiemens:
+                ccgt_399_1 = block_creator.get_ccgt_399(global_id(), local_id(), station_name, 0)
+            ###############################################################
+            hw_bus = steam_bus = None
+            hw_sink = steam_sink = None
+            ###############################################################
+            el_turb_no_siemens = [tk_330_1]
+            el_turb_siemens = [ccgt_399_1] if self.allowSiemens else []
+            el_turb = el_turb_no_siemens + el_turb_siemens
+            hw_chp_turb = None
+            hw_gas_boilers = None
+            hw_el_boilers = None
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
             
             
         def add_Mogilevskay_tec_2(self):
@@ -665,7 +730,6 @@ class Specific_stations:
             #   в/о котлы	460	Гкал/час	
             # В/о ЭК	25.8	Гкал/час	
 
-            
 
             
         def add_Grodnenskay_tec_2(self):
@@ -726,7 +790,14 @@ class Specific_stations:
 
             
         def add_district_boilers(self):
-            station_name = 'Районные котельные'
+            station_name = 'Котельные ЖКХ'
+            pass
+
+
+            
+        def add_district_boilers_Belenergo(self):
+            station_name = 'Районные котельные Белэнерго'
+            pass
         
         
                     

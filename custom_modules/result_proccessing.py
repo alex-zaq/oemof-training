@@ -10,64 +10,20 @@ from custom_modules.helpers import convert_Mwth_to_1000_m3
 
 
 
-def get_dataframe_by_output_bus_all(results, node_collection, output_bus):
-    res = pd.DataFrame()
-    results_by_commodity = solph.views.node(results, output_bus.label)["sequences"].dropna()
-    # print(results_by_commodity)
-    for node in node_collection:
-        outputs_node = [str(output) for output in node.outputs]  
-        if output_bus.label in outputs_node:
-            res[node.label] = results_by_commodity[((node.label, output_bus.label),'flow')]
-    return res
-
-
-def get_dataframe_by_input_bus_all(results, node_collection, input_bus):
-    res = pd.DataFrame()
-    results_by_commodity = solph.views.node(results, input_bus.label)["sequences"].dropna()
-    print(results_by_commodity)
-    for node in node_collection:
-        inputs_nodes = [str(input) for input in node.inputs]  
-        if input_bus.label in inputs_nodes:
-            res[node.label] = results_by_commodity[((input_bus.label, node.label),'flow')]
-    return res
-
-
-def get_dataframe_by_output_bus_single(results, block, output_bus):
-    res = pd.DataFrame()
-    results_by_commodity = solph.views.node(results, output_bus.label)["sequences"].dropna()
-    # print(results_by_commodity)
-    outputs_node = [str(output) for output in block.outputs]  
-    if output_bus.label in outputs_node:
-        res[block.label] = results_by_commodity[((block.label, output_bus.label),'flow')]
-    return res
-
-
-def get_dataframe_by_input_bus_single(results, block, input_bus):
-    res = pd.DataFrame()
-    results_by_commodity = solph.views.node(results, input_bus.label)["sequences"].dropna()
-    # print(results_by_commodity)
-    inputs_nodes = [str(input) for input in block.inputs]  
-    if input_bus.label in inputs_nodes:
-        res[block.label] = results_by_commodity[((input_bus.label, block.label),'flow')]
-    return res
-
 class Custom_result_extractor:
     def __init__(self, custom_es, processed_results):
         self.custom_es = custom_es
         self.processed_results = processed_results
-        pass
 
-            
+###########################################################################################
+#                                использование природного газ
+###########################################################################################
     def get_natural_gas_price(self):
+        'получить установленную цену на природный газ (долл. США за 1000 м3)'
         return self.custom_es.natural_gas_price
 
-    def get_install_energy_system_power(self):
-        return self.custom_es.get_install_energy_system_power()   
-
-    def get_total_gas_consumtion_by_block_type(self, block_type):
-        pass
-
     def get_total_gas_consumption_value_m3(self, scale):
+        'получить суммарное потребление природного газа в энергосистеме'
         global_gas_source = self.custom_es.global_gas_source
         global_gas_bus = self.custom_es.global_input_bus
         results = solph.views.node(self.processed_results, global_gas_bus.label)["sequences"].dropna() 
@@ -83,41 +39,113 @@ class Custom_result_extractor:
             raise Exception('Не выбраны единицы')
         total_gas_consumption = round(total_gas_consumption_1000_m3 / divider, 3) 
         return total_gas_consumption
-    
-    def get_total_gas_part(self):
-        pass
 
-
-    def get_total_gas_consumption_by_station_type(self):
+    def get_total_gas_consumtion_by_block_type(self, block_type):
+        'получить затраченный объем газа для указанного типа блока (млн. 1000 м3)'
         pass
     
-    def get_total_gas_consumption_by_station_value(self, station_name, commodity_type):
+    def get_total_gas_energy_generation_part(self):
+        'получить долю генерации энергии природного газа в энергосистеме'
+        pass
+    
+    def get_total_gas_consumption_by_station_type(self, station_type):
+        'получить объем использованного природного газа указанной типа станции'
+        pass
+    
+    def get_total_gas_consumption_by_station_value(self, station_name):
+        'получить объем использованного природного газа указанной  станции'
+        pass
+###########################################################################################
+#                               генерация электроэнергии
+###########################################################################################
+    def get_dataframe_orig_electricity_demand(self):
+        'возвращает исходный профиль электрической нагрузки'        
+        pass
+    
+    def get_total_electricity_generation_value(self):
+        pass
+    
+    def get_chp_el_energy_by_station(self, station_name):
+        'получить электроэнергию выработанную на тепловом потреблении для указанной станции'
+        pass
+    
+    def get_chp_el_energy(self):
+        'получить электроэнергию выработанную на тепловом потреблении в энергосистеме'
         pass
     
     
+    def get_total_npp_energy_generation_part(self):
+        'получить долю генерации энергии от АЭС'
+        pass
     
-    def get_total_el_boilers_power(self):
+    
+    def get_el_energy_by_block_type(self, block_type):
+        'получить объем электрической энергии для указанного типа блока'
+        pass
+    
+    
+    def get_el_energy_by_station(self, station_name):
+        'получить объем электрической энергии для указанной станции'
+        pass
+    
+        
+    def get_el_energy_by_station_type(self, station_type):
+        'получить объем электрической энергии для указанного типа станции'
+        pass
+###########################################################################################
+#                               генерация тепла
+###########################################################################################   
+    def get_total_heat_generation_value_by_station(self, station_name, commodite_type):
+        pass
+    
+    def get_total_heat_generation_by_type(self, commodite_type):
+        pass
+    
+    def get_total_heat_generation(self):
+        pass
+###########################################################################################   
+#                                    электрокотлы
+###########################################################################################   
+    
+    def get_install_el_boilers_power(self, commodite_type):
+        'получить установленную мощность электрокотлов в энергосистеме'
         hw_blocks = self.custom_es.get_all_blocks_by_block_type('эк')
-        # el_boilers = hw_blocks[['эк-гвс']]
         el_boilers_power = self.custom_es.get_install_power_blocklist(hw_blocks)
         return el_boilers_power
     
-    def get_el_boilers_power_by_station(self, station_name):
+    def get_install_el_boilers_power_by_station(self, station_name, commodite_type):
+        'получить мощность электротлов для указанной станции (ГВС или ПАР)'
         pass
     
-    
-    def get_max_el_boilers_consumption_by_station_value(self, station_name, commodite_type):
+    def get_max_el_boilers_power_by_station_value(self, station_name, commodite_type):
+        'получить суммарное максимальной использование электрокотлов для указанной станции (ГВС или ПАР)'
         pass
-    
     
     def get_dataframe_el_boilers_consumption(self, commodite_type):
+        'получить датафрейм потребления всех электрокотлов (ГВС или ПАР)'
+        pass
+    
+    def get_dataframe_el_boilers_consumption_by_station(self, station_name, commodite_type):
+        'получить датафрейм потребления электрокотлов указ. типа (гвс или пар) для указанной станции'
         pass
     
     def get_total_el_boilers_consumption_value(self, commodite_type):
+        'получить  потребление всех электрокотлов указ. типа (гвс или пар)'
         pass
 
+    
+    def get_total_el_boilers_consumption_value(self, station_name, commodite_type):
+        'получить  потребление всех электрокотлов указ. типа (гвс или пар) для указанной станции ' 
+        pass
+###########################################################################################   
+#                          электрическая мощность 
+###########################################################################################               
+    def get_install_energy_system_power(self):
+        'получить установленную мощность энергосистемы (МВТ(э))'
+        return self.custom_es.get_install_energy_system_power()   
 
     def get_dataframe_online_power(self):
+        'получить датафрейм включенной мощности'
         output_bus = self.custom_es.global_output_bus
         results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
         el_blocks = self.custom_es.get_all_el_blocks()
@@ -134,9 +162,9 @@ class Custom_result_extractor:
         blocks_df = pd.DataFrame(blocks_df)
         blocks_df.columns = ['Включенная мощность']
         return blocks_df  
-
     
     def get_dataframe_online_power_by_station(self, station_name):
+        'получить датафрейм включенной мощности для указанной станции'
         output_bus = self.custom_es.global_output_bus
         results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
         el_blocks = self.custom_es.get_el_blocks_by_station(station_name)
@@ -154,43 +182,24 @@ class Custom_result_extractor:
         blocks_df.columns = ['Включенная мощность ' + station_name]
         return blocks_df  
 
-
     def get_dataframe_load_fraction(self):
+        'получить датафрейм отношение установленной мощности к текущей нагрузке'
         pass
-    
-    
-    def get_el_energy_by_block_type(self, block_type):
-        pass
-    
-    
-    def get_el_energy_by_station(self, station_name):
-        pass
-    
-        
-    def get_el_energy_by_station_type(self, station_type):
-        pass
-    
-    
-    def get_dataframe_spinning_reserve(self):
-        # включенная мощность - полная мощность в часу
-        pass
-    
-    
     def load_factor_by_station(self, station_name):
+        'получить коэффициент установленной электрической мощности для станции'
         pass
-        
-    
-    def get_chp_electricity_by_station(self):
-        pass
-    
-    
+###########################################################################################   
+#                          себестоимость электроэнергии
+###########################################################################################        
     def get_usd_MWth_by_station(self, station):
+        'получить себестоимость производства для указанной станции'
         pass
-    
     
     def get_usd_MWth_total(self):
+        'получить полную себестоимость производства для энергосистемы'
         pass
-    
+###########################################################################################        
+
 
 
 class Custom_result_grouper:
@@ -228,7 +237,7 @@ class Custom_result_grouper:
         res = pd.DataFrame()
         stations_names = data.keys()
         
-        
+        # потом убрать
     def get_dataframe_orig_electricity_demand(self, el_bus, el_sink):
         'возвращает исходный профиль электрической нагрузки'        
         results = solph.views.node(self.processed_results, el_bus.label)["sequences"].dropna()      
@@ -245,13 +254,6 @@ class Custom_result_grouper:
         elif commodity_type == 'пар':
             return self.custom_es.get_all_steam_blocks()
             
-
-    
-    
-    
-    
-    
-    
         
         
     def __get_dataframe_block_station_plot_1(self, commodity_type):
@@ -429,6 +431,7 @@ class Custom_result_grouper:
                     station_names.append(station_name)
                 res = pd.concat(res, axis=1)
                 res.columns = station_names
+                res[res < 0] = 0    
                 res = res.loc[:, (res > 0.1).any(axis=0)]
                 return res    
              elif commodity_type in ['гвс', 'пар']:
@@ -461,8 +464,7 @@ class Custom_result_grouper:
                     station_names.append(station_name)
                 res = pd.concat(res, axis=1)
                 res.columns = station_names        
-                        
-                        
+                res[res < 0] = 0      
                 res = res.loc[:, (res > 0.1).any(axis=0)]
                 return res
             
@@ -514,6 +516,7 @@ class Custom_result_grouper:
                     station_types.append(station_name)
                 res = pd.concat(res, axis=1)
                 res.columns = station_types
+                res[res < 0] = 0    
                 res = res.loc[:, (res > 0.1).any(axis=0)]
                 return res    
             elif  commodity_type in ['гвс', 'пар']:
@@ -546,8 +549,7 @@ class Custom_result_grouper:
                     station_names.append(station_name)
                 res = pd.concat(res, axis=1)
                 res.columns = station_names        
-                        
-                        
+                res[res < 0] = 0            
                 res = res.loc[:, (res > 0.1).any(axis=0)]
                 return res
 
@@ -619,6 +621,7 @@ class Custom_result_grouper:
                 values = list(items.values())
                 res = pd.concat(values, axis=1)
                 res.columns = names
+                res[res < 0] = 0    
                 res = res.loc[:, (res > 0.1).any(axis=0)]
                 return res  
             elif  commodity_type in ['гвс', 'пар']:
@@ -666,6 +669,7 @@ class Custom_result_grouper:
                     values = list(items.values())
                     res = pd.concat(values, axis=1)
                     res.columns = names
+                    res[res < 0] = 0    
                     res = res.loc[:, (res > 0.1).any(axis=0)]
                     return res
     
@@ -842,48 +846,3 @@ class Custom_result_grouper:
         self.custom_es.set_block_type_in_station_type(data_block_type_in_station_type)
         self.select_plot_type = 6
   
-  
-  
-  
-    # class Custom_color_setter:
-    #     def __init__(self, custom_es) -> None:
-    #         self.custom_es = custom_es
-            
-            
-    #     def set_color_by_block_type(self, block_type, color):
-    #         pass
-                
-    #     def set_color_by_station(self, station_name, color):
-    #         pass
-        
-    #     def set_color_by_station_type(self, station_type, color):
-    #         pass
-        
-    #     def set_color_by_id(self, color):
-    #         pass
-
-    #     def set_color_by_station_block_type(self, station, block_type, color):
-    #         pass
-        
-    #     def set_color_by_station_type_block_type(self, station_type, block_type, color):
-    #         pass
-        
-        
-              
-    
-
-    # class Custom_plotter_el_hw_steam:
-    #     def __init__(self, df_el, df_hw, df_steam):
-    #         pass
-                                               
-    #     def set_max_value(self, max_value):
-    #         pass
-         
-    #     def set_X_label(self, plot_type):
-    #        pass
-                    
-    #     def set_Y_label(self, plot_type):
-    #        pass
-            
-    #     def set_label(self, plot_type):
-    #         pass    

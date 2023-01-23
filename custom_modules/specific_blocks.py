@@ -111,7 +111,7 @@ class Specific_blocks:
             'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
-            'block_name': 'ГТУ-120',
+            'block_name': 'ГТУ-29',
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,
@@ -138,7 +138,7 @@ class Specific_blocks:
             'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
-            'block_name': 'ГТУ-120',
+            'block_name': 'ГТУ-25',
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,
@@ -355,8 +355,6 @@ class Specific_blocks:
             
             
         def get_ccgt_399(self,global_index, local_index, station_name,extra_variable_cost = 0,  planning_outage = None):
-            self.minimum_uptime_ccgt = 3
-            self.minimum_downtime_ccgt = 1
             block_type = self.block_type['пгу-кэс']
             return self.g_block_creator.create_offset_transformer(
                 nominal_value = 399,
@@ -369,8 +367,6 @@ class Specific_blocks:
                 extra_variable_cost = extra_variable_cost,
                 boiler_efficiency = 1,
                 start_up_options = self.start_up_options,
-                # minimum_uptime= self.minimum_uptime_ccgt,
-                # minimum_downtime = self.minimum_downtime_ccgt,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),

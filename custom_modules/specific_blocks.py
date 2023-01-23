@@ -91,7 +91,60 @@ class Specific_blocks:
             )
             
             
+        def get_ocgt_small_2_3(self,global_index, local_index,station_name, extra_variable_cost = 0 , planning_outage = None):
+            block_type = self.block_type['гту']
+            return self.g_block_creator.create_offset_transformer(
+            nominal_value = 2.3,
+            input_flow = self.global_natural_gas_flow,
+            output_flow = self.global_el_flow,
+            efficiency_min = 0.25,
+            efficiency_max = 0.40,
+            min_power_fraction = 0.25,
+            variable_costs = 0,
+            extra_variable_cost = extra_variable_cost,
+            boiler_efficiency = 1,  
+            start_up_options = self.start_up_options,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': 'ГТУ-2.3',
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': 2.3
+            })   
             
+                         
+        def get_ocgt_small_2_6(self,global_index, local_index,station_name, extra_variable_cost = 0 , planning_outage = None):
+            block_type = self.block_type['гту']
+            return self.g_block_creator.create_offset_transformer(
+            nominal_value = 2.6,
+            input_flow = self.global_natural_gas_flow,
+            output_flow = self.global_el_flow,
+            efficiency_min = 0.25,
+            efficiency_max = 0.40,
+            min_power_fraction = 0.25,
+            variable_costs = 0,
+            extra_variable_cost = extra_variable_cost,
+            boiler_efficiency = 1,  
+            start_up_options = self.start_up_options,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': 'ГТУ-2.3',
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': 2.6
+            })    
+                   
+                       
             
         def get_ocgt_29(self,global_index, local_index,station_name, extra_variable_cost = 0 , planning_outage = None):
             block_type = self.block_type['гту']

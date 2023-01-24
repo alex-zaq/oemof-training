@@ -84,7 +84,7 @@ scen_builder.set_turbine_T_modelling_type('simple')
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
 # scen_builder.remove_siemens()
 # добавить фиксированный вариант работы аэс
-# scen_builder.reduce_block_station_power_to_minimum()
+scen_builder.reduce_block_station_power_to_minimum()
 # scen_builder.remove_renewables()
 ##################################################################################################
 ##################################################################################################

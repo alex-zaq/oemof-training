@@ -50,51 +50,92 @@ class Specific_stations:
                 'Блок-станции' : 0,
             }
 
-
-
-            self.bel_npp_block_1_status = 1
-            self.bel_npp_block_2_status = 1
-            self.bel_npp_block_1_fix = None
-            self.bel_npp_block_2_fix = None
-            self.bel_npp_block_1_min = 0.75
-            self.bel_npp_block_2_min = 0.75
-            
-            self.el_boiler_hw_variable_cost = 0
-            self.el_boiler_steam_variable_cost = 0            
-
-            self.gas_boiler_hw_variable_cost = 0
-            self.gas_boiler_steam_variable_cost = 0
-            
-            self.allowSiemens = True
-            self.allowRenewables = True
-
-            self.infinity_el_boilers_hw_large_chp = False
-            self.infinity_el_boilers_steam_large_chp = False
-
-            self.infinity_gas_boilers_hw_large_chp = False
-            self.infinity_gas_boilers_steam_large_chp = False
-
-            self.infinity_el_boilers_hw_small_chp = False
-            self.infinity_gas_boilers_hw_small_chp = False
-
-
-            self.infinity_el_boilers_hw_district_boilers = False
-            self.infinity_el_boilers_hw_Belenergo_district_boilers = False
-
-
-            self.new_ocgt_25_count = 0
-            self.new_ocgt_100_count = 0
-            self.new_ocgt_125_count = 0
-
-
-            self.reduce_block_station_power = False
-            self.small_chp_active_part = 1
-            self.small_chp_replace_el_boiler = False
-            self.small_chp_replace_gas_boiler = False
-            # self.small_chp_replace_el_boiler_and_gas_boiler = False
+            self.el_boiler_variable_cost = {
+                'гвс': 0,
+                'пар': 0,
+            }
             
             
-        def set_start_up_options(self, start_up_cost, shout_down_cost ,maximum_startups, maximum_shutdowns ,initial_status):
+            self.gas_boiler_variable_cost = {
+                'гвс': 0,
+                'пар': 0,
+            }
+            
+            
+            self.infinity_el_boilers_large_chp = {
+                'гвс': False,
+                'пар': False,
+            }                        
+            
+            self.infinity_gas_boilers_large_chp = {
+                'гвс': False,
+                'пар': False,
+            }                        
+            
+            self.infinity_el_boilers_small_chp = {
+                'гвс': False,
+            }                        
+            
+            self.infinity_gas_boilers_small_chp = {
+                'гвс': False,
+            }                        
+
+            self.infinity_el_boilers_discrict_boilers = {
+                'гвс' : False
+            }
+
+            self.infinity_el_boilers_Belenergo_district_boilers = {
+                'гвс': False,
+                'пар': False,
+            }
+
+            self.new_ocgt_count_options = {
+                'гту-25': 0,
+                'гту-100': 0,
+                'гту-125': 0
+            }
+
+
+            self.bel_npp_options = {
+                'блок_1': True,
+                'блок_2': True,
+                'блок_1_мин': 0.75,
+                'блок_2_мин': 0.75,
+                'блок_1_затраты': -999,
+                'блок_2_затраты': -999
+                
+            }
+
+            self.new_npp_scenario_options = {
+                'ввэр_тои': True,
+                'ввэр-600': True,
+                'ритм-200': 0,
+                'ввэр_тои_мин': 0.75,
+                'ввэр-600_мин': 0.70,
+                'ритм-200_мин': 0.65,
+                'ввэр_тои_затраты': -999,
+                'ввэр-600_затраты': -999,
+                'ритм-200_затраты': -999
+            }
+                
+
+            self.retirement_options = {
+                'блок-станции_без_тех_огр' : True,
+                'siemens': True,
+                'виэ': True,
+                'план вывода Белэнерго': True,
+                'пар_крупные_тэц_ПТ' : True,
+                'пар_крупные_тэц_Р' : True,
+                'малые тэц_откл_часть' : 0,
+                'гвс_коте_Белэнерго_откл_часть' : 0,
+                'пар_кот_Белэнерго_откл_часть' : 0,
+                'гвс_кот_жкх_откл_часть' : 0,
+                
+            }
+
+            
+            
+        def set_start_up_options(self, start_up_cost, shout_down_cost, maximum_startups, maximum_shutdowns, initial_status):
             
             options = {
                 'start_up_cost': start_up_cost,
@@ -129,6 +170,17 @@ class Specific_stations:
                 peak_load= get_peak_load_by_energy_2021(level_in_billion_kWth)
             )
             
+            
+        def set_electricity_abs(self, demand_absolute_data):
+            if not self.profile.empty:
+                raise Exception('Недопустимые параметры')
+            self.gobal_elictricity_sink = self.sink_creator.create_sink_absolute_demand(
+                'электричество_потребитель',
+                self.global_output_bus,
+                demand_absolute_data = demand_absolute_data 
+            )
+            
+                
             
 			
         def inc_global_id(self):
@@ -1568,7 +1620,7 @@ class Specific_stations:
             return station_name
             
             
-        def add_district_boilers(self):
+        def add_district_boilers(self, heat_water_demand_data):
             station_name = 'Котельные ЖКХ'
             # create_buses = self.bus_creator.create_buses
             # block_creator = self.block_creator
@@ -1584,21 +1636,159 @@ class Specific_stations:
             # steam_bus = None
             # hw_bus = None
             # pass
+            pass
 
 
          
-        def add_district_boilers_Belenergo(self):
+        def add_district_boilers_Belenergo(self, heat_water_demand_data, steam_demand_data):
             station_name = 'Районные котельные Белэнерго'
             pass
             
             
             
-        def add_new_capacity(self):
-            station_name = 'Новые энергоисточники'
+        def add_new_npp(self):
+            station_name = 'Новые АЭС'
+            block_creator = self.block_creator
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+                        
+            vver_toi_1 = None
+            if self.vver_toi_flag:
+                vver_toi_1 = block_creator.get_vver_toi(global_id(), local_id(), station_name, 0)            
+
+            vver_600_1 = None
+            if self.vver_600_flag:
+                vver_600_1 = block_creator.get_vver_600(global_id(), local_id(), station_name, 0)
+            
+            ritm_200_lst = []
+            if self.ritm_200_count:
+                for i in range(1, self.ritm_200_count + 1):
+                    ritm_200_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0)
+                    ritm_200_lst.append(ritm_200_1)
+            
+            el_turb = []
+
+            if vver_toi_1:
+                el_turb = el_turb + ritm_200_1.append(vver_toi_1)            
+
+            if vver_600_1:
+                el_turb = el_turb + ritm_200_1.append(vver_600_1)
+            
+            install_power = self.get_install_power_blocklist(el_turb)
+            
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': None,
+                                    'гвс-кот-источник': None,
+                                    'гвс-эк-источник': None
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': None,
+                                    'пар-кот-источник': None,
+                                    'пар-эк-источник': None,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': None, 
+                                'пар-поток': None,
+                },
+                'потребители':{
+                                'гвс-потребитель': None,
+                                'пар-потребитель': None
+                }} 
+            
+            return station_name
             
             
-            # ocgt
+                        
             
+            
+        def add_new_ocgt(self):
+            station_name = 'Новые ГТУ'
+            create_buses = self.bus_creator.create_buses
+            block_creator = self.block_creator
+            create_sink_abs = self.sink_creator.create_sink_absolute_demand
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+            
+            ocgt_25_lst = []
+            ocgt_100_lst = []
+            ocgt_125_lst = []
+            
+            if self.new_ocgt_count_options['гту-25']:
+                for i in range(1, self.new_ocgt_count_options['гту-25'] + 1):
+                    ocgt_25_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0)
+                    ocgt_25_lst.append(ocgt_25_1)
+                        
+            if self.new_ocgt_count_options['гту-100']:
+                for i in range(1, self.new_ocgt_count_options['гту-100'] + 1):
+                    ocgt_100_1 = block_creator.get_ocgt_100(global_id(), local_id(), station_name, 0)
+                    ocgt_100_lst.append(ocgt_100_1)
+                    
+                        
+            if self.new_ocgt_count_options['гту-125']:
+                for i in range(1, self.new_ocgt_count_options['гту-125'] + 1):
+                    ocgt_125_1 = block_creator.get_ocgt_125(global_id(), local_id(), station_name, 0)
+                    ocgt_125_lst.append(ocgt_125_1)
+            
+
+            el_turb = ocgt_25_lst + ocgt_125_lst + ocgt_100_lst
+
+            install_power = self.get_install_power_blocklist(el_turb)
+            
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': None,
+                                    'гвс-кот-источник': None,
+                                    'гвс-эк-источник': None
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': None,
+                                    'пар-кот-источник': None,
+                                    'пар-эк-источник': None,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': None, 
+                                'пар-поток': None,
+                },
+                'потребители':{
+                                'гвс-потребитель': None,
+                                'пар-потребитель': None
+                }} 
+            
+            return station_name
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
             
         # def add_Fake_station(self):
         #     station_name = 'Фейковая станция'

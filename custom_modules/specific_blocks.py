@@ -1425,6 +1425,9 @@ class Specific_blocks:
                 'nominal_value': 50   
             } 
             )
+            
+
+
 
         def get_small_chp(self, global_index, local_index, nominal_value, station_name, output_flow_T ,fixed_el_load_data_rel, variable_costs = 0):
             block_type = self.block_type['малые тэц']

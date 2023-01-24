@@ -34,7 +34,7 @@ class Scenario_builder:
 
     def set_electricity_demand_abs(self, electricity_demand):
         "установка элетктрической нагрузки в абсолютном виде (МВт)"
-        pass
+        self.custom_es.set_electricity_abs(electricity_demand)
 ######################################################################################################   
 # Установка цены на природный газ
 ######################################################################################################  
@@ -50,26 +50,16 @@ class Scenario_builder:
 # Настройки БелАЭС
 ######################################################################################################   
 
-    def set_bel_npp_vver_1200_first_options(self, active_status, fix, min_power_fraction):
-        if active_status == 0:
-            if fix is not None or min_power_fraction is not None:
-                raise Exception('Недопустимые параметры')
-        elif active_status == 1:
+    def set_bel_npp_vver_1200_first_options(self, active_status, min_power_fraction, usd_per_Mwth):
+        if active_status == 1:
             self.custom_es.bel_npp_block_1_status = 1
-            if fix:
-                self.custom_es.bel_npp_block_1_fix = fix
             if min_power_fraction:
                 self.custom_es.bel_npp_block_1_min = min_power_fraction
             
     
-    def set_bel_npp_vver_1200_second_options(self, active_status, fix, min_power_fraction):
-        if active_status == 0:
-            if fix is not None or min_power_fraction is not None:
-                raise Exception('Недопустимые параметры')
-        elif active_status == 1:
+    def set_bel_npp_vver_1200_second_options(self, active_status, min_power_fraction, usd_per_Mwth):
+        if active_status == 1:
             self.custom_es.bel_npp_block_2_status = 1
-            if fix:
-                self.custom_es.bel_npp_block_2_fix = fix
             if min_power_fraction:
                 self.custom_es.bel_npp_block_2_min = min_power_fraction
     
@@ -187,34 +177,39 @@ class Scenario_builder:
         'добавить бесконечное количество электрокотлов ГВС для  КОТЕЛЬНЫХ Белэнерго'
         # +++++++++
         return self
+                        
+    def add_inifinity_el_boilers_steam_for_Belenergo_district_boiler(self):
+        'добавить бесконечное количество электрокотлов ПАРА для КОТЕЛЬНЫХ Белэнерго'
+        # +++++++++
+        return self
      
  
-    def add_ocgt_125(self):
+    def add_ocgt_125(self, count):
         'добавить гту-122'
         # +++++++++
         return self    
     
-    def add_ocgt_100(self):
+    def add_ocgt_100(self, count):
         'добавить гту-100'
         # +++++++++
         return self
         
-    def add_ocgt_25(self):
+    def add_ocgt_25(self, count):
         'добавить гту-25'
         # +++++++++
         return self
     
-    def add_vver_toi_1255(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
+    def add_vver_toi_1255(self, min_power_fraction, usd_per_Mwth = -9999 ):
         'добавить ввэр-тои с устновкой себестоимости и возможностью маневренирования'
         # +++++++++
         return self
     
-    def add_vver_600(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
+    def add_vver_600(self, min_power_fraction, usd_per_Mwth = -9999):
         'добавить ввэр-600 с устновкой себестоимости и возможностью маневренирования'
         # +++++++++
         return self
 
-    def add_ritm_200(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
+    def add_ritm_200(self, min_power_fraction, usd_per_Mwth = -9999 ):
         'добавить ритм-200 с устновкой себестоимости и возможностью маневренирования'
         # +++++++++
         return self

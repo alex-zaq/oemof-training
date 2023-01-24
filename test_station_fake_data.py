@@ -79,7 +79,8 @@ custom_es.set_start_up_options(initial_status = 1, shout_down_cost = shout_down_
 ##################################################################################################
 scen_builder = Scenario_builder(custom_es)
 scen_builder.set_electricity_profile(elictricity_profile = main_power_profile_rel)
-scen_builder.set_electricity_level(energy_level_in_billion_kWth = 41)
+scen_builder.set_electricity_level(energy_level_in_billion_kWth = 39)
+scen_builder.set_turbine_T_modelling_type('simple')
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
 # scen_builder.remove_siemens()
 # добавить фиксированный вариант работы аэс
@@ -114,31 +115,36 @@ result_extractor = Custom_result_extractor(custom_es, results)
 ##################################################################################################
 # Настройка группировки результатов
 ##################################################################################################
-result_plotter.set_block_station_plot_1({
-    bel_npp: ['ввэр'],
-    block_station: ['блок-станции-газ'],
-    small_tec: ['малые тэц', 'эк', 'кот'],
-    minskay_tec_4: ['пт','т','эк','кот'],
-    novopockay_tec: ['р','пт', 'кот'],
-    minskay_tec_5: ['пгу-кэс', 'к'],
-    lukomolskay_gres: ['пгу-кэс','к'],
-    berezovskay_gres: ['пгу-кэс','к', 'гту'],
-    renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
-})
+
+el_boilers_power = result_extractor.get_install_el_boilers_power('гвс')
+print('Мощность электрокотлов-гвс: ', el_boilers_power)
+
+
+# result_plotter.set_block_station_plot_1({
+#     bel_npp: ['ввэр'],
+#     block_station: ['блок-станции-газ'],
+#     small_tec: ['малые тэц', 'эк', 'кот'],
+#     minskay_tec_4: ['пт','т','эк','кот'],
+#     novopockay_tec: ['р','пт', 'кот'],
+#     minskay_tec_5: ['пгу-кэс', 'к'],
+#     lukomolskay_gres: ['пгу-кэс','к'],
+#     berezovskay_gres: ['пгу-кэс','к', 'гту'],
+#     renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
+# })
 
 ##################################################################################################
-# result_plotter.set_station_plot_3(
-#   [ bel_npp,
-#     block_station,
-#     small_tec,
-#     minskay_tec_4,
-#     novopockay_tec,
-#     minskay_tec_5,
-#     lukomolskay_gres,
-#     berezovskay_gres,
-#     renewables,
-#     # fake_el_source
-# ])
+result_plotter.set_station_plot_3(
+  [ bel_npp,
+    block_station,
+    small_tec,
+    minskay_tec_4,
+    novopockay_tec,
+    minskay_tec_5,
+    lukomolskay_gres,
+    berezovskay_gres,
+    renewables,
+    # fake_el_source
+])
 ##################################################################################################
 
 # result_plotter.set_block_type_station_plot_5(
@@ -173,8 +179,6 @@ result_plotter.set_block_station_plot_1({
 ##################################################################################################
 
 # input_data = custom_es.get_all_blocks()
-# el_boilers_power = result_extractor.get_install_el_boilers_power()
-# print('Мощность электрокотлов: ', el_boilers_power)
 
 # gas_consumption = result_extractor.get_total_gas_consumption_value_m3(scale = 'млн')
 # print('потребление газа: ', gas_consumption , 'млн. м3')

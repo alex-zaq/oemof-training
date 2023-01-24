@@ -14,6 +14,8 @@ class Custom_result_extractor:
     def __init__(self, custom_es, processed_results):
         self.custom_es = custom_es
         self.processed_results = processed_results
+        self.custom_es.set_heat_water_groupname_all_stations('гвс')
+        self.custom_es.set_steam_groupname_all_stations('пар')  
 
 ###########################################################################################
 #                                использование природного газ
@@ -109,8 +111,9 @@ class Custom_result_extractor:
     
     def get_install_el_boilers_power(self, commodite_type):
         'получить установленную мощность электрокотлов в энергосистеме'
-        hw_blocks = self.custom_es.get_all_blocks_by_block_type('эк')
-        el_boilers_power = self.custom_es.get_install_power_blocklist(hw_blocks)
+        el_boilers = self.custom_es.get_all_blocks_by_block_type('эк')
+        el_boilers = self.custom_es.filter_block_list_by_group_options_attr(el_boilers, 'heat_demand_type', commodite_type)
+        el_boilers_power = self.custom_es.get_install_power_blocklist(el_boilers)
         return el_boilers_power
     
     def get_install_el_boilers_power_by_station(self, station_name, commodite_type):

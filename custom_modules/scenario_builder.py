@@ -7,7 +7,7 @@ import os
 import datetime as dt
 from enum import Enum
 from custom_modules.helpers import set_label
-from custom_modules.specific_blocks import Specific_blocks
+from custom_modules.specific_blocks import Specific_blocks, Turbine_T_factory
 from custom_modules.generic_blocks import Generic_sinks, Generic_buses
 from custom_modules.helpers import Custom_counter, set_label
 from functools import reduce
@@ -43,42 +43,66 @@ class Scenario_builder:
 ######################################################################################################
 # Выбор варинта детализации теплофикационных турбин типа Т
 ######################################################################################################       
-    def set_turbine_T_modelling_type(type):
+    def set_turbine_T_modelling_type(self, modelling_type):
         'установка детализации турбин Т - simple или detail'
-        pass
+        self.custom_es.set_turbine_T_factory(modelling_type)
 ######################################################################################################   
-# Добавление проектного маневрирования для двух блоков БелАЭС
+# Настройки БелАЭС
 ######################################################################################################   
-    def set_bel_npp_options(self, allow_power_variability = False, usd_per_Mwth = -9999 ):
-        'установка себестоимости и возможности маневрирования для двух блоков БелАЭС'        
-        # +++++++++
-        return self
+
+    def set_bel_npp_vver_1200_first_options(self, active_status, fix, min_power_fraction):
+        if active_status == 0:
+            if fix is not None or min_power_fraction is not None:
+                raise Exception('Недопустимые параметры')
+        elif active_status == 1:
+            self.custom_es.bel_npp_block_1_status = 1
+            if fix:
+                self.custom_es.bel_npp_block_1_fix = fix
+            if min_power_fraction:
+                self.custom_es.bel_npp_block_1_min = min_power_fraction
+            
+    
+    def set_bel_npp_vver_1200_second_options(self, active_status, fix, min_power_fraction):
+        if active_status == 0:
+            if fix is not None or min_power_fraction is not None:
+                raise Exception('Недопустимые параметры')
+        elif active_status == 1:
+            self.custom_es.bel_npp_block_2_status = 1
+            if fix:
+                self.custom_es.bel_npp_block_2_fix = fix
+            if min_power_fraction:
+                self.custom_es.bel_npp_block_2_min = min_power_fraction
+    
 ######################################################################################################   
 # Изменение переменных затрат для газовых и электрокотлов
 ######################################################################################################       
-    def set_el_boilers_hw_variable_cost(self):
+    def set_el_boilers_hw_variable_cost(self, variable_costs):
         'установка переменных затрат для всех электрокотлов ГВС в энергосистеме'
-        pass
+        self.custom_es.el_boiler_hw_variable_cost = variable_costs
     
         
-    def set_el_boilers_steam_variable_cost(self):
+    def set_el_boilers_steam_variable_cost(self, variable_costs):
         'установка переменных затрат для всех электрокотлов ПАРА в энергосистеме'
-        pass
+        self.custom_es.el_boiler_steam_variable_cost = variable_costs
         
         
-    def set_gas_boilers_hw_variable_cost(self):
+    def set_gas_boilers_hw_variable_cost(self, variable_costs):
         'установка переменных затрат для всех газовых котлов ГВС в энергосистеме'
-        pass
+        self.custom_es.gas_boiler_hw_variable_cost = variable_costs
     
         
-    def set_gas_boilers_steam_variable_cost(self):
+    def set_gas_boilers_steam_variable_cost(self, variable_costs):
         'установка переменных затрат для всех газовых котлов ПАРА в энергосистеме'
-        pass
+        self.custom_es.gas_boiler_steam_variable_cost = variable_costs
     
     
-    def set_station_variable_cost_by_station_name(self, station_name, value):
+    def set_station_variable_cost_by_station_name(self, station_name, variable_costs):
+        'установка переменных затрат для указанной станции'
+        self.custom_es.station_not_fuel_var_cost[station_name] = variable_costs
+        
+    def set_station_variable_cost_by_dict(self, data_dict):
         'установка переменных затрат для всех блоков станции'
-        pass
+        self.custom_es.station_not_fuel_var_cost = data_dict
     
 ######################################################################################################   
 # Удаление существующих источников
@@ -165,7 +189,7 @@ class Scenario_builder:
         return self
      
  
-    def add_ocgt_122(self):
+    def add_ocgt_125(self):
         'добавить гту-122'
         # +++++++++
         return self    

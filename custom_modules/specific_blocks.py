@@ -488,6 +488,35 @@ class Specific_blocks:
         def get_ocgt_chp_121(self,global_index, local_index, station_name, output_flow_T, output_flow_P, planning_outage = None):
             pass
 
+
+        def get_t_14_simple(self, global_index, local_index, station_name, output_flow_T, extra_variable_cost = 0,  planning_outage = None):
+            block_type = self.block_type['т']
+            return self.g_block_creator.create_chp_T_turbine_simple(
+                nominal_el_value = 16,
+                min_power_fraction = 0.35,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
+                output_flow_T = output_flow_T,
+                efficiency_T = 0.88,
+                heat_to_el_T = 1.9,
+                variable_costs = 0,
+                extra_variable_cost = extra_variable_cost,
+                start_up_options = self.start_up_options,
+                boiler_efficiency = 0.9,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'Т-16',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 16   
+                }    
+            )
+          
             
         def get_t_250_detail(self, global_index, local_index, station_name, output_flow_T, extra_variable_cost = 0,  planning_outage = None):
             block_type = self.block_type['т']
@@ -736,9 +765,41 @@ class Specific_blocks:
                 'nominal_value': 100   
                 }    
             )
+          
+##################################################################################   
+# ТР - 16
+################################################################################## 
                   
-            
-            
+        def get_tp_16(self,global_index, local_index, station_name, output_flow_P, output_flow_T,extra_variable_cost = 0, planning_outage = None):
+            block_type = self.block_type['пт']
+            return self.g_block_creator.create_chp_PT_turbine(
+            nominal_el_value = 16,
+            min_power_fraction = 0.35,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
+            output_flow_P = output_flow_P,
+            output_flow_T = output_flow_T,
+            efficiency_P = 0.89,
+            efficiency_T = 0.89,
+            heat_to_el_P = 3.8,
+            heat_to_el_T = 2.02,
+            variable_costs = 0,
+            extra_variable_cost = extra_variable_cost,
+            start_up_options = self.start_up_options,
+            boiler_efficiency = 0.9,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': 'ТР-16',
+            'block_type': block_type,
+            'heat_demand_type_hw': None,
+            'heat_demand_type_steam': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': 16   
+            })              
             
 ##################################################################################   
 # ПТ - 50
@@ -759,7 +820,7 @@ class Specific_blocks:
             variable_costs = 0,
             extra_variable_cost = extra_variable_cost,
             start_up_options = self.start_up_options,
-            boiler_efficiency = 1,
+            boiler_efficiency = 0.9,
             group_options = {
             'global_index': str(global_index),
             'local_index': str(local_index),
@@ -1203,6 +1264,36 @@ class Specific_blocks:
             })
             
             
+        def get_p_15(self, global_index, local_index, station_name, output_flow_P, extra_variable_cost = 0, planning_outage = None):
+            block_type = self.block_type['р']
+            return self.g_block_creator.create_back_pressure_turbine(
+            nominal_el_value = 15,
+            min_power_fraction = 0.35,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
+            output_flow_P = output_flow_P,
+            efficiency_P = 0.8,
+            heat_to_el_P = 3.8,
+            variable_costs = 0,
+            extra_variable_cost = extra_variable_cost,
+            start_up_options = self.start_up_options,
+            boiler_efficiency = 0.9,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': 'Р-50',
+            'block_type': block_type,
+            'heat_demand_type_hw': None,
+            'heat_demand_type_steam': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': 15   
+            })
+            
+            
+            
         def get_p_50(self, global_index, local_index, station_name, output_flow_P, extra_variable_cost = 0, planning_outage = None):
             block_type = self.block_type['р']
             return self.g_block_creator.create_back_pressure_turbine(
@@ -1229,8 +1320,7 @@ class Specific_blocks:
             'station_order': None,
             'block_order': None,
             'nominal_value': 50   
-            } 
-            )
+            })
  ##################################################################################
  # ВВЭР-1200
  ##################################################################################
@@ -1555,7 +1645,9 @@ class Turbine_T_factory:
                             output_flow_T, extra_variable_cost,  planning_outage = None)
         
  
-   
+        def get_t_14(self, global_index, local_index, station_name, output_flow_T, extra_variable_cost = 0,  planning_outage = None):
+            return self.block_factory.get_t_16_simple(self, global_index, local_index, station_name,
+                            output_flow_T, extra_variable_cost = 0,  planning_outage = None)
    
    
    

@@ -14,6 +14,7 @@ from custom_modules.helpers import get_peak_load_by_energy_2020, get_peak_load_b
 from functools import reduce
 
 
+
 class Specific_stations:
   
         def __init__(self, es, global_input_bus, global_output_bus):
@@ -326,6 +327,311 @@ class Specific_stations:
 
 
 
+# ТЭЦ-5 энергоблок ст. №1	
+# Березовская ГРЭС энергоблоки ст. №3,4,5	
+# Лукомльская ГРЭС энергоблоки ст. №1-8		
+
+# Минская ТЭЦ-3	
+# Минская ТЭЦ-4		
+# Светлогорская ТЭЦ		
+# Новополоцкая ТЭЦ	
+# Могилевская ТЭЦ-2		
+# Бобруйская  ТЭЦ-2	
+# Гродненская   ТЭЦ-2	
+# Мозырская   ТЭЦ-2	
+# Гомельская  ТЭЦ-2	
+
+        # +
+
+        def add_Minskay_tec_5(self):
+            station_name = 'Минская ТЭЦ-5'
+            block_creator = self.block_creator
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+            ###############################################################
+            # ТК-330-240-3М
+            # M701F  (270)
+            # TC2F  (129.6)
+            # турбины	719.6	МВт	
+            # в/о котлы	100	Гкал/час	
+            ###############################################################
+            tk_330_1 = block_creator.get_tk_330(global_id(), local_id(), station_name, 0)
+            if self.allowSiemens:
+                ccgt_399_1 = block_creator.get_ccgt_399(global_id(), local_id(), station_name, 0)
+            ###############################################################
+            hw_bus = steam_bus = None
+            hw_sink = steam_sink = None
+            ###############################################################
+            el_turb_no_siemens = [tk_330_1]
+            el_turb_siemens = [ccgt_399_1] if self.allowSiemens else []
+            el_turb = el_turb_no_siemens + el_turb_siemens
+            hw_chp_turb = None
+            hw_gas_boilers = None
+            hw_el_boilers = None
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
+            
+        # +      
+        def add_Berezovskay_gres(self):
+            station_name = 'Березовская ГРЭС'
+            block_creator = self.block_creator
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+            ###############################################################
+            # К-160-130 (165)
+            # К-160-130-2ПР1 (165)
+            # К-175/180-12,8 (180)
+            # ГТЭ-25НГ80
+            # ГТЭ-25НГ80
+            # SGT-700 (29.06)
+            # SGT5-4000F (285,87)
+            # LZN140-12,78/2,937/ 0,391  (141,13)
+            # В/о ЭК	25.8	Гкал/час
+            # турбины	1095.12	МВт
+            ###############################################################
+            k_160_1 = block_creator.get_k_160(global_id(), local_id(), station_name, 0.01)
+            k_160_2 = block_creator.get_k_160(global_id(), local_id(), station_name, 0.03)
+            k_175_1 = block_creator.get_k_175(global_id(), local_id(), station_name, 0)
+            ocgt_25_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.01)
+            ocgt_25_2 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.02)
+            if self.allowSiemens:
+                ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name)
+                ocgt_29_1 = block_creator.get_ocgt_29(global_id(), local_id(), station_name, 0)
+            ###############################################################
+            hw_bus = steam_bus = None
+            hw_sink = steam_sink = None
+            ###############################################################
+            el_turb_no_siemens = [k_160_1, k_160_2, k_175_1, ocgt_25_1, ocgt_25_2]
+            el_turb_siemens = [ccgt_427_1, ocgt_29_1] if self.allowSiemens else []
+            el_turb = el_turb_no_siemens + el_turb_siemens
+            hw_chp_turb = None
+            hw_gas_boilers = None
+            hw_el_boilers = None
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
+  
+        # + 
+        def add_Lukomolskay_gres(self, heat_water_demand_data = None):
+            station_name = 'Лукомольская ГРЭС'
+            ###############################################################
+            create_buses = self.bus_creator.create_buses
+            block_creator = self.block_creator
+            create_sink_abs = self.sink_creator.create_sink_absolute_demand
+            counter = Custom_counter()
+            local_id = counter.next
+            global_id = self.inc_global_id
+            ###############################################################
+            hw_name = 'гвс'
+            # steam_name = 'пар'
+            hw_bus = create_buses(set_label(station_name, hw_name))
+            steam_bus = None
+            # steam_bus = create_buses(set_label(station_name, steam_name))
+            ###############################################################
+            # турбоагрегаты, котлы и электрокотлы
+            # К-300-240-6МР(315) # К-300-240-6МР(315) # К-300-240-6МР(315) # К-300-240-9МР(310) 
+            # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1(300) 
+            # SGT5-PAC 4000F- 286 МВт  N141-563/551 - 141 МВт
+            # эк - 68.8 гкал/ч  пвк - нет
+            ###############################################################
+            k_315_1 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.001)
+            k_315_2 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.002)
+            k_315_3 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.003)
+            k_310_4 = block_creator.get_k_310(global_id(), local_id(), station_name, 0.004)
+            k_300_5 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.005)
+            k_300_6 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.006)
+            k_300_7 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.007)
+            k_300_8 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.008)
+            if self.allowSiemens:
+                ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, 0)
+            ###############################################################
+            el_boilers_hw = None
+            back_hw_gas_boilers = None
+            # el_boilers_hw = block_creator.get_el_boilers(next(), station_name, 1.163 * 68.8, hw_bus, hw_name , 0)
+            # фейковые дорогие источники тепла
+            # back_hw_gas_boilers = block_creator.get_gas_boilers(next() ,station_name, 10_000, hw_bus, hw_name, 9999)
+            # тепловые потребители - sink
+            ###############################################################
+            hw_sink = create_sink_abs(label = set_label(
+            station_name, hw_name, 'потребитель'),
+            input_flow = hw_bus,
+            demand_absolute_data = heat_water_demand_data)
+            steam_sink = None
+            # steam_sink = create_sink_abs(label = set_label(
+            # station_name, steam_name, 'потребитель'),
+            # input_flow = steam_bus,
+            # demand_absolute_data = steam_demand_data)
+            ###############################################################
+            el_turb_no_siemens = [k_315_1, k_315_2, k_315_3, k_310_4, k_300_5, k_300_6, k_300_7, k_300_8]
+            # el_turb_no_siemens = []
+            el_turb_siemens = [ccgt_427_1] if self.allowSiemens else []
+            el_turb = el_turb_no_siemens + el_turb_siemens
+            hw_chp_turb = None
+            hw_gas_boilers = back_hw_gas_boilers
+            hw_el_boilers = el_boilers_hw
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
+            
+            
+       # +      
+        def add_Minskay_tec_3(self, heat_water_demand_data, steam_demand_data):
+            station_name = 'Минская ТЭЦ-3'
+            create_buses = self.bus_creator.create_buses
+            block_creator = self.block_creator
+            turbine_T_factory = self.turbine_T_factory
+            create_sink_abs = self.sink_creator.create_sink_absolute_demand
+            counter = Custom_counter()
+            global_id = self.inc_global_id
+            local_id = counter.next
+            ###############################################################
+            hw_name = 'гвс'
+            steam_name = 'пар'
+            hw_bus = create_buses(set_label(station_name, hw_name))
+            steam_bus = create_buses(set_label(station_name, steam_name))
+            ###############################################################
+            # ПТ-60-130/13
+            # ПТ-60-130/13
+            # Т-100-130
+            # GT 13E2
+            # Т-53/67-8,0
+            # турбины	442	МВт	
+            # в/о котлы	940	Гкал/час	
+            # В/о ЭК	86	Гкал/час	
+            ###############################################################
+            [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
+            [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.02)
+            t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, 0)
+            # не сделано
+            ccgt_chp_222 = block_creator.get_ccgt_сhp_222(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
+            hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 940 * 1.163, hw_bus, 0)
+            el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 86 * 1.163, hw_bus, 0)
+            ###############################################################
+            hw_sink = create_sink_abs(label = set_label(
+            station_name, hw_name, 'потребитель'),
+            input_flow = hw_bus,
+            demand_absolute_data = heat_water_demand_data)
+            steam_sink = create_sink_abs(label = set_label(
+            station_name, steam_name, 'потребитель'),
+            input_flow = steam_bus,
+            demand_absolute_data = steam_demand_data)
+            ###############################################################
+            el_turb = [pt_t_60_el_1, pt_t_60_el_2, t_100_1, ccgt_chp_222]
+            hw_chp_turb = [pt_t_60_1, pt_t_60_2, t_100_1, ccgt_chp_222]
+            hw_gas_boilers = hw_gas_boilers
+            hw_el_boilers = el_boilers_hw
+            steam_chp_turb = [pt_p_60_1, pt_p_60_2]
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            return station_name
+    
+        # + 
         def add_Minskay_tec_4(self, heat_water_demand_data, steam_demand_data = None):
             # добавить паровую нагрзука для пт-60
             station_name = 'Минская ТЭЦ-4'
@@ -420,6 +726,20 @@ class Specific_stations:
 
             return station_name
             
+            
+        # -       
+        def add_Svetlogorskay_tec(self):
+            station_name = 'Cветлогорская ТЭЦ'
+            # Р-15-90/10
+            # ТР-16-10
+            # Т-14/25-10
+            # ПТ-60-130/13
+            # Р-50-130-1ПР1
+            # турбины	155	МВт
+            pass
+
+            
+        # +            
         def add_Novopockay_tec(self, heat_water_demand_data, steam_demand_data = None):
             station_name = 'Новополоцкая ТЭЦ'
             ###############################################################
@@ -492,220 +812,8 @@ class Specific_stations:
                 }} 
             return station_name
             
-            
-        def add_Lukomolskay_gres(self, heat_water_demand_data = None):
-            station_name = 'Лукомольская ГРЭС'
-            ###############################################################
-            create_buses = self.bus_creator.create_buses
-            block_creator = self.block_creator
-            create_sink_abs = self.sink_creator.create_sink_absolute_demand
-            counter = Custom_counter()
-            local_id = counter.next
-            global_id = self.inc_global_id
-            ###############################################################
-            hw_name = 'гвс'
-            # steam_name = 'пар'
-            hw_bus = create_buses(set_label(station_name, hw_name))
-            steam_bus = None
-            # steam_bus = create_buses(set_label(station_name, steam_name))
-            ###############################################################
-            # турбоагрегаты, котлы и электрокотлы
-            # К-300-240-6МР(315) # К-300-240-6МР(315) # К-300-240-6МР(315) # К-300-240-9МР(310) 
-            # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1 (300)   # К-300-240-1(300) 
-            # SGT5-PAC 4000F- 286 МВт  N141-563/551 - 141 МВт
-            # эк - 68.8 гкал/ч  пвк - нет
-            ###############################################################
-            k_315_1 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.001)
-            k_315_2 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.002)
-            k_315_3 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.003)
-            k_310_4 = block_creator.get_k_310(global_id(), local_id(), station_name, 0.004)
-            k_300_5 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.005)
-            k_300_6 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.006)
-            k_300_7 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.007)
-            k_300_8 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.008)
-            if self.allowSiemens:
-                ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, 0)
-            ###############################################################
-            el_boilers_hw = None
-            back_hw_gas_boilers = None
-            # el_boilers_hw = block_creator.get_el_boilers(next(), station_name, 1.163 * 68.8, hw_bus, hw_name , 0)
-            # фейковые дорогие источники тепла
-            # back_hw_gas_boilers = block_creator.get_gas_boilers(next() ,station_name, 10_000, hw_bus, hw_name, 9999)
-            # тепловые потребители - sink
-            ###############################################################
-            hw_sink = create_sink_abs(label = set_label(
-            station_name, hw_name, 'потребитель'),
-            input_flow = hw_bus,
-            demand_absolute_data = heat_water_demand_data)
-            steam_sink = None
-            # steam_sink = create_sink_abs(label = set_label(
-            # station_name, steam_name, 'потребитель'),
-            # input_flow = steam_bus,
-            # demand_absolute_data = steam_demand_data)
-            ###############################################################
-            el_turb_no_siemens = [k_315_1, k_315_2, k_315_3, k_310_4, k_300_5, k_300_6, k_300_7, k_300_8]
-            # el_turb_no_siemens = []
-            el_turb_siemens = [ccgt_427_1] if self.allowSiemens else []
-            el_turb = el_turb_no_siemens + el_turb_siemens
-            hw_chp_turb = None
-            hw_gas_boilers = back_hw_gas_boilers
-            hw_el_boilers = el_boilers_hw
-            steam_chp_turb = None
-            steam_gas_boilers = None
-            steam_el_boilers = None
-            install_power = self.get_install_power_blocklist(el_turb)
-            ###############################################################
-            self.active_stations_data[station_name] = {
-                'установленная мощность': install_power,
-                'источники': {
-                                'э-источники': el_turb,
-                                'гвс-источники': {
-                                    'гвс-тэц-источник': hw_chp_turb,
-                                    'гвс-кот-источник': hw_gas_boilers,
-                                    'гвс-эк-источник': hw_el_boilers
-                                    },
-                                'пар-источники': {
-                                    'пар-тэц-источник': steam_chp_turb,
-                                    'пар-кот-источник': steam_gas_boilers,
-                                    'пар-эк-источник': steam_el_boilers,
-                                    }
-                },
-                'потоки':  {
-                                'гвс-поток': hw_bus, 
-                                'пар-поток': steam_bus,
-                },
-                'потребители':{
-                                'гвс-потребитель': hw_sink,
-                                'пар-потребитель': steam_sink
-                }} 
-            return station_name
-            
-            
-        def add_Berezovskay_gres(self):
-            station_name = 'Березовская ГРЭС'
-            block_creator = self.block_creator
-            counter = Custom_counter()
-            local_id = counter.next
-            global_id = self.inc_global_id
-            ###############################################################
-            # К-160-130 (165)
-            # К-160-130-2ПР1 (165)
-            # К-175/180-12,8 (180)
-            # ГТЭ-25НГ80
-            # ГТЭ-25НГ80
-            # SGT-700 (29.06)
-            # SGT5-4000F (285,87)
-            # LZN140-12,78/2,937/ 0,391  (141,13)
-            # В/о ЭК	25.8	Гкал/час
-            # турбины	1095.12	МВт
-            ###############################################################
-            k_160_1 = block_creator.get_k_160(global_id(), local_id(), station_name, 0.01)
-            k_160_2 = block_creator.get_k_160(global_id(), local_id(), station_name, 0.03)
-            k_175_1 = block_creator.get_k_175(global_id(), local_id(), station_name, 0)
-            ocgt_25_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.01)
-            ocgt_25_2 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.02)
-            if self.allowSiemens:
-                ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name)
-                ocgt_29_1 = block_creator.get_ocgt_29(global_id(), local_id(), station_name, 0)
-            ###############################################################
-            hw_bus = steam_bus = None
-            hw_sink = steam_sink = None
-            ###############################################################
-            el_turb_no_siemens = [k_160_1, k_160_2, k_175_1, ocgt_25_1, ocgt_25_2]
-            el_turb_siemens = [ccgt_427_1, ocgt_29_1] if self.allowSiemens else []
-            el_turb = el_turb_no_siemens + el_turb_siemens
-            hw_chp_turb = None
-            hw_gas_boilers = None
-            hw_el_boilers = None
-            steam_chp_turb = None
-            steam_gas_boilers = None
-            steam_el_boilers = None
-            install_power = self.get_install_power_blocklist(el_turb)
-            ###############################################################
-            self.active_stations_data[station_name] = {
-                'установленная мощность': install_power,
-                'источники': {
-                                'э-источники': el_turb,
-                                'гвс-источники': {
-                                    'гвс-тэц-источник': hw_chp_turb,
-                                    'гвс-кот-источник': hw_gas_boilers,
-                                    'гвс-эк-источник': hw_el_boilers
-                                    },
-                                'пар-источники': {
-                                    'пар-тэц-источник': steam_chp_turb,
-                                    'пар-кот-источник': steam_gas_boilers,
-                                    'пар-эк-источник': steam_el_boilers,
-                                    }
-                },
-                'потоки':  {
-                                'гвс-поток': hw_bus, 
-                                'пар-поток': steam_bus,
-                },
-                'потребители':{
-                                'гвс-потребитель': hw_sink,
-                                'пар-потребитель': steam_sink
-                }} 
-            return station_name
-  
-            
-            
-        def add_Minskay_tec_5(self):
-            station_name = 'Минская ТЭЦ-5'
-            block_creator = self.block_creator
-            counter = Custom_counter()
-            local_id = counter.next
-            global_id = self.inc_global_id
-            ###############################################################
-            # ТК-330-240-3М
-            # M701F  (270)
-            # TC2F  (129.6)
-            # турбины	719.6	МВт	
-            # в/о котлы	100	Гкал/час	
-            ###############################################################
-            tk_330_1 = block_creator.get_tk_330(global_id(), local_id(), station_name, 0)
-            if self.allowSiemens:
-                ccgt_399_1 = block_creator.get_ccgt_399(global_id(), local_id(), station_name, 0)
-            ###############################################################
-            hw_bus = steam_bus = None
-            hw_sink = steam_sink = None
-            ###############################################################
-            el_turb_no_siemens = [tk_330_1]
-            el_turb_siemens = [ccgt_399_1] if self.allowSiemens else []
-            el_turb = el_turb_no_siemens + el_turb_siemens
-            hw_chp_turb = None
-            hw_gas_boilers = None
-            hw_el_boilers = None
-            steam_chp_turb = None
-            steam_gas_boilers = None
-            steam_el_boilers = None
-            install_power = self.get_install_power_blocklist(el_turb)
-            ###############################################################
-            self.active_stations_data[station_name] = {
-                'установленная мощность': install_power,
-                'источники': {
-                                'э-источники': el_turb,
-                                'гвс-источники': {
-                                    'гвс-тэц-источник': hw_chp_turb,
-                                    'гвс-кот-источник': hw_gas_boilers,
-                                    'гвс-эк-источник': hw_el_boilers
-                                    },
-                                'пар-источники': {
-                                    'пар-тэц-источник': steam_chp_turb,
-                                    'пар-кот-источник': steam_gas_boilers,
-                                    'пар-эк-источник': steam_el_boilers,
-                                    }
-                },
-                'потоки':  {
-                                'гвс-поток': hw_bus, 
-                                'пар-поток': steam_bus,
-                },
-                'потребители':{
-                                'гвс-потребитель': hw_sink,
-                                'пар-потребитель': steam_sink
-                }} 
-            return station_name
-            
-            
+
+         # +          
         def add_Mogilevskay_tec_2(self, heat_water_demand_data, steam_demand_data):
             station_name = 'Могилевская ТЭЦ-2'
             create_buses = self.bus_creator.create_buses
@@ -786,7 +894,7 @@ class Specific_stations:
             ###############################################################
             
             ###############################################################            
-            
+        # +   
         def add_Bobryskay_tec_2(self, heat_water_demand_data, steam_demand_data):
             station_name = 'Бобруйская ТЭЦ-2'
             create_buses = self.bus_creator.create_buses
@@ -862,7 +970,7 @@ class Specific_stations:
                 }} 
             return station_name
 
-            
+        # + 
         def add_Grodnenskay_tec_2(self, heat_water_demand_data, steam_demand_data):
             station_name = 'Гродненская ТЭЦ-2'
             create_buses = self.bus_creator.create_buses
@@ -936,60 +1044,30 @@ class Specific_stations:
                                 'пар-потребитель': steam_sink
                 }} 
             return station_name
-
-
-
-        def add_Svetlogorskay_tec(self):
-            station_name = 'Cветлогорская ТЭЦ'
             
-            # Р-15-90/10
-            # ТР-16-10
-            # Т-14/25-10
-            # ПТ-60-130/13
-            # Р-50-130-1ПР1
-            # турбины	155	МВт
-
-            
-            
-        def add_Mozyrskay_tec_2(self):
+        # +        
+        def add_Mozyrskay_tec_2(self, heat_water_demand_data, steam_demand_data):
             station_name = 'Мозырская ТЭЦ-2'
-            # ПТ-70-130/40/13
-            # ПТ-135/165-130/15
-            # турбины	205	МВт
-
-
-                        
-        def add_Minskay_tec_3(self, heat_water_demand_data, steam_demand_data):
-            station_name = 'Минская ТЭЦ-3'
             create_buses = self.bus_creator.create_buses
             block_creator = self.block_creator
-            turbine_T_factory = self.turbine_T_factory
             create_sink_abs = self.sink_creator.create_sink_absolute_demand
             counter = Custom_counter()
-            global_id = self.inc_global_id
             local_id = counter.next
+            global_id = self.inc_global_id
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
             hw_bus = create_buses(set_label(station_name, hw_name))
             steam_bus = create_buses(set_label(station_name, steam_name))
             ###############################################################
-            # ПТ-60-130/13
-            # ПТ-60-130/13
-            # Т-100-130
-            # GT 13E2
-            # Т-53/67-8,0
-            # турбины	442	МВт	
-            # в/о котлы	940	Гкал/час	
-            # В/о ЭК	86	Гкал/час	
+            # ПТ-70-130/40/13
+            # ПТ-135/165-130/15
+            # турбины	205	МВт
             ###############################################################
-            [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
-            [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.02)
-            t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, 0)
-            # не сделано
-            ccgt_chp_222 = block_creator.get_ccgt_сhp_222(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
-            hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 940 * 1.163, hw_bus, 0)
-            el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 86 * 1.163, hw_bus, 0)
+            [pt_t_70_el_1, pt_p_70_1, pt_t_70_1] = block_creator.get_pt_70(global_id(), local_id(), station_name, steam_bus, hw_bus)
+            [pt_t_135_el_1, pt_p_135_1, pt_t_135_1] = block_creator.get_pt_135(global_id(), local_id(), station_name, steam_bus, hw_bus)
+            hw_gas_boilers = None
+            el_boilers_hw = None
             ###############################################################
             hw_sink = create_sink_abs(label = set_label(
             station_name, hw_name, 'потребитель'),
@@ -999,12 +1077,11 @@ class Specific_stations:
             station_name, steam_name, 'потребитель'),
             input_flow = steam_bus,
             demand_absolute_data = steam_demand_data)
-            ###############################################################
-            el_turb = [pt_t_60_el_1, pt_t_60_el_2, t_100_1, ccgt_chp_222]
-            hw_chp_turb = [pt_t_60_1, pt_t_60_2, t_100_1, ccgt_chp_222]
+            el_turb = [pt_t_70_el_1, pt_t_135_el_1]
+            hw_chp_turb = [pt_t_70_1, pt_t_135_1]
             hw_gas_boilers = hw_gas_boilers
             hw_el_boilers = el_boilers_hw
-            steam_chp_turb = [pt_p_60_1, pt_p_60_2]
+            steam_chp_turb = [pt_p_70_1, pt_p_135_1]
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
@@ -1034,8 +1111,9 @@ class Specific_stations:
                 }} 
             return station_name
 
+
                         
-                        
+        # +                 
         def add_Gomelskay_tec_2(self, heat_water_demand_data, steam_demand_data):
             station_name = 'Гомельская ТЭЦ-2'
             create_buses = self.bus_creator.create_buses
@@ -1107,19 +1185,19 @@ class Specific_stations:
             return station_name
 
 
-            
+         # -     
         def add_district_boilers(self):
             station_name = 'Котельные ЖКХ'
             pass
 
 
-            
+         # -     
         def add_district_boilers_Belenergo(self):
             station_name = 'Районные котельные Белэнерго'
             pass
         
         
-                    
+         # +            
         def add_block_staion_natural_gas(self, fixed_el_load_data_rel):
             station_name = 'Блок-станции(газ)'
             counter = Custom_counter()
@@ -1172,7 +1250,7 @@ class Specific_stations:
                 }} 
             return station_name
         
-                                
+        # +                        
         def add_renewables_fixed(self, fixed_wind_rel, fixed_solar_rel, fixed_hydro_rel):
             # сделать варинат без фиксированной нагрузки
             station_name = 'ВИЭ'
@@ -1245,7 +1323,7 @@ class Specific_stations:
                                    
                                             
             
-            
+        # +    
         def add_small_chp(self, fixed_el_load_data_rel):
             station_name = 'Малые ТЭЦ'
             counter = Custom_counter()
@@ -1319,7 +1397,7 @@ class Specific_stations:
             return station_name
 
                         
-
+        # +  
         def add_Bel_npp(self):
             station_name = 'Белорусская АЭС'
             ###############################################################

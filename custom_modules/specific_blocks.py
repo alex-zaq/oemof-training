@@ -199,6 +199,33 @@ class Specific_blocks:
             'nominal_value': 25
             })    
             
+            
+        def get_ocgt_100(self,global_index, local_index,station_name, extra_variable_cost = 0 , planning_outage = None):
+            block_type = self.block_type['гту']
+            return self.g_block_creator.create_offset_transformer(
+            nominal_value = 100,
+            input_flow = self.global_natural_gas_flow,
+            output_flow = self.global_el_flow,
+            efficiency_min = 0.25,
+            efficiency_max = 0.40,
+            min_power_fraction = 0.25,
+            variable_costs = 0,
+            extra_variable_cost = extra_variable_cost,
+            boiler_efficiency = 1,  
+            start_up_options = self.start_up_options,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': 'ГТУ-100',
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': 100
+            })    
+            
                         
             
         def get_ocgt_120(self,global_index, local_index,station_name, extra_variable_cost = 0 , planning_outage = None):
@@ -1324,11 +1351,11 @@ class Specific_blocks:
  ##################################################################################
  # ВВЭР-1200
  ##################################################################################
-        def get_vver_1200(self, global_index, local_index, station_name, variable_costs, extra_variable_cost = 0, planning_outage = None):
+        def get_vver_1200(self, global_index, local_index, station_name, min_power_fraction ,variable_costs, extra_variable_cost = 0, planning_outage = None):
             block_type = self.block_type['ввэр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 1200,
-                min_power_fraction = 0.75,
+                min_power_fraction = min_power_fraction,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 extra_variable_cost = extra_variable_cost,
@@ -1350,11 +1377,11 @@ class Specific_blocks:
 ##################################################################################
  # ВВЭР-ТОИ
  ##################################################################################
-        def get_vver_toi(self, global_index, local_index, station_name, variable_costs,extra_variable_cost = 0, planning_outage = None):
+        def get_vver_toi(self, global_index, local_index, station_name, min_power_fraction, variable_costs,extra_variable_cost = 0, planning_outage = None):
             block_type = self.block_type['ввэр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 1255,
-                min_power_fraction = 0.75,
+                min_power_fraction = min_power_fraction,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 extra_variable_cost = extra_variable_cost,
@@ -1376,11 +1403,11 @@ class Specific_blocks:
  ##################################################################################
  # ВВЭР-600
  ##################################################################################
-        def get_vver_600(self, global_index, local_index, station_name, variable_costs, extra_variable_cost = 0, planning_outage = None):
+        def get_vver_600(self, global_index, local_index, station_name, min_power_fraction , variable_costs, extra_variable_cost = 0, planning_outage = None):
             block_type = self.block_type['ввэр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 600,
-                min_power_fraction = 0.65,
+                min_power_fraction = min_power_fraction,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 extra_variable_cost = extra_variable_cost,
@@ -1402,11 +1429,11 @@ class Specific_blocks:
  ##################################################################################
  # РИТМ-200
  ##################################################################################
-        def get_ritm_200(self,global_index, local_index, station_name, variable_costs, extra_variable_cost = 0, planning_outage = None):
+        def get_ritm_200(self,global_index, local_index, station_name, min_power_fraction, variable_costs, extra_variable_cost = 0, planning_outage = None):
             block_type = self.block_type['ммр']
             return self.g_block_creator.create_NPP_block(
                 nominal_el_value = 50,
-                min_power_fraction = 0.65,
+                min_power_fraction = min_power_fraction,
                 output_flow = self.global_el_flow,
                 variable_costs = variable_costs,
                 extra_variable_cost = extra_variable_cost,

@@ -25,12 +25,29 @@ class Specific_stations:
             self.global_output_bus = global_output_bus
             self.gobal_elictricity_sink = None
             self.global_gas_source = None
+            # плохо
             self.block_creator = Specific_blocks(es, global_input_bus, global_output_bus, 9999)
             self.turbine_T_factory = Turbine_T_factory(self.block_creator, 'simple')
             self.sink_creator = Generic_sinks(es)
             self.bus_creator = Generic_buses(es)
             self.active_stations_data = {}
 
+
+            self.station_all_turb_retired = {
+                'Лукомольская ГРЭС' : False,
+                'Березовская ГРЭС' : False,
+                'Минская ТЭЦ-5' : False,
+                'Минская ТЭЦ-3' : False,
+                'Минская ТЭЦ-4' : False,
+                'Светлогорская ТЭЦ' : False,
+                'Новополоцкая ТЭЦ' : False,
+                'Могилевская ТЭЦ-2' : False,
+                'Бобруйская ТЭЦ-2' : False,
+                'Гродненская ТЭЦ-2' : False,
+                'Мозырская ТЭЦ-2' : False,
+                'Гомельская ТЭЦ' : False,
+                'Блок-станции' : False,
+            }
 
             self.station_not_fuel_var_cost = {
                 'Лукомольская ГРЭС' : 0,
@@ -48,46 +65,188 @@ class Specific_stations:
                 'Малые ТЭЦ' : 0,
                 'ВИЭ' : 0,
                 'Блок-станции' : 0,
+                'Котельные Белэнерго' : 0,
+                'Котельные ЖКХ' : 0,
+                'Новые энергоисточники': 0,
+                'Аккумуляторы': 0
+            }
+            
+            self.el_boiler_hw_infinity = {
+                'Лукомольская ГРЭС' : False,
+                'Березовская ГРЭС' : False,
+                'Минская ТЭЦ-5' : False,
+                'Минская ТЭЦ-3' : False,
+                'Минская ТЭЦ-4' : False,
+                'Светлогорская ТЭЦ' : False,
+                'Новополоцкая ТЭЦ' : False,
+                'Могилевская ТЭЦ-2' : False,
+                'Бобруйская ТЭЦ-2' : False,
+                'Гродненская ТЭЦ-2' : False,
+                'Мозырская ТЭЦ-2' : False,
+                'Гомельская ТЭЦ' : False,
+                'Малые ТЭЦ' : False,
+                'ВИЭ' : False,
+                'Блок-станции' : False,
+                'Котельные Белэнерго' : False,
+                'Котельные ЖКХ' : False,
+                'Новые энергоисточники': False,
+                'Аккумуляторы': False
+            }
+            
+            self.el_boiler_steam_infinity = {
+                'Лукомольская ГРЭС' : False,
+                'Березовская ГРЭС' : False,
+                'Минская ТЭЦ-5' : False,
+                'Минская ТЭЦ-3' : False,
+                'Минская ТЭЦ-4' : False,
+                'Светлогорская ТЭЦ' : False,
+                'Новополоцкая ТЭЦ' : False,
+                'Могилевская ТЭЦ-2' : False,
+                'Бобруйская ТЭЦ-2' : False,
+                'Гродненская ТЭЦ-2' : False,
+                'Мозырская ТЭЦ-2' : False,
+                'Гомельская ТЭЦ' : False,
+                'Малые ТЭЦ' : False,
+                'ВИЭ' : False,
+                'Блок-станции' : False,
+                'Котельные Белэнерго' : False,
+                'Котельные ЖКХ' : False,
+                'Новые энергоисточники': False,
+                'Аккумуляторы': False
             }
 
-            self.el_boiler_variable_cost = {
-                'гвс': 0,
-                'пар': 0,
+            self.gas_boiler_hw_infinity = {
+                'Лукомольская ГРЭС' : False,
+                'Березовская ГРЭС' : False,
+                'Минская ТЭЦ-5' : False,
+                'Минская ТЭЦ-3' : False,
+                'Минская ТЭЦ-4' : False,
+                'Светлогорская ТЭЦ' : False,
+                'Новополоцкая ТЭЦ' : False,
+                'Могилевская ТЭЦ-2' : False,
+                'Бобруйская ТЭЦ-2' : False,
+                'Гродненская ТЭЦ-2' : False,
+                'Мозырская ТЭЦ-2' : False,
+                'Гомельская ТЭЦ' : False,
+                'Малые ТЭЦ' : False,
+                'ВИЭ' : False,
+                'Блок-станции' : False,
+                'Котельные Белэнерго' : False,
+                'Котельные ЖКХ' : False,
+                'Новые энергоисточники': False,
+                'Аккумуляторы': False
             }
             
-            
-            self.gas_boiler_variable_cost = {
-                'гвс': 0,
-                'пар': 0,
+            self.gas_boiler_steam_infinity = {
+                'Лукомольская ГРЭС' : False,
+                'Березовская ГРЭС' : False,
+                'Минская ТЭЦ-5' : False,
+                'Минская ТЭЦ-3' : False,
+                'Минская ТЭЦ-4' : False,
+                'Светлогорская ТЭЦ' : False,
+                'Новополоцкая ТЭЦ' : False,
+                'Могилевская ТЭЦ-2' : False,
+                'Бобруйская ТЭЦ-2' : False,
+                'Гродненская ТЭЦ-2' : False,
+                'Мозырская ТЭЦ-2' : False,
+                'Гомельская ТЭЦ' : False,
+                'Малые ТЭЦ' : False,
+                'ВИЭ' : False,
+                'Блок-станции' : False,
+                'Котельные Белэнерго' : False,
+                'Котельные ЖКХ' : False,
+                'Новые энергоисточники': False,
+                'Аккумуляторы': False
             }
-            
-            
-            self.infinity_el_boilers_large_chp = {
-                'гвс': False,
-                'пар': False,
-            }                        
-            
-            self.infinity_gas_boilers_large_chp = {
-                'гвс': False,
-                'пар': False,
-            }                        
-            
-            self.infinity_el_boilers_small_chp = {
-                'гвс': False,
-            }                        
-            
-            self.infinity_gas_boilers_small_chp = {
-                'гвс': False,
-            }                        
 
-            self.infinity_el_boilers_discrict_boilers = {
-                'гвс' : False
+            self.el_boiler_hw_var_cost = {
+                'Лукомольская ГРЭС' : 0,
+                'Березовская ГРЭС' : 0,
+                'Минская ТЭЦ-5' : 0,
+                'Минская ТЭЦ-3' : 0,
+                'Минская ТЭЦ-4' : 0,
+                'Светлогорская ТЭЦ' : 0,
+                'Новополоцкая ТЭЦ' : 0,
+                'Могилевская ТЭЦ-2' : 0,
+                'Бобруйская ТЭЦ-2' : 0,
+                'Гродненская ТЭЦ-2' : 0,
+                'Мозырская ТЭЦ-2' : 0,
+                'Гомельская ТЭЦ' : 0,
+                'Малые ТЭЦ' : 0,
+                'ВИЭ' : 0,
+                'Блок-станции' : 0,
+                'Котельные Белэнерго' : 0,
+                'Котельные ЖКХ' : 0,
+                'Новые энергоисточники': 0,
+                'Аккумуляторы': 0
             }
 
-            self.infinity_el_boilers_Belenergo_district_boilers = {
-                'гвс': False,
-                'пар': False,
+            self.el_boiler_steam_var_cost = {
+                'Лукомольская ГРЭС' : 0,
+                'Березовская ГРЭС' : 0,
+                'Минская ТЭЦ-5' : 0,
+                'Минская ТЭЦ-3' : 0,
+                'Минская ТЭЦ-4' : 0,
+                'Светлогорская ТЭЦ' : 0,
+                'Новополоцкая ТЭЦ' : 0,
+                'Могилевская ТЭЦ-2' : 0,
+                'Бобруйская ТЭЦ-2' : 0,
+                'Гродненская ТЭЦ-2' : 0,
+                'Мозырская ТЭЦ-2' : 0,
+                'Гомельская ТЭЦ' : 0,
+                'Малые ТЭЦ' : 0,
+                'ВИЭ' : 0,
+                'Блок-станции' : 0,
+                'Котельные Белэнерго' : 0,
+                'Котельные ЖКХ' : 0,
+                'Новые энергоисточники': 0,
+                'Аккумуляторы': 0
             }
+
+            self.gas_boiler_hw_var_cost = {
+                'Лукомольская ГРЭС' : 0,
+                'Березовская ГРЭС' : 0,
+                'Минская ТЭЦ-5' : 0,
+                'Минская ТЭЦ-3' : 0,
+                'Минская ТЭЦ-4' : 0,
+                'Светлогорская ТЭЦ' : 0,
+                'Новополоцкая ТЭЦ' : 0,
+                'Могилевская ТЭЦ-2' : 0,
+                'Бобруйская ТЭЦ-2' : 0,
+                'Гродненская ТЭЦ-2' : 0,
+                'Мозырская ТЭЦ-2' : 0,
+                'Гомельская ТЭЦ' : 0,
+                'Малые ТЭЦ' : 0,
+                'ВИЭ' : 0,
+                'Блок-станции' : 0,
+                'Котельные Белэнерго' : 0,
+                'Котельные ЖКХ' : 0,
+                'Новые энергоисточники': 0,
+                'Аккумуляторы': 0
+            }
+
+            self.gas_boiler_steam_var_cost = {
+                'Лукомольская ГРЭС' : 0,
+                'Березовская ГРЭС' : 0,
+                'Минская ТЭЦ-5' : 0,
+                'Минская ТЭЦ-3' : 0,
+                'Минская ТЭЦ-4' : 0,
+                'Светлогорская ТЭЦ' : 0,
+                'Новополоцкая ТЭЦ' : 0,
+                'Могилевская ТЭЦ-2' : 0,
+                'Бобруйская ТЭЦ-2' : 0,
+                'Гродненская ТЭЦ-2' : 0,
+                'Мозырская ТЭЦ-2' : 0,
+                'Гомельская ТЭЦ' : 0,
+                'Малые ТЭЦ' : 0,
+                'ВИЭ' : 0,
+                'Блок-станции' : 0,
+                'Котельные Белэнерго' : 0,
+                'Котельные ЖКХ' : 0,
+                'Новые энергоисточники': 0,
+                'Аккумуляторы': 0
+            }
+
 
             self.new_ocgt_count_options = {
                 'гту-25': 0,
@@ -107,8 +266,8 @@ class Specific_stations:
             }
 
             self.new_npp_scenario_options = {
-                'ввэр_тои': True,
-                'ввэр-600': True,
+                'ввэр_тои': False,
+                'ввэр-600': False,
                 'ритм-200': 0,
                 'ввэр_тои_мин': 0.75,
                 'ввэр-600_мин': 0.70,
@@ -118,21 +277,19 @@ class Specific_stations:
                 'ритм-200_затраты': -999
             }
                 
-
-            self.retirement_options = {
-                'блок-станции_без_тех_огр' : True,
-                'siemens': True,
-                'виэ': True,
-                'план вывода Белэнерго': True,
-                'пар_крупные_тэц_ПТ' : True,
-                'пар_крупные_тэц_Р' : True,
-                'малые тэц_откл_часть' : 0,
-                'гвс_коте_Белэнерго_откл_часть' : 0,
-                'пар_кот_Белэнерго_откл_часть' : 0,
-                'гвс_кот_жкх_откл_часть' : 0,
                 
-            }
-
+            self.allow_siemens = True                           # разрешить энергоисточники siemens
+            self.reduce_block_station_power = False             # запретить блок-станции без техн. ограничений
+            self.allow_renewables = True                        # разрешить виэ
+            self.apply_BelEnergo_retirement_until_2025 = False  # применить план вывода Белэнерго до 2025 года
+            self.allow_steam_large_chp_pt_mode = False          # разрешить пт режим турбин типа пт
+            self.allow_steam_large_chp_back_pressure = False    # разрешить работу турбин типа р
+            self.small_chp_demand_reduced_part = 0             # убрать долю мощности малых тэц (например 0,1 - убрать 10 % мощности)
+            self.gas_boiler_hw_Belenergo_demand_reduced_part = 0    # убрать долю мощности газовых котельных ГВС (например 0,1 - убрать 10 % мощности)
+            self.gas_boiler_steam_Belenergo_demand_reduced_part = 0 # убрать долю мощности газовых котельных пара (например 0,1 - убрать 10 % мощности)
+            self.gas_boiler_hw_demand_reduced_part = 0              # # убрать долю мощности газовых котельных ЖКХ (например 0,1 - убрать 10 % мощности)
+                 
+ 
             
             
         def set_start_up_options(self, start_up_cost, shout_down_cost, maximum_startups, maximum_shutdowns, initial_status):
@@ -220,22 +377,6 @@ class Specific_stations:
             install_power = 0
             for station_name, _ in self.active_stations_data:
                 res += self.active_stations_data[station_name]['установленная мощность']
-      
-
-        # def set_block_type_station_type(self, data):
-        #     'устанавливает приоритет типов блоков в указанных типах станциях'
-        #     station_types = data.keys()
-        #     order_dict = { station_type: order for order, station_type in enumerate(station_types) }
-
-            
-
-        #     for station_type in station_types:
-        #         order_dict = { block_type: order for order,block_type in enumerate(data[station_type])}
-        #         for block_type, order in order_dict.items():
-        #             blocks = self.get_all_blocks_by_block_type(block_type)
-        #             for block in blocks:
-        #                 block.group_options['block_order'] = order
-            
         
 
         def set_station_type_with_order(self, data):
@@ -447,21 +588,7 @@ class Specific_stations:
             return res
             
 
-
-# ТЭЦ-5 энергоблок ст. №1	
-# Березовская ГРЭС энергоблоки ст. №3,4,5	
-# Лукомльская ГРЭС энергоблоки ст. №1-8		
-
-# Минская ТЭЦ-3	
-# Минская ТЭЦ-4		
-# Светлогорская ТЭЦ		
-# Новополоцкая ТЭЦ	
-# Могилевская ТЭЦ-2		
-# Бобруйская  ТЭЦ-2	
-# Гродненская   ТЭЦ-2	
-# Мозырская   ТЭЦ-2	
-# Гомельская  ТЭЦ-2	
-
+ 
         # +
 
         def add_Minskay_tec_5(self):
@@ -478,7 +605,7 @@ class Specific_stations:
             # в/о котлы	100	Гкал/час	
             ###############################################################
             tk_330_1 = block_creator.get_tk_330(global_id(), local_id(), station_name, 0)
-            if self.allowSiemens:
+            if self.allow_siemens:
                 ccgt_399_1 = block_creator.get_ccgt_399(global_id(), local_id(), station_name, 0)
             # hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 100 * 1.163, hw_bus, 0)
             ###############################################################
@@ -486,7 +613,7 @@ class Specific_stations:
             hw_sink = steam_sink = None
             ###############################################################
             el_turb_no_siemens = [tk_330_1]
-            el_turb_siemens = [ccgt_399_1] if self.allowSiemens else []
+            el_turb_siemens = [ccgt_399_1] if self.allow_siemens else []
             el_turb = el_turb_no_siemens + el_turb_siemens
             hw_chp_turb = None
             hw_gas_boilers = None
@@ -495,6 +622,8 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -545,7 +674,7 @@ class Specific_stations:
             k_175_1 = block_creator.get_k_175(global_id(), local_id(), station_name, 0)
             ocgt_25_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.01)
             ocgt_25_2 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0.02)
-            if self.allowSiemens:
+            if self.allow_siemens:
                 ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, 0)
                 ocgt_29_1 = block_creator.get_ocgt_29(global_id(), local_id(), station_name, 0)
             ###############################################################
@@ -553,7 +682,7 @@ class Specific_stations:
             hw_sink = steam_sink = None
             ###############################################################
             el_turb_no_siemens = [k_160_1, k_160_2, k_175_1, ocgt_25_1, ocgt_25_2]
-            el_turb_siemens = [ccgt_427_1, ocgt_29_1] if self.allowSiemens else []
+            el_turb_siemens = [ccgt_427_1, ocgt_29_1] if self.allow_siemens else []
             el_turb = el_turb_no_siemens + el_turb_siemens
             hw_chp_turb = None
             hw_gas_boilers = None
@@ -562,6 +691,8 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -619,7 +750,7 @@ class Specific_stations:
             k_300_6 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.006)
             k_300_7 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.007)
             k_300_8 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.008)
-            if self.allowSiemens:
+            if self.allow_siemens:
                 ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, 0)
             ###############################################################
             el_boilers_hw = None
@@ -640,7 +771,7 @@ class Specific_stations:
             # demand_absolute_data = steam_demand_data)
             ###############################################################
             el_turb_no_siemens = [k_315_1, k_315_2, k_315_3, k_310_4, k_300_5, k_300_6, k_300_7, k_300_8]
-            el_turb_siemens = [ccgt_427_1] if self.allowSiemens else []
+            el_turb_siemens = [ccgt_427_1] if self.allow_siemens else []
             el_turb = el_turb_no_siemens + el_turb_siemens
             hw_chp_turb = None
             hw_gas_boilers = back_hw_gas_boilers
@@ -649,6 +780,8 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -726,6 +859,10 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -811,6 +948,10 @@ class Specific_stations:
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
+            ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
                 'источники': {
@@ -884,6 +1025,10 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -959,6 +1104,10 @@ class Specific_stations:
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
+            ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
                 'источники': {
@@ -1013,7 +1162,7 @@ class Specific_stations:
             [pt_50_el_1, pt_p_50_1, pt_t_50_1]= block_creator.get_pt_50(global_id(), local_id(), station_name, 0)
             [pt_135_el_1, pt_p_135_1, pt_t_135_1]= block_creator.get_pt_135(global_id(), local_id(), station_name, 0)
             p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, 0)
-            if self.allowSiemens:
+            if self.allow_siemens:
                 small_ocgt = block_creator.get_ocgt_small_2_3(global_id(), local_id(), station_name, 0)
             hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 400 * 1.163, hw_bus, 0)
             el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 1.163 * 34.4, hw_bus, 0)
@@ -1029,7 +1178,7 @@ class Specific_stations:
             demand_absolute_data = steam_demand_data)
             ###############################################################
             el_turb_no_siemens = [pt_65_el_1, pt_50_el_1, pt_135_el_1, p_50_1]
-            el_turb_siemens = [small_ocgt] if self.allowSiemens else []
+            el_turb_siemens = [small_ocgt] if self.allow_siemens else []
             el_turb = el_turb_no_siemens + el_turb_siemens
             hw_chp_turb = [pt_t_65_1, pt_t_50_1, pt_t_135_1]
             hw_gas_boilers = hw_gas_boilers
@@ -1038,6 +1187,10 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -1092,7 +1245,7 @@ class Specific_stations:
             [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
             [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
             [pt_t_60_el_3, pt_p_60_3, pt_t_60_3] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
-            if self.allowSiemens:
+            if self.allow_siemens:
                 small_ocgt = block_creator.get_ocgt_small_2_6(global_id(), local_id(), station_name, 0)
             hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 460 * 1.163, hw_bus, 0)
             el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 25.8 * 1.163, hw_bus, 0)
@@ -1107,7 +1260,7 @@ class Specific_stations:
             demand_absolute_data = steam_demand_data)
             ###############################################################
             el_turb_no_siemens = [pt_t_60_el_1, pt_t_60_el_2, pt_t_60_el_3]
-            el_turb_siemens = [small_ocgt] if self.allowSiemens else []
+            el_turb_siemens = [small_ocgt] if self.allow_siemens else []
             el_turb = el_turb_no_siemens + el_turb_siemens
             hw_chp_turb = [pt_t_60_1, pt_t_60_2, pt_t_60_3]
             hw_gas_boilers = hw_gas_boilers
@@ -1116,6 +1269,10 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -1192,6 +1349,10 @@ class Specific_stations:
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
+            ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
                 'источники': {
@@ -1257,6 +1418,10 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -1331,6 +1496,10 @@ class Specific_stations:
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
+            hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None
+            steam_chp_turb = steam_chp_turb if not self.station_all_turb_retired[station_name] else None
+            ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
                 'источники': {
@@ -1359,7 +1528,7 @@ class Specific_stations:
         
          # +            
         def add_block_staion_natural_gas(self, fixed_el_load_data_rel):
-            station_name = 'Блок-станции(газ)'
+            station_name = 'Блок-станции'
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
@@ -1384,6 +1553,8 @@ class Specific_stations:
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
             ###############################################################
             self.active_stations_data[station_name] = {
                 'установленная мощность': install_power,
@@ -1418,7 +1589,7 @@ class Specific_stations:
             global_id = self.inc_global_id
             local_id = counter.next
             
-            if self.allowRenewables:
+            if self.allow_renewables:
                 hydro_renewables = self.block_creator.get_hydro_renewables(
                     global_index = global_id(),
                     local_index = local_id(),
@@ -1446,7 +1617,7 @@ class Specific_stations:
             hw_bus  = steam_bus = None
             hw_sink = steam_sink = None
             ###############################################################
-            el_renewables = [hydro_renewables, wind_renewables, solar_renewables] if self.allowRenewables else []
+            el_renewables = [hydro_renewables, wind_renewables, solar_renewables] if self.allow_renewables else []
             el_turb = [] + el_renewables
             hw_chp_turb = None
             hw_gas_boilers = None
@@ -1496,23 +1667,31 @@ class Specific_stations:
             hw_bus = create_buses(set_label(station_name, hw_name))
             heat_to_power = 1.9
             
-            nominal_el_value = 470
+            max_active_year_power = 470
+            nominal_el_value = max_active_year_power
+
+            max_power_in_period_selected = max_active_year_power * max(fixed_el_load_data_rel)
+            
+
+            if 0 <= self.small_chp_demand_reduced_part <= 1:
+                nominal_el_value = (1- self.small_chp_demand_reduced_part) * max_power_in_period_selected
+            else:
+                raise Exception('Недопустимые параметры')
+
             small_chp = block_creator.get_small_chp(global_id(),local_id(),
                                 nominal_el_value, station_name, hw_bus ,fixed_el_load_data_rel)
-
+            el_boilers_hw = None
+            if self.el_boiler_hw_infinity[station_name]:
+                variable_costs = self.el_boiler_hw_var_cost[station_name]
+                el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, variable_costs)
             
-            el_boilers_hw = gas_boilers_hw = None
-            if self.small_chp_active_part < 1:
-                boilers_power = (1 - self.small_chp_active_part) * heat_to_power * nominal_el_value
-                if self.small_chp_replace_el_boiler:
-                    el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, boilers_power, hw_bus, 0)
-                if self.small_chp_replace_gas_boiler:
-                    gas_boilers_hw = block_creator.get_gas_boilers(global_id(), local_id(), station_name, boilers_power, hw_bus, 0)
-                    
-             
-
+            gas_boilers_hw = None
+            if self.gas_boiler_hw_infinity[station_name]:
+                variable_costs = self.gas_boiler_hw_var_cost[station_name]
+                gas_boilers_hw = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, variable_costs)
+            ###############################################################
             hw_load_abs = pd.DataFrame(fixed_el_load_data_rel)
-            hw_load_abs = hw_load_abs * heat_to_power * 470
+            hw_load_abs = hw_load_abs * heat_to_power * max_active_year_power
             hw_load_abs = hw_load_abs['Малые ТЭЦ'].values.tolist()
             hw_sink = create_sink_abs(label = set_label(
             station_name, hw_name, 'потребитель'),
@@ -1524,8 +1703,8 @@ class Specific_stations:
             ###############################################################
             el_turb = [small_chp]
             hw_chp_turb = [small_chp]
-            hw_gas_boilers = None if not gas_boilers_hw else gas_boilers_hw
-            hw_el_boilers = None if not el_boilers_hw else el_boilers_hw
+            hw_gas_boilers = gas_boilers_hw
+            hw_el_boilers = el_boilers_hw
             steam_chp_turb = None
             steam_gas_boilers = None
             steam_el_boilers = None
@@ -1567,6 +1746,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            options = self.bel_npp_options
             ###############################################################
             # hw_name = None
             # hw_name = 'гвс'
@@ -1576,15 +1756,23 @@ class Specific_stations:
             hw_bus = None
             ###############################################################
             # турбоагрегаты, котлы и электрокотлы
-            # ВВЭР-1200(1170) # ВВЭР-1200(1170)
+            # ВВЭР-1200(1200) # ВВЭР-1200(1200)
             ###############################################################
-            vver_1200_1 = block_creator.get_vver_1200(global_id(), local_id(), station_name, -999)
-            vver_1200_2 = block_creator.get_vver_1200(global_id(), local_id(), station_name, -999)
-            # новый блок аэс
+ 
+            vver_1200_1 = None
+            if options['блок_1']:
+                vver_1200_1 = block_creator.get_vver_1200(global_id(), local_id(), station_name, options['блок_1_мин'], options[ 'блок_1_затраты'])
+
+            vver_1200_2 = None
+            if options['блок_2']:
+                vver_1200_2 = block_creator.get_vver_1200(global_id(), local_id(), station_name,options['блок_1_мин'], options[ 'блок_2_затраты'])
+
+
             ###############################################################
             hw_sink = steam_sink = None
             ###############################################################
-            el_turb = [vver_1200_1, vver_1200_2]
+            blocks = [block for block in [vver_1200_1, vver_1200_2] if block is not None]
+            el_turb = blocks
             hw_chp_turb = None
             hw_gas_boilers = None
             hw_el_boilers = None
@@ -1620,29 +1808,168 @@ class Specific_stations:
             return station_name
             
             
-        def add_district_boilers(self, heat_water_demand_data):
-            station_name = 'Котельные ЖКХ'
-            # create_buses = self.bus_creator.create_buses
-            # block_creator = self.block_creator
-            # create_sink_abs = self.sink_creator.create_sink_absolute_demand
-            # counter = Custom_counter()
-            # local_id = counter.next
-            # global_id = self.inc_global_id
-            # ###############################################################
-            # # hw_name = None
-            # # hw_name = 'гвс'
-            # # steam_name = 'пар'
-            # # hw_bus = create_buses(set_label(station_name, hw_name))
-            # steam_bus = None
-            # hw_bus = None
-            # pass
-            pass
+        def add_district_boilers_Belenergo(self, heat_water_demand_data, steam_demand_data):
+            station_name = 'Котельные Белэнерго'
+            create_buses = self.bus_creator.create_buses
+            block_creator = self.block_creator
+            create_sink_abs = self.sink_creator.create_sink_absolute_demand
+            counter = Custom_counter()
+            global_id = self.inc_global_id
+            local_id = counter.next
+            ###############################################################
+            hw_name = 'гвс'
+            steam_name = 'пар'
+            hw_bus = create_buses(set_label(station_name, hw_name))
+            steam_bus = create_buses(set_label(station_name, steam_name))
+            ###############################################################
+            # неточно
+            max_active_year_power_hw = 900
+            max_active_year_power_steam = 800
+            nominal_value_hw = max_active_year_power_hw
+            nominal_value_steam = max_active_year_power_steam
+            
+            nominal_value_hw = max_active_year_power_hw * max(heat_water_demand_data)
+            nominal_value_steam = max_active_year_power_steam * max(steam_demand_data)
+
+            if 0 <= self.gas_boiler_hw_Belenergo_demand_reduced_part <= 1:
+                nominal_value_hw = (1- self.gas_boiler_hw_Belenergo_demand_reduced_part) * nominal_value_hw
+            else:
+                raise Exception('Недопустимые параметры')
+                        
+            if 0 <= self.gas_boiler_steam_Belenergo_demand_reduced_part <= 1:
+                nominal_value_steam = (1- self.gas_boiler_steam_Belenergo_demand_reduced_part) * nominal_value_steam
+            else:
+                raise Exception('Недопустимые параметры')
+            
+            variable_costs_hw =  self.gas_boiler_variable_cost['гвс']
+            variable_costs_steam = self.gas_boiler_variable_cost['пар']
+                        
+            gas_boilers_hw = block_creator.get_gas_boilers(global_id(), local_id(), station_name, nominal_value_hw, hw_bus, variable_costs_hw)
+            gas_boilers_steam = block_creator.get_gas_boilers(global_id(), local_id(), station_name, nominal_value_steam, steam_bus, variable_costs_steam)
+            
+            el_boilers_hw = None
+            if self.el_boiler_hw_infinity[station_name]:
+                variable_costs = self.el_boiler_hw_var_cost[station_name]
+                el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, variable_costs)
+            
+            el_boilers_steam = None
+            if self.el_boiler_steam_infinity[station_name]:
+                variable_costs = self.el_boiler_steam_var_cost[station_name]
+                el_boilers_steam = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, variable_costs)
+            ###############################################################
+            hw_sink = create_sink_abs(label = set_label(
+            station_name, hw_name, 'потребитель'),
+            input_flow = hw_bus,
+            demand_absolute_data = heat_water_demand_data)
+            steam_sink = create_sink_abs(label = set_label(
+            station_name, steam_name, 'потребитель'),
+            input_flow = steam_bus,
+            demand_absolute_data = steam_demand_data)
+            ###############################################################
+            el_turb = None
+            hw_chp_turb = None
+            hw_gas_boilers = gas_boilers_hw
+            hw_el_boilers = el_boilers_hw
+            steam_chp_turb = None
+            steam_gas_boilers = gas_boilers_steam
+            steam_el_boilers = el_boilers_steam
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': steam_bus,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': steam_sink
+                }} 
+            
+            return station_name
+             
 
 
          
-        def add_district_boilers_Belenergo(self, heat_water_demand_data, steam_demand_data):
-            station_name = 'Районные котельные Белэнерго'
-            pass
+        def add_district_boilers(self, heat_water_demand_data):
+            station_name = 'Котельные ЖКХ'
+            create_buses = self.bus_creator.create_buses
+            block_creator = self.block_creator
+            create_sink_abs = self.sink_creator.create_sink_absolute_demand
+            counter = Custom_counter()
+            global_id = self.inc_global_id
+            local_id = counter.next
+            ###############################################################
+            hw_name = 'гвс'
+            hw_bus = create_buses(set_label(station_name, hw_name))
+            ###############################################################
+            max_active_year_power_hw = 900
+            nominal_value_hw = max_active_year_power_hw * max(heat_water_demand_data)
+            if 0 <= self.gas_boiler_hw_demand_reduced_part <= 1:
+                nominal_value_hw = (1- self.gas_boiler_hw_Belenergo_demand_reduced_part) * nominal_value_hw
+            else:
+                raise Exception('Недопустимые параметры')
+            ###############################################################
+            variable_costs_hw =  self.gas_boiler_variable_cost['гвс']
+            gas_boilers_hw = block_creator.get_gas_boilers(global_id(), local_id(), station_name, nominal_value_hw, hw_bus, variable_costs_hw) 
+            el_boilers_hw = None
+            if self.infinity_el_boilers_discrict_boilers['гвс']:
+                variable_costs = self.el_boiler_variable_cost['гвс']
+                el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, variable_costs)
+            ###############################################################
+            hw_sink = create_sink_abs(label = set_label(
+            station_name, hw_name, 'потребитель'),
+            input_flow = hw_bus,
+            demand_absolute_data = heat_water_demand_data)
+            ###############################################################
+            el_turb = None
+            hw_chp_turb = None
+            hw_gas_boilers = gas_boilers_hw
+            hw_el_boilers = el_boilers_hw
+            steam_chp_turb = None
+            steam_gas_boilers = None
+            steam_el_boilers = None
+            install_power = self.get_install_power_blocklist(el_turb)
+            ###############################################################
+            self.active_stations_data[station_name] = {
+                'установленная мощность': install_power,
+                'источники': {
+                                'э-источники': el_turb,
+                                'гвс-источники': {
+                                    'гвс-тэц-источник': hw_chp_turb,
+                                    'гвс-кот-источник': hw_gas_boilers,
+                                    'гвс-эк-источник': hw_el_boilers
+                                    },
+                                'пар-источники': {
+                                    'пар-тэц-источник': steam_chp_turb,
+                                    'пар-кот-источник': steam_gas_boilers,
+                                    'пар-эк-источник': steam_el_boilers,
+                                    }
+                },
+                'потоки':  {
+                                'гвс-поток': hw_bus, 
+                                'пар-поток': None,
+                },
+                'потребители':{
+                                'гвс-потребитель': hw_sink,
+                                'пар-потребитель': None
+                }} 
+            
+            return station_name
+            
             
             
             
@@ -1652,28 +1979,33 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            options = self.new_npp_scenario_options
+
+  
+                        
+                        
                         
             vver_toi_1 = None
-            if self.vver_toi_flag:
-                vver_toi_1 = block_creator.get_vver_toi(global_id(), local_id(), station_name, 0)            
+            if options['ввэр_тои']:
+                vver_toi_1 = block_creator.get_vver_toi(global_id(), local_id(), station_name, options['ввэр_тои_мин'], options['ввэр_тои_затраты'])            
 
             vver_600_1 = None
-            if self.vver_600_flag:
-                vver_600_1 = block_creator.get_vver_600(global_id(), local_id(), station_name, 0)
+            if options['ввэр-600']:
+                vver_600_1 = block_creator.get_vver_600(global_id(), local_id(), station_name, options['ввэр-600_мин'], options['ввэр-600_затраты'])
             
             ritm_200_lst = []
-            if self.ritm_200_count:
-                for i in range(1, self.ritm_200_count + 1):
-                    ritm_200_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, 0)
+            if options['ритм-200']:
+                for _ in range(1, options['ритм-200'] + 1):
+                    ritm_200_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, options['ритм-200_мин'], options['ритм-200_затраты'])
                     ritm_200_lst.append(ritm_200_1)
             
             el_turb = []
 
             if vver_toi_1:
-                el_turb = el_turb + ritm_200_1.append(vver_toi_1)            
+                el_turb = [ vver_toi_1, *ritm_200_lst]           
 
             if vver_600_1:
-                el_turb = el_turb + ritm_200_1.append(vver_600_1)
+                el_turb = [vver_600_1, *el_turb]
             
             install_power = self.get_install_power_blocklist(el_turb)
             

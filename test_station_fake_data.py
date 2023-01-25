@@ -73,7 +73,7 @@ heat_steam_demand_abs = {
 custom_es = Specific_stations(es, gas_bus, el_bus)
 shout_down_lst = 10 * [0] + 14 * [999999]
 custom_es.set_start_up_options(initial_status = 1, shout_down_cost = shout_down_lst ,
-                start_up_cost= 9999999, maximum_shutdowns=1, maximum_startups = 100 )
+                start_up_cost= 9999999, maximum_shutdowns = 1, maximum_startups = 100 )
 ##################################################################################################
 # Настройка сценария
 ##################################################################################################
@@ -82,9 +82,21 @@ scen_builder.set_electricity_profile(elictricity_profile = main_power_profile_re
 scen_builder.set_electricity_level(energy_level_in_billion_kWth = 39)
 scen_builder.set_turbine_T_modelling_type('simple')
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
+scen_builder.set_bel_npp_vver_1200_first_options(active_status= 1, min_power_fraction=1)
+scen_builder.set_bel_npp_vver_1200_second_options(active_status=1, min_power_fraction=1)
+# scen_builder.add_ocgt_100(1)
+# scen_builder.add_vver_toi_1255(1, -999)
+# scen_builder.add_vver_600(0.6, -999)
+# scen_builder.reduce_small_chp_demand_by_part(0)
+# scen_builder.add_inifinity_el_boilers_hw_by_station('Малые ТЭЦ').set_el_boilers_hw_var_cost_by_station('Малые ТЭЦ', 2)
+# scen_builder.set_bel_npp_vver_1200_first_options(active_status=0, min_power_fraction=0.75, usd_per_Mwth= -999)
+
+
+# scen_builder.add_inifinity_el_boilers_hw_small_chp()
+# scen_builder.add_inifinity_gas_boilers_hw_small_chp()
+# scen_builder.reduce_block_station_power_to_minimum()
 # scen_builder.remove_siemens()
 # добавить фиксированный вариант работы аэс
-scen_builder.reduce_block_station_power_to_minimum()
 # scen_builder.remove_renewables()
 ##################################################################################################
 ##################################################################################################
@@ -103,6 +115,8 @@ novopockay_tec = custom_es.add_Novopockay_tec(heat_water_demand_data = heat_wate
 small_tec = custom_es.add_small_chp(fixed_el_load_data_rel= fixed_load_rel['Малые ТЭЦ'])
 block_station = custom_es.add_block_staion_natural_gas(fixed_el_load_data_rel = fixed_load_rel['Блок-станции'])
 bel_npp = custom_es.add_Bel_npp()
+new_npp = custom_es.add_new_npp()
+new_ocgt = custom_es.add_new_ocgt()
 # fake_el_source = custom_es.add_electricity_source(nominal_value = 10000, usd_per_Mwth = -9999)
 ##################################################################################################
 # Выполнение расчета 
@@ -120,31 +134,33 @@ el_boilers_power = result_extractor.get_install_el_boilers_power('гвс')
 print('Мощность электрокотлов-гвс: ', el_boilers_power)
 
 
-# result_plotter.set_block_station_plot_1({
-#     bel_npp: ['ввэр'],
-#     block_station: ['блок-станции-газ'],
-#     small_tec: ['малые тэц', 'эк', 'кот'],
-#     minskay_tec_4: ['пт','т','эк','кот'],
-#     novopockay_tec: ['р','пт', 'кот'],
-#     minskay_tec_5: ['пгу-кэс', 'к'],
-#     lukomolskay_gres: ['пгу-кэс','к'],
-#     berezovskay_gres: ['пгу-кэс','к', 'гту'],
-#     renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
-# })
+result_plotter.set_block_station_plot_1({
+    bel_npp: ['ввэр'],
+    new_npp: ['ввэр'],
+    block_station: ['блок-станции-газ'],
+    small_tec: ['малые тэц', 'эк', 'кот'],
+    minskay_tec_4: ['пт','т','эк','кот'],
+    novopockay_tec: ['р','пт', 'кот'],
+    minskay_tec_5: ['пгу-кэс', 'к'],
+    lukomolskay_gres: ['пгу-кэс','к'],
+    berezovskay_gres: ['пгу-кэс','к', 'гту'],
+    new_ocgt: ['гту'],
+    renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
+})
 
 ##################################################################################################
-result_plotter.set_station_plot_3(
-  [ bel_npp,
-    block_station,
-    small_tec,
-    minskay_tec_4,
-    novopockay_tec,
-    minskay_tec_5,
-    lukomolskay_gres,
-    berezovskay_gres,
-    renewables,
-    # fake_el_source
-])
+# result_plotter.set_station_plot_3(
+#   [ bel_npp,
+#     block_station,
+#     small_tec,
+#     minskay_tec_4,
+#     novopockay_tec,
+#     minskay_tec_5,
+#     lukomolskay_gres,
+#     berezovskay_gres,
+#     renewables,
+#     # fake_el_source
+# ])
 ##################################################################################################
 
 # result_plotter.set_block_type_station_plot_5(

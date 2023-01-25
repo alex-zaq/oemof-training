@@ -48,6 +48,33 @@ class Specific_stations:
                 'Гомельская ТЭЦ' : False,
                 'Блок-станции' : False,
             }
+            
+            
+            self.station_hw_chp_demand_prohibited = {
+                'Минская ТЭЦ-3' : False,
+                'Минская ТЭЦ-4' : False,
+                'Светлогорская ТЭЦ' : False,
+                'Новополоцкая ТЭЦ' : False,
+                'Могилевская ТЭЦ-2' : False,
+                'Бобруйская ТЭЦ-2' : False,
+                'Гродненская ТЭЦ-2' : False,
+                'Мозырская ТЭЦ-2' : False,
+                'Гомельская ТЭЦ' : False,
+            }
+                        
+            self.station_steam_chp_demand_prohibited = {
+                'Минская ТЭЦ-3' : False,
+                'Минская ТЭЦ-4' : False,
+                'Светлогорская ТЭЦ' : False,
+                'Новополоцкая ТЭЦ' : False,
+                'Могилевская ТЭЦ-2' : False,
+                'Бобруйская ТЭЦ-2' : False,
+                'Гродненская ТЭЦ-2' : False,
+                'Мозырская ТЭЦ-2' : False,
+                'Гомельская ТЭЦ' : False,
+            }
+            
+            
 
             self.station_not_fuel_var_cost = {
                 'Лукомольская ГРЭС' : 0,
@@ -834,13 +861,36 @@ class Specific_stations:
             # в/о котлы	940	Гкал/час	
             # В/о ЭК	86	Гкал/час	
             ###############################################################
-            [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
-            [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.02)
-            t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, 0)
-            # не сделано
-            ccgt_chp_222 = block_creator.get_ccgt_сhp_222(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
+            pt_el_chp_turb = []
+            pt_hw_chp_turb = []
+            pt_steam_chp_turb = []
+            
+            if self.station_hw_chp_demand_prohibited[station_name] == self.station_steam_chp_demand_prohibited[station_name]:
+                raise Exception('Недопустимые параметры')
+            
+            if self.station_hw_chp_demand_prohibited[station_name]:
+                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2]
+                pt_steam_chp_turb = [pt_p_60_1, pt_p_60_2]
+            elif self.station_steam_chp_demand_prohibited[station_name]:
+                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
+                [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
+                ccgt_chp_222 = block_creator.get_ccgt_сhp_222(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
+                t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, 0)
+                pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2, ccgt_chp_222, t_100_1]
+                pt_hw_chp_turb = [pt_t_60_1, pt_t_60_2, ccgt_chp_222, t_100_1]
+            else:
+                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
+                [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.02)
+                pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2]
+                pt_steam_chp_turb = [pt_p_60_1, pt_p_60_2]
+                pt_hw_chp_turb = [pt_t_60_1, pt_t_60_2]
+
+
             hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 940 * 1.163, hw_bus, 0)
             el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 86 * 1.163, hw_bus, 0)
+
             ###############################################################
             hw_sink = create_sink_abs(label = set_label(
             station_name, hw_name, 'потребитель'),
@@ -851,11 +901,11 @@ class Specific_stations:
             input_flow = steam_bus,
             demand_absolute_data = steam_demand_data)
             ###############################################################
-            el_turb = [pt_t_60_el_1, pt_t_60_el_2, t_100_1, ccgt_chp_222]
-            hw_chp_turb = [pt_t_60_1, pt_t_60_2, t_100_1, ccgt_chp_222]
+            el_turb = pt_el_chp_turb if pt_el_chp_turb else None
+            hw_chp_turb = pt_hw_chp_turb if pt_el_chp_turb else None
             hw_gas_boilers = hw_gas_boilers
             hw_el_boilers = el_boilers_hw
-            steam_chp_turb = [pt_p_60_1, pt_p_60_2]
+            steam_chp_turb = pt_steam_chp_turb if pt_steam_chp_turb else None
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
@@ -1002,11 +1052,38 @@ class Specific_stations:
             # Р-50-130-1ПР1 +
             # турбины	155	МВт
             ###############################################################
-            p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
-            [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
-            р_15_1 = block_creator.get_p_15(global_id(), local_id(), station_name, steam_bus)
-            [tr_16_el_1, tr_16_p_1, tr_16_t_1] = block_creator.get_tp_16(global_id(), local_id(), station_name, steam_bus, hw_bus)
-            t_14_1 = turbine_T_factory.get_t_14(global_id(), local_id(), station_name, hw_bus)
+
+            if self.station_hw_chp_demand_prohibited[station_name] == self.station_steam_chp_demand_prohibited[station_name]:
+                raise Exception('Недопустимые параметры')
+            
+            pt_el_chp_turb = []
+            pt_hw_chp_turb = []
+            pt_steam_chp_turb = []
+            
+            if self.station_hw_chp_demand_prohibited[station_name]:
+                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [tr_16_el_1, tr_16_p_1] = block_creator.get_tr_16_p(global_id(), local_id(), station_name, steam_bus, hw_bus)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                р_15_1 = block_creator.get_p_15(global_id(), local_id(), station_name, steam_bus)
+                pt_el_chp_turb = [pt_t_60_el_1, tr_16_el_1, p_50_1, р_15_1]
+                pt_steam_chp_turb = [pt_p_60_1, tr_16_p_1, p_50_1, р_15_1]
+            elif self.station_steam_chp_demand_prohibited[station_name]:
+                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
+                [tr_16_el_1, tr_16_t_1] = block_creator.get_tr_16_t(global_id(), local_id(), station_name, steam_bus, hw_bus)
+                t_14_1 = turbine_T_factory.get_t_14(global_id(), local_id(), station_name, hw_bus)
+                pt_el_chp_turb = [pt_t_60_el_1, t_14_1, tr_16_el_1]
+                pt_hw_chp_turb = [pt_t_60_1, tr_16_t_1]
+            else:
+                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                р_15_1 = block_creator.get_p_15(global_id(), local_id(), station_name, steam_bus)
+                t_14_1 = turbine_T_factory.get_t_14(global_id(), local_id(), station_name, hw_bus)
+                [tr_16_el_1, tr_16_p_1, tr_16_t_1] = block_creator.get_tp_16(global_id(), local_id(), station_name, steam_bus, hw_bus)
+                pt_el_chp_turb = [pt_t_60_el_1, p_50_1, р_15_1, t_14_1]
+                pt_steam_chp_turb = [pt_p_60_1]
+                pt_hw_chp_turb = [pt_t_60_1, p_50_1, р_15_1]
+
+
             ###############################################################
             hw_sink = create_sink_abs(label = set_label(
             station_name, hw_name, 'потребитель'),
@@ -1017,11 +1094,11 @@ class Specific_stations:
             input_flow = steam_bus,
             demand_absolute_data = steam_demand_data)
             ###############################################################
-            el_turb = [p_50_1, pt_t_60_el_1, р_15_1, tr_16_el_1, t_14_1]
-            hw_chp_turb = [pt_t_60_1, tr_16_t_1, t_14_1]
+            el_turb = pt_el_chp_turb if pt_el_chp_turb else None
+            hw_chp_turb = pt_hw_chp_turb if pt_hw_chp_turb else None
             hw_gas_boilers = None
             hw_el_boilers = None
-            steam_chp_turb = [pt_p_60_1, tr_16_p_1, p_50_1]
+            steam_chp_turb = pt_steam_chp_turb if pt_steam_chp_turb else None
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
@@ -1076,11 +1153,41 @@ class Specific_stations:
             # ПТ-60-130/13  # ПТ-60-130/13  # ПТ-50-130/7  # Р-50-130/13
             # Р-50-130/13    # пвк - нет    # эк - нет
             ###############################################################
-            [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
-            [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
-            [pt_t_50_el_1, pt_p_50_1, pt_t_50_1] = block_creator.get_pt_50(global_id(), local_id(), station_name, steam_bus, hw_bus)
-            p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
-            p_50_2 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+
+
+            if self.station_hw_chp_demand_prohibited[station_name] == self.station_steam_chp_demand_prohibited[station_name]:
+                raise Exception('Недопустимые параметры')
+            
+            pt_el_chp_turb = []
+            pt_hw_chp_turb = []
+            pt_steam_chp_turb = []
+            
+            if self.station_hw_chp_demand_prohibited[station_name]:
+                [pt_t_50_el_1, pt_p_50_1] = block_creator.get_pt_50_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                p_50_2 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                pt_el_chp_turb = [pt_t_50_el_1, pt_t_60_el_1, pt_t_60_el_2, p_50_1, p_50_2]
+                pt_steam_chp_turb = [pt_p_50_1, pt_p_60_1, pt_p_60_2, p_50_1, p_50_2]
+            elif self.station_steam_chp_demand_prohibited[station_name]:
+                [pt_t_50_el_1, pt_t_50_1] = block_creator.get_pt_50_t(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
+                [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
+                pt_el_chp_turb = [pt_t_50_el_1, pt_t_60_el_1, pt_t_60_el_2]
+                pt_hw_chp_turb = [pt_t_50_1, pt_t_60_1, pt_t_60_2]
+            else:
+                [pt_t_50_el_1, pt_p_50_1, pt_t_50_1] = block_creator.get_pt_50(global_id(), local_id(), station_name, steam_bus, hw_bus)
+                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
+                [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.02)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                p_50_2 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2, p_50_1, p_50_2]
+                pt_steam_chp_turb = [pt_p_60_1, pt_p_60_2, p_50_1, p_50_2]
+                pt_hw_chp_turb = [pt_t_60_1, pt_t_60_2]
+
+
+
             # фейковые дорогие источники тепла
             back_hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 10_000, hw_bus, 9999)
             back_steam_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 10_000, steam_bus, 9999)
@@ -1095,11 +1202,11 @@ class Specific_stations:
             input_flow = steam_bus,
             demand_absolute_data = steam_demand_data)
             ###############################################################
-            el_turb = [pt_t_60_el_1, pt_t_60_el_2, pt_t_50_el_1, p_50_1, p_50_2]
-            hw_chp_turb = [pt_t_60_1, pt_t_60_2, pt_t_50_1]
+            el_turb = pt_el_chp_turb if pt_el_chp_turb else None
+            hw_chp_turb = pt_hw_chp_turb if pt_hw_chp_turb else None
             hw_gas_boilers = back_hw_gas_boilers
             hw_el_boilers = None
-            steam_chp_turb = [pt_p_60_1, pt_p_60_2, pt_p_50_1, p_50_1, p_50_2]
+            steam_chp_turb = pt_steam_chp_turb if pt_steam_chp_turb else None
             steam_gas_boilers = back_steam_gas_boilers
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
@@ -1158,12 +1265,45 @@ class Specific_stations:
             # в/о котлы	400	Гкал/час	
             # В/о ЭК	34.4	Гкал/час	
             ###############################################################
-            [pt_65_el_1, pt_p_65_1, pt_t_65_1]= block_creator.get_pt_65(global_id(), local_id(), station_name, 0)
-            [pt_50_el_1, pt_p_50_1, pt_t_50_1]= block_creator.get_pt_50(global_id(), local_id(), station_name, 0)
-            [pt_135_el_1, pt_p_135_1, pt_t_135_1]= block_creator.get_pt_135(global_id(), local_id(), station_name, 0)
-            p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, 0)
+
+
+            if self.station_hw_chp_demand_prohibited[station_name] == self.station_steam_chp_demand_prohibited[station_name]:
+                raise Exception('Недопустимые параметры')
+            
+            pt_el_chp_turb = []
+            pt_hw_chp_turb = []
+            pt_steam_chp_turb = []
+            
+            if self.station_hw_chp_demand_prohibited[station_name]:
+                [pt_t_65_el_1, pt_p_65_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_50_el_1, pt_p_50_1] = block_creator.get_pt_50_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_135_el_1, pt_p_135_1] = block_creator.get_pt_135_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                pt_el_chp_turb = [pt_t_65_el_1, pt_t_50_el_1, pt_t_135_el_1, p_50_1]
+                pt_steam_chp_turb = [pt_p_65_1, pt_p_50_1, pt_p_135_1, p_50_1]
+            elif self.station_steam_chp_demand_prohibited[station_name]:
+                [pt_t_65_el_1, pt_t_65_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_50_el_1, pt_t_50_1] = block_creator.get_pt_50_t(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_135_el_1, pt_t_135_1] = block_creator.get_pt_135_t(global_id(), local_id(), station_name, steam_bus, 0.01)
+                pt_el_chp_turb = [pt_t_65_el_1, pt_t_50_el_1, pt_t_135_el_1]
+                pt_hw_chp_turb = [pt_t_65_1, pt_t_50_1, pt_t_135_1]
+            else:
+                [pt_65_el_1, pt_p_65_1, pt_t_65_1]= block_creator.get_pt_60(global_id(), local_id(), station_name, 0)
+                [pt_50_el_1, pt_p_50_1, pt_t_50_1]= block_creator.get_pt_50(global_id(), local_id(), station_name, 0)
+                [pt_135_el_1, pt_p_135_1, pt_t_135_1]= block_creator.get_pt_135(global_id(), local_id(), station_name, 0)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, 0)
+                pt_el_chp_turb = [pt_65_el_1, pt_50_el_1, pt_135_el_1, p_50_1]
+                pt_steam_chp_turb = [pt_p_65_1, pt_p_50_1, pt_p_135_1]
+                pt_hw_chp_turb = [pt_t_65_1, pt_t_50_1, pt_t_135_1]
+
+            small_ocgt = None
             if self.allow_siemens:
                 small_ocgt = block_creator.get_ocgt_small_2_3(global_id(), local_id(), station_name, 0)
+
+            if small_ocgt:
+                pt_el_chp_turb.append(small_ocgt)
+
+                
             hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 400 * 1.163, hw_bus, 0)
             el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 1.163 * 34.4, hw_bus, 0)
             # back_steam_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 10_000, steam_bus, 9999)
@@ -1177,13 +1317,11 @@ class Specific_stations:
             input_flow = steam_bus,
             demand_absolute_data = steam_demand_data)
             ###############################################################
-            el_turb_no_siemens = [pt_65_el_1, pt_50_el_1, pt_135_el_1, p_50_1]
-            el_turb_siemens = [small_ocgt] if self.allow_siemens else []
-            el_turb = el_turb_no_siemens + el_turb_siemens
-            hw_chp_turb = [pt_t_65_1, pt_t_50_1, pt_t_135_1]
+            el_turb = pt_el_chp_turb if pt_el_chp_turb else None
+            hw_chp_turb = pt_hw_chp_turb if pt_hw_chp_turb else None
             hw_gas_boilers = hw_gas_boilers
             hw_el_boilers = el_boilers_hw
-            steam_chp_turb = [pt_p_65_1, pt_p_50_1, pt_p_135_1]
+            steam_chp_turb = pt_steam_chp_turb if pt_steam_chp_turb else None
             steam_gas_boilers = None
             steam_el_boilers = None
             install_power = self.get_install_power_blocklist(el_turb)
@@ -1242,11 +1380,18 @@ class Specific_stations:
             #   в/о котлы	460	Гкал/час	
             # В/о ЭК	25.8	Гкал/час	
             ###############################################################
+
+            
             [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
             [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
             [pt_t_60_el_3, pt_p_60_3, pt_t_60_3] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
+
+
+
             if self.allow_siemens:
                 small_ocgt = block_creator.get_ocgt_small_2_6(global_id(), local_id(), station_name, 0)
+
+
             hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 460 * 1.163, hw_bus, 0)
             el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 25.8 * 1.163, hw_bus, 0)
             ###############################################################

@@ -136,15 +136,33 @@ class Scenario_builder:
         self.custom_es.station_all_turb_retired[station_name] = True
         return self
         
-    # плохо из-за пт
-    def prohibit_steam_demand_by_chp_turbs(self):
-        'запретить покрытия паровой нагрузки теплофикационными турбинами'
+        
+    def prohibit_steam_demand_chp_turb_by_station_name(self, station_name):
+        'запретить покрытия паровой нагрузки теплофикационными турбинами для указанной станции'
+        self.custom_es.station_hw_chp_demand_prohibited[station_name] = True
+        return self
+        
+    def prohibit_hw_demand_chp_turb_by_station_name(self, station_name):
+        'запретить покрытия отопительной нагрузки теплофикационными турбинами для указанной станции'
+        self.custom_es.station_steam_chp_demand_prohibited[station_name] = True
+        return self
+        
 
+    # плохо из-за пт
+    def prohibit_steam_demand_chp_turbs(self):
+        'запретить покрытия паровой нагрузки теплофикационными турбинами'
+        stations = self.custom_es.station_steam_chp_demand_prohibited.keys()
+        for station in stations:
+            self.custom_es.station_steam_chp_demand_prohibited[station]= True
+        
         return self
         
     # плохо из-за пт
-    def prohibit_hw_demand_by_chp_turbs(self):
+    def prohibit_hw_demand_chp_turbs(self):
         'запретить покрытия отопительной нагрузки теплофикационными турбинами'
+        stations = self.custom_es.station_hw_chp_demand_prohibited.keys()
+        for station in stations:
+            self.custom_es.station_hw_chp_demand_prohibited[station]= True
         return self
     
     def reduced_demand_boiler_district_by_part(self, part):

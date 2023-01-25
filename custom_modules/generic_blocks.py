@@ -266,6 +266,7 @@ class Generic_blocks:
             group_options):
             
             # кпд котла?
+            # nominal_input_P ?
             pt_full_P_mode = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'электроэнергия_чистый_П_режим'),
 

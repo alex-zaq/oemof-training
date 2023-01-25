@@ -828,6 +828,66 @@ class Specific_blocks:
             'nominal_value': 16   
             })              
             
+    
+    
+        def get_tr_16_p(self, global_index, local_index, station_name, output_flow_P, extra_variable_cost = 0,  planning_outage = None):
+            block_type = self.block_type['пт']
+            return self.g_block_creator.create_chp_PT_turbine_full_P_mode(
+            nominal_el_value = 16,
+            min_power_fraction = 0.4,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
+            output_flow_P = output_flow_P,
+            nominal_input_P = 300,
+            efficiency_P = 0.91,
+            heat_to_el_P = 3.8,
+            variable_costs = 0,
+            extra_variable_cost = extra_variable_cost,
+            start_up_options = self.start_up_options,
+            boiler_efficiency = 1,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': 'ТР-16_р',
+            'block_type': block_type,
+            'heat_demand_type_steam': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': 16   
+            } 
+            )            
+            
+        def get_tr_16_t(self, global_index, local_index, station_name, output_flow_T,extra_variable_cost = 0,  planning_outage = None):
+            block_type = self.block_type['пт']
+            return self.g_block_creator.create_chp_PT_turbine_full_T_mode(
+            nominal_el_value = 16,
+            min_power_fraction = 0.4,
+            input_flow = self.global_natural_gas_flow,
+            output_flow_el = self.global_el_flow,
+            output_flow_T = output_flow_T,
+            nominal_input_T = 200,
+            efficiency_T = 0.91,
+            heat_to_el_T = 2.02,
+            variable_costs = 0,
+            extra_variable_cost = extra_variable_cost,
+            start_up_options = self.start_up_options,
+            boiler_efficiency = 1,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': 'ТР-16_Т',
+            'block_type': block_type,
+            'heat_demand_type_hw': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': 50   
+            })
+            
+            
 ##################################################################################   
 # ПТ - 50
 ################################################################################## 

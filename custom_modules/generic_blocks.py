@@ -419,6 +419,65 @@ class Generic_blocks:
             return tr
         
         
+        def create_ccgt_chp_detail(
+                self,
+                nominal_el_value,
+                min_power_fraction,
+                input_flow,
+                output_flow_el,
+                output_flow_T,
+                efficiency_T,
+                heat_to_el_T,
+                efficiency_full_condensing_mode,
+                not_fuel_var_cost,
+                extra_variable_cost,
+                start_up_options,
+                boiler_efficiency,
+                group_options):
+            
+            el_inner_bus = Generic_buses(self.es).create_buses(set_label(group_options['station_name'],
+            group_options['block_name'], group_options['local_index'], 'электричество-промежуточное'))
+
+            ccgt_inner_condensing = solph.components.Transformer (
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'конденсационный режим'),
+            inputs = {input_flow: solph.Flow()},
+            outputs = {el_inner_bus: solph.Flow(nominal_el_value = nominal_el_value)},
+            conversion_factors = {input_flow: 1 / efficiency_full_condensing_mode, el_inner_bus: 1},
+
+            )
+            ccgt_inner_condensing.group_options = deepcopy(group_options)
+
+
+
+            ccgt_hw_part = solph.components.Transformer (
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index'], 'теплофикационный режим'),
+            inputs = {input_flow: solph.Flow()},
+            outputs = {output_flow_T: solph.Flow(),
+                                    el_inner_bus: solph.Flow(nominal_el_value = nominal_el_value)
+                                },
+            conversion_factors = {input_flow: (1 + heat_to_el_T) / (efficiency_T * boiler_efficiency), el_inner_bus: 1, output_flow_T: heat_to_el_T},
+            )
+            ccgt_hw_part.group_options = deepcopy(group_options)
+                        
+            
+            
+            ccgt_el_part = solph.components.Transformer (
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
+            inputs = {el_inner_bus: solph.Flow()},
+            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(
+                                        initial_status = start_up_options['initial_status'],
+                                        startup_costs =  start_up_options['start_up_cost'], 
+                                        shutdown_costs = start_up_options['shout_down_cost'],
+                                        maximum_startups = start_up_options['maximum_startups'],
+                                        maximum_shutdowns = start_up_options['maximum_shutdowns']), 
+                                        variable_costs = not_fuel_var_cost + extra_variable_cost)},
+                                        group_options = group_options
+            )
+            ccgt_el_part.group_options = deepcopy(group_options)
+            self.es.add(ccgt_inner_condensing, ccgt_el_part, ccgt_hw_part)
+            return [ccgt_el_part, ccgt_hw_part]
+            
+        
         
         def create_simple_chp_with_fixed_load(
             self,

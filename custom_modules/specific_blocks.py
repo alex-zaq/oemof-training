@@ -428,9 +428,6 @@ class Specific_blocks:
                 'nominal_value': 330   
                 }    
             )
-                       
-            
-            
             
             
             
@@ -488,28 +485,155 @@ class Specific_blocks:
             )
              
             
-        # def get_ccgt_сhp_222(self, index, station_name, output_flow_T, planning_outage = None, ):
-        #     return self.g_block_creator.create_chp_T_turbine(
-        #         index = index,
-        #         station_name = station_name,
-        #         block_name = 'ПГУ-Т',
-        #         nominal_el_value = 250,
-        #         max_el_value = 300,
-        #         min_power_fraction = 0.5,
-        #         nominal_input_T = 750,
-        #         input_flow = self.global_natural_gas_flow,
-        #         output_flow_el = self.global_el_flow,
-        #         output_flow_T = output_flow_T,
-        #         efficiency_T = 0.9,
-        #         heat_to_el_T = 1.6767,
-        #         efficiency_full_condensing_mode = 0.41,
-        #         variable_costs = 0,
-        #         boiler_efficiency = 1
+        def get_ccgt_сhp_222_simple(
+            self,
+            global_index,
+            local_index,
+            station_name,
+            output_flow_T,
+            not_fuel_var_cost,
+            extra_variable_cost = 0,
+            planning_outage = None):
+            block_type = self.block_type['пгу-тэц']
+            return self.g_block_creator.create_chp_T_turbine_simple(
+                nominal_el_value = 222,
+                min_power_fraction = 0.40,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
+                output_flow_T = output_flow_T,
+                efficiency_T = 0.90,
+                heat_to_el_T = 0.65,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 1,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'ПГУ-ТЭЦ-222_теплоф.режим',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 222   
+                } 
                 
-        #     )
+            )
             
-        def get_ocgt_chp_121(self,global_index, local_index, station_name, output_flow_T, output_flow_P, planning_outage = None):
-            pass
+            
+        def get_ccgt_сhp_222_cond(self, global_index, local_index, station_name,  not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
+            block_type = self.block_type['пгу-тэц']
+            return self.g_block_creator.create_offset_transformer(
+                nominal_value = 222,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
+                efficiency_min = 0.43,
+                efficiency_max = 0.52,
+                min_power_fraction = 0.4,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 1,  
+                start_up_options = self.start_up_options,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'ПГУ-ТЭЦ-222_конд_режим',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 222   
+                }    
+            )
+                             
+            
+            
+        def get_ccgt_сhp_222_detail(
+            self,
+            global_index,
+            local_index,
+            station_name,
+            output_flow_T,
+            not_fuel_var_cost,
+            extra_variable_cost = 0,
+            planning_outage = None
+        ):
+            block_type = self.block_type['пгу-тэц']
+            return self.g_block_creator.create_ccgt_chp_detail(
+                nominal_el_value = 222,
+                min_power_fraction = 0.40,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
+                output_flow_T = output_flow_T,
+                efficiency_T = 0.90,
+                heat_to_el_T = 0.65,
+                efficiency_full_condensing_mode = 0.49,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 1,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'ПГУ-ТЭЦ-222',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 222   
+                } 
+            )
+            
+            
+            
+            
+            
+            
+            
+            
+        def get_ocgt_chp_121(
+            self,
+            global_index,
+            local_index,
+            station_name,
+            output_flow_T,
+            output_flow_P,
+            not_fuel_var_cost,
+            extra_variable_cost = 0,
+            planning_outage = None):
+            block_type = self.block_type['гту-тэц']
+            return self.g_block_creator.create_ocgt_chp_steam(
+                nominal_el_value = 122,
+                min_power_fraction = 0.35,
+                input_flow = self.global_natural_gas_flow,
+                output_flow_el = self.global_el_flow,
+                output_flow_P = output_flow_P,
+                efficiency_P = 0.75,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 1,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'ГТУ-ТЭЦ-122',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 122   
+                } 
+                
+            )
+            
+            
+            
+            
 
 
         def get_t_14_simple(self, global_index, local_index, station_name, output_flow_T,  not_fuel_var_cost, extra_variable_cost = 0,  planning_outage = None):
@@ -1731,12 +1855,44 @@ class Turbine_T_factory:
         
  
         def get_t_14(self, global_index, local_index, station_name, output_flow_T,  not_fuel_var_cost, extra_variable_cost = 0,  planning_outage = None):
-            return self.block_factory.get_t_16_simple(self, global_index, local_index, station_name,
+            return self.block_factory.get_t_16_simple(global_index, local_index, station_name,
                             output_flow_T, not_fuel_var_cost, extra_variable_cost = 0,  planning_outage = None)
    
    
    
-   
+# class CCGT_chp_factory:
+#         def __init__(self, block_factory, type_ccgt_chp):
+#              self.block_factory = block_factory
+#              self.type_ccgt_chp = type_ccgt_chp
         
- 
+        # def get_ccgt_сhp_222(
+        #     self,
+        #     global_index,
+        #     local_index,
+        #     station_name,
+        #     output_flow_T,
+        #     not_fuel_var_cost,
+        #     extra_variable_cost = 0,
+        #     planning_outage = None):
+        #     if self.type_ccgt_chp == 'simple':
+        #         return self.block_factory.get_ccgt_сhp_222_simple(
+        #                     self,
+        #                     global_index,
+        #                     local_index,
+        #                     station_name,
+        #                     output_flow_T,
+        #                     not_fuel_var_cost,
+        #                     extra_variable_cost = 0,
+        #                     planning_outage = None)
+        #     elif self.type_ccgt_chp == 'detail':
+        #         return self.block_factory.get_ccgt_сhp_222_detail(
+        #                     self,
+        #                     global_index,
+        #                     local_index,
+        #                     station_name,
+        #                     output_flow_T,
+        #                     not_fuel_var_cost,
+        #                     extra_variable_cost = 0,
+        #                     planning_outage = None)
+                
  

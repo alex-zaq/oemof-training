@@ -756,6 +756,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             # steam_name = 'пар'
@@ -769,16 +770,16 @@ class Specific_stations:
             # SGT5-PAC 4000F- 286 МВт  N141-563/551 - 141 МВт
             # эк - 68.8 гкал/ч  пвк - нет
             ###############################################################
-            k_315_1 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.001)
-            k_315_2 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.002)
-            k_315_3 = block_creator.get_k_315(global_id(), local_id(), station_name, 0.003)
-            k_310_4 = block_creator.get_k_310(global_id(), local_id(), station_name, 0.004)
-            k_300_5 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.005)
-            k_300_6 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.006)
-            k_300_7 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.007)
-            k_300_8 = block_creator.get_k_300(global_id(), local_id(), station_name, 0.008)
+            k_315_1 = block_creator.get_k_315(global_id(), local_id(), station_name, not_fuel_var_cost, 0.001)
+            k_315_2 = block_creator.get_k_315(global_id(), local_id(), station_name, not_fuel_var_cost, 0.002)
+            k_315_3 = block_creator.get_k_315(global_id(), local_id(), station_name, not_fuel_var_cost, 0.003)
+            k_310_4 = block_creator.get_k_310(global_id(), local_id(), station_name, not_fuel_var_cost, 0.004)
+            k_300_5 = block_creator.get_k_300(global_id(), local_id(), station_name, not_fuel_var_cost, 0.005)
+            k_300_6 = block_creator.get_k_300(global_id(), local_id(), station_name, not_fuel_var_cost, 0.006)
+            k_300_7 = block_creator.get_k_300(global_id(), local_id(), station_name, not_fuel_var_cost, 0.007)
+            k_300_8 = block_creator.get_k_300(global_id(), local_id(), station_name, not_fuel_var_cost, 0.008)
             if self.allow_siemens:
-                ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, 0)
+                ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
             ###############################################################
             el_boilers_hw = None
             back_hw_gas_boilers = None
@@ -846,6 +847,12 @@ class Specific_stations:
             counter = Custom_counter()
             global_id = self.inc_global_id
             local_id = counter.next
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
+            el_boilers_hw_var_cost = self.el_boiler_hw_var_cost[station_name]
+            el_boilers_steam_var_cost = self.el_boiler_steam_var_cost[station_name]
+            gas_boilers_hw_var_cost = self.gas_boiler_hw_var_cost[station_name]
+            gas_boilers_steam_var_cost = self.gas_boiler_steam_var_cost[station_name]
+
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -869,27 +876,42 @@ class Specific_stations:
                 raise Exception('Недопустимые параметры')
             
             if self.station_hw_chp_demand_prohibited[station_name]:
-                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
+                [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
                 pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2]
                 pt_steam_chp_turb = [pt_p_60_1, pt_p_60_2]
             elif self.station_steam_chp_demand_prohibited[station_name]:
-                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
-                [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
-                ccgt_chp_222 = block_creator.get_ccgt_сhp_222(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
-                t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, 0)
+                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
+                [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
+                ccgt_chp_222 = block_creator.get_ccgt_сhp_222(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.01)
+                t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0)
                 pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2, ccgt_chp_222, t_100_1]
                 pt_hw_chp_turb = [pt_t_60_1, pt_t_60_2, ccgt_chp_222, t_100_1]
             else:
-                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
-                [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.02)
+                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.01)
+                [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.02)
                 pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2]
                 pt_steam_chp_turb = [pt_p_60_1, pt_p_60_2]
                 pt_hw_chp_turb = [pt_t_60_1, pt_t_60_2]
 
 
-            hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 940 * 1.163, hw_bus, 0)
-            el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 86 * 1.163, hw_bus, 0)
+            if self.el_boiler_hw_infinity[station_name]:
+                    el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, el_boilers_hw_var_cost)
+            else:
+                el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 86 * 1.163, hw_bus, el_boilers_hw_var_cost)
+                
+            if self.el_boiler_steam_infinity[station_name]:
+                    el_boilers_steam = block_creator.get_el_boilers(global_id(), local_id(), station_name, 100_000, steam_bus, el_boilers_steam_var_cost)
+            
+            if self.gas_boiler_hw_infinity[station_name]:
+                hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, gas_boilers_hw_var_cost)
+            else:
+                hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 940 * 1.163, hw_bus, gas_boilers_hw_var_cost)
+                
+            
+            if self.gas_boiler_steam_infinity[station_name]:
+                steam_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, 100_000, steam_bus, gas_boilers_steam_var_cost)
+                
 
             ###############################################################
             hw_sink = create_sink_abs(label = set_label(
@@ -951,6 +973,7 @@ class Specific_stations:
             counter = Custom_counter()
             global_id = self.inc_global_id
             local_id = counter.next
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -967,12 +990,12 @@ class Specific_stations:
             # плановые остановки могут определяться здесь
             ###############################################################
             # pt_t_60 = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus) 
-            [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus)
-            t_250_1 = turbine_T_factory.get_t_250(global_id(), local_id(), station_name, hw_bus, 0.01) # 2
-            t_250_2 = turbine_T_factory.get_t_250(global_id(), local_id(), station_name, hw_bus, 0.02) # 3
-            t_255_1 = turbine_T_factory.get_t_250(global_id(), local_id(), station_name, hw_bus, 0.03) # 4
-            t_110_1 = turbine_T_factory.get_t_110(global_id(), local_id(), station_name, hw_bus, 0.04)
-            t_110_2 = turbine_T_factory.get_t_110(global_id(), local_id(), station_name, hw_bus, 0.05)
+            [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost)
+            t_250_1 = turbine_T_factory.get_t_250(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01) # 2
+            t_250_2 = turbine_T_factory.get_t_250(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.02) # 3
+            t_255_1 = turbine_T_factory.get_t_250(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.03) # 4
+            t_110_1 = turbine_T_factory.get_t_110(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.04)
+            t_110_2 = turbine_T_factory.get_t_110(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.05)
             el_boilers_hw = block_creator.get_el_boilers(global_id(), local_id(), station_name, 1.163 * 137.6 * 10, hw_bus , 0)
             # фейковые дорогие источники тепла
             # back_hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(),station_name, 10_000, hw_bus, 9999)
@@ -1039,6 +1062,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -1061,24 +1085,24 @@ class Specific_stations:
             pt_steam_chp_turb = []
             
             if self.station_hw_chp_demand_prohibited[station_name]:
-                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [tr_16_el_1, tr_16_p_1] = block_creator.get_tr_16_p(global_id(), local_id(), station_name, steam_bus, hw_bus)
-                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
-                р_15_1 = block_creator.get_p_15(global_id(), local_id(), station_name, steam_bus)
+                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost , 0.01)
+                [tr_16_el_1, tr_16_p_1] = block_creator.get_tr_16_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
+                р_15_1 = block_creator.get_p_15(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
                 pt_el_chp_turb = [pt_t_60_el_1, tr_16_el_1, p_50_1, р_15_1]
                 pt_steam_chp_turb = [pt_p_60_1, tr_16_p_1, p_50_1, р_15_1]
             elif self.station_steam_chp_demand_prohibited[station_name]:
-                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
-                [tr_16_el_1, tr_16_t_1] = block_creator.get_tr_16_t(global_id(), local_id(), station_name, steam_bus, hw_bus)
-                t_14_1 = turbine_T_factory.get_t_14(global_id(), local_id(), station_name, hw_bus)
+                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
+                [tr_16_el_1, tr_16_t_1] = block_creator.get_tr_16_t(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.01)
+                t_14_1 = turbine_T_factory.get_t_14(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost)
                 pt_el_chp_turb = [pt_t_60_el_1, t_14_1, tr_16_el_1]
                 pt_hw_chp_turb = [pt_t_60_1, tr_16_t_1]
             else:
-                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
-                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
-                р_15_1 = block_creator.get_p_15(global_id(), local_id(), station_name, steam_bus)
-                t_14_1 = turbine_T_factory.get_t_14(global_id(), local_id(), station_name, hw_bus)
-                [tr_16_el_1, tr_16_p_1, tr_16_t_1] = block_creator.get_tp_16(global_id(), local_id(), station_name, steam_bus, hw_bus)
+                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.01)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                р_15_1 = block_creator.get_p_15(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                t_14_1 = turbine_T_factory.get_t_14(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0)
+                [tr_16_el_1, tr_16_p_1, tr_16_t_1] = block_creator.get_tp_16(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0)
                 pt_el_chp_turb = [pt_t_60_el_1, p_50_1, р_15_1, t_14_1]
                 pt_steam_chp_turb = [pt_p_60_1]
                 pt_hw_chp_turb = [pt_t_60_1, p_50_1, р_15_1]
@@ -1143,6 +1167,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -1163,25 +1188,25 @@ class Specific_stations:
             pt_steam_chp_turb = []
             
             if self.station_hw_chp_demand_prohibited[station_name]:
-                [pt_t_50_el_1, pt_p_50_1] = block_creator.get_pt_50_p(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
-                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
-                p_50_2 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                [pt_t_50_el_1, pt_p_50_1] = block_creator.get_pt_50_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.)
+                [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.)
+                [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                p_50_2 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
                 pt_el_chp_turb = [pt_t_50_el_1, pt_t_60_el_1, pt_t_60_el_2, p_50_1, p_50_2]
                 pt_steam_chp_turb = [pt_p_50_1, pt_p_60_1, pt_p_60_2, p_50_1, p_50_2]
             elif self.station_steam_chp_demand_prohibited[station_name]:
-                [pt_t_50_el_1, pt_t_50_1] = block_creator.get_pt_50_t(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
-                [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, 0.01)
+                [pt_t_50_el_1, pt_t_50_1] = block_creator.get_pt_50_t(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0)
+                [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0)
                 pt_el_chp_turb = [pt_t_50_el_1, pt_t_60_el_1, pt_t_60_el_2]
                 pt_hw_chp_turb = [pt_t_50_1, pt_t_60_1, pt_t_60_2]
             else:
-                [pt_t_50_el_1, pt_p_50_1, pt_t_50_1] = block_creator.get_pt_50(global_id(), local_id(), station_name, steam_bus, hw_bus)
-                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.01)
-                [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, 0.02)
-                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
-                p_50_2 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
+                [pt_t_50_el_1, pt_p_50_1, pt_t_50_1] = block_creator.get_pt_50(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0)
+                [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0)
+                [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                p_50_2 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
                 pt_el_chp_turb = [pt_t_60_el_1, pt_t_60_el_2, p_50_1, p_50_2]
                 pt_steam_chp_turb = [pt_p_60_1, pt_p_60_2, p_50_1, p_50_2]
                 pt_hw_chp_turb = [pt_t_60_1, pt_t_60_2]
@@ -1250,6 +1275,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -1275,30 +1301,30 @@ class Specific_stations:
             pt_steam_chp_turb = []
             
             if self.station_hw_chp_demand_prohibited[station_name]:
-                [pt_t_65_el_1, pt_p_65_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_50_el_1, pt_p_50_1] = block_creator.get_pt_50_p(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_135_el_1, pt_p_135_1] = block_creator.get_pt_135_p(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_65_el_1, pt_p_65_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                [pt_t_50_el_1, pt_p_50_1] = block_creator.get_pt_50_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                [pt_t_135_el_1, pt_p_135_1] = block_creator.get_pt_135_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
                 p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, steam_bus)
                 pt_el_chp_turb = [pt_t_65_el_1, pt_t_50_el_1, pt_t_135_el_1, p_50_1]
                 pt_steam_chp_turb = [pt_p_65_1, pt_p_50_1, pt_p_135_1, p_50_1]
             elif self.station_steam_chp_demand_prohibited[station_name]:
-                [pt_t_65_el_1, pt_t_65_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_50_el_1, pt_t_50_1] = block_creator.get_pt_50_t(global_id(), local_id(), station_name, steam_bus, 0.01)
-                [pt_t_135_el_1, pt_t_135_1] = block_creator.get_pt_135_t(global_id(), local_id(), station_name, steam_bus, 0.01)
+                [pt_t_65_el_1, pt_t_65_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                [pt_t_50_el_1, pt_t_50_1] = block_creator.get_pt_50_t(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                [pt_t_135_el_1, pt_t_135_1] = block_creator.get_pt_135_t(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
                 pt_el_chp_turb = [pt_t_65_el_1, pt_t_50_el_1, pt_t_135_el_1]
                 pt_hw_chp_turb = [pt_t_65_1, pt_t_50_1, pt_t_135_1]
             else:
-                [pt_65_el_1, pt_p_65_1, pt_t_65_1]= block_creator.get_pt_60(global_id(), local_id(), station_name, 0)
-                [pt_50_el_1, pt_p_50_1, pt_t_50_1]= block_creator.get_pt_50(global_id(), local_id(), station_name, 0)
-                [pt_135_el_1, pt_p_135_1, pt_t_135_1]= block_creator.get_pt_135(global_id(), local_id(), station_name, 0)
-                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, 0)
+                [pt_65_el_1, pt_p_65_1, pt_t_65_1]= block_creator.get_pt_60(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
+                [pt_50_el_1, pt_p_50_1, pt_t_50_1]= block_creator.get_pt_50(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
+                [pt_135_el_1, pt_p_135_1, pt_t_135_1]= block_creator.get_pt_135(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
+                p_50_1 = block_creator.get_p_50(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
                 pt_el_chp_turb = [pt_65_el_1, pt_50_el_1, pt_135_el_1, p_50_1]
                 pt_steam_chp_turb = [pt_p_65_1, pt_p_50_1, pt_p_135_1]
                 pt_hw_chp_turb = [pt_t_65_1, pt_t_50_1, pt_t_135_1]
 
             small_ocgt = None
             if self.allow_siemens:
-                small_ocgt = block_creator.get_ocgt_small_2_3(global_id(), local_id(), station_name, 0)
+                small_ocgt = block_creator.get_ocgt_small_2_3(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
 
             if small_ocgt:
                 pt_el_chp_turb.append(small_ocgt)
@@ -1366,6 +1392,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -1453,6 +1480,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -1532,6 +1560,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -1605,6 +1634,7 @@ class Specific_stations:
             counter = Custom_counter()
             global_id = self.inc_global_id
             local_id = counter.next
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             ###############################################################
             hw_name = 'гвс'
             steam_name = 'пар'
@@ -1677,6 +1707,7 @@ class Specific_stations:
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             block_stations_install_power = 200 if self.reduce_block_station_power else 630
             block_stations = self.block_creator.get_block_station_natural_gas(
                 global_index = global_id(),
@@ -1733,7 +1764,8 @@ class Specific_stations:
             counter = Custom_counter()
             global_id = self.inc_global_id
             local_id = counter.next
-            
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
+
             if self.allow_renewables:
                 hydro_renewables = self.block_creator.get_hydro_renewables(
                     global_index = global_id(),

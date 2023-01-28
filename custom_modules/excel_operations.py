@@ -45,12 +45,13 @@ def import_dataframe_to_excel(dataframe, path, excel_name):
 		dataframe.to_excel(path + '/'+ excel_name)
 
   
-  
+def transform_dataframe_to_sql_style(self, df):
+    pass
   
  
-def create_res_scheme(energy_system, folders_options):
-		path_local_result = __get_local_path(folders_options)
-		gr = ESGraphRenderer(energy_system=energy_system, filepath=path_local_result+'/res' , img_format="png", txt_fontsize=10, txt_width=10)
+def create_res_scheme(energy_system, filepath):
+		# path_local_result = __get_local_path(folders_options)
+		gr = ESGraphRenderer(energy_system=energy_system, filepath=filepath , img_format="png", txt_fontsize=10, txt_width=10)
 		gr.view()			
 
   

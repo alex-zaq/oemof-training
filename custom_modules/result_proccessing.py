@@ -124,6 +124,9 @@ class Custom_result_extractor:
         'получить суммарное максимальной использование электрокотлов для указанной станции (ГВС или ПАР)'
         pass
     
+    def get_max_el_boilers_load_value(self):
+        pass
+    
     def get_dataframe_el_boilers_consumption(self, commodite_type):
         'получить датафрейм потребления всех электрокотлов (ГВС или ПАР)'
         pass
@@ -231,7 +234,7 @@ class Custom_result_grouper:
             res = self.__get_dataframe_block_type_station_plot_5(commodity_type)
         elif self.select_plot_type == 6:
             res = self.__get_dataframe_block_type_station_type_plot_6(commodity_type)
-        elif self.select_plot_type == 0:
+        else:
             raise Exception('Не выбран тип графика')
         return res
         

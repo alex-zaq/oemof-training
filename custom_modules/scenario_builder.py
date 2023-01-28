@@ -132,10 +132,62 @@ class Scenario_builder:
         self.custom_es.small_chp_demand_reduced_part = part
         return self
     
-    def remove_all_turb_by_station_name (self, station_name):
-        self.custom_es.station_all_turb_retired[station_name] = True
+    def disable_all_exist_turb_by_station_name (self, station_name):
+        self.custom_es.station_all_turb_avail[station_name] = False
         return self
+    
+    def disable_all_exist_turb(self):
+        stations = self.custom_es.station_all_turb_avail.keys()
+        for station in stations:
+            self.custom_es.station_all_turb_avail[station]= False
+        return self
+    
+    
+    def disable_el_boiler_hw_by_station_name(self, station_name):
+        self.custom_es.station_el_hw_on[station_name] = False
         
+    def disable_el_boiler_steam_by_station_name(self, station_name):
+        self.custom_es.station_el_steam_on[station_name] = False
+        pass
+    
+    
+    def disable_el_boiler_hw(self):
+        stations = self.custom_es.station_el_hw_on.keys()
+        for station in stations:
+            self.custom_es.station_el_hw_on[station] = False
+        
+    
+    def disable_el_boiler_steam(self):
+        stations = self.custom_es.station_el_steam_on.keys()
+        for station in stations:
+            self.custom_es.station_el_steam_on[station] = False
+    
+    def disable_el_boiler_all_types(self):
+        self.disable_el_boiler_hw()
+        self.disable_el_boiler_steam()
+    
+    
+    def enable_gas_boiler_hw_by_station_name(self, station_name):
+        self.custom_es.station_gas_hw_on[station_name] = True
+    
+    def enable_gas_boiler_steam_by_station_name(self, station_name):
+        self.custom_es.station_gas_steam_on[station_name] = True
+    
+    def enable_gas_boiler_hw(self):
+        stations = self.custom_es.station_gas_hw_on.keys()
+        for station in stations:
+            self.custom_es.station_gas_hw_on[station] = False
+            
+    def enable_gas_boiler_steam(self):
+        stations = self.custom_es.station_gas_steam_on.keys()
+        for station in stations:
+            self.custom_es.station_gas_steam_on[station] = False
+    
+    
+    def enable_gas_boilers_all_types(self):
+        self.enable_gas_boiler_hw()
+        self.enable_gas_boiler_steam()
+    
         
     def prohibit_steam_demand_chp_turb_by_station_name(self, station_name):
         'запретить покрытия паровой нагрузки теплофикационными турбинами для указанной станции'
@@ -146,18 +198,16 @@ class Scenario_builder:
         'запретить покрытия отопительной нагрузки теплофикационными турбинами для указанной станции'
         self.custom_es.station_steam_chp_demand_prohibited[station_name] = True
         return self
-        
 
-    # плохо из-за пт
+
     def prohibit_steam_demand_chp_turbs(self):
         'запретить покрытия паровой нагрузки теплофикационными турбинами'
         stations = self.custom_es.station_steam_chp_demand_prohibited.keys()
         for station in stations:
             self.custom_es.station_steam_chp_demand_prohibited[station]= True
-        
         return self
         
-    # плохо из-за пт
+
     def prohibit_hw_demand_chp_turbs(self):
         'запретить покрытия отопительной нагрузки теплофикационными турбинами'
         stations = self.custom_es.station_hw_chp_demand_prohibited.keys()
@@ -171,6 +221,17 @@ class Scenario_builder:
     def reduced_demand_boiler_district_Belenergo_by_part(self, part):
         self.custom_es.gas_boiler_steam_Belenergo_demand_reduced_part = part
     
+ ######################################################################################################   
+ # общая группа с ограниечениями
+ ######################################################################################################   
+    def add_constraint_for_el_boiler_group(self, group_name, upper_el_boiler_hw_power):
+        self.custom_es.add_general_el_boiler_hw_constraint(group_name, upper_el_boiler_hw_power) 
+        if not hasattr(self.custom_es, 'el_boiler_groups'):
+            self.custom_es.el_boiler_groups = {}
+        self.custom_es.el_boiler_groups[group_name] = group_name
+        return self
+
+
  ######################################################################################################   
  # Добавление новых источников
  ######################################################################################################   
@@ -202,6 +263,7 @@ class Scenario_builder:
             self.custom_es.gas_boiler_steam_infinity[station] = True
         return self
     
+           
     
     def add_inifinity_el_boilers_hw_by_station(self, station_name):
         self.custom_es.el_boiler_hw_infinity[station_name] = True

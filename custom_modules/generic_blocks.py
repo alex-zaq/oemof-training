@@ -36,13 +36,13 @@ class Generic_blocks:
             input_flow,
             output_flow,
             efficiency,
-            variable_costs,
+            not_fuel_var_cost,
             group_options
             ):
             tr = solph.components.Transformer(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
             inputs = {input_flow: solph.Flow()},
-            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, variable_costs = variable_costs)},
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, variable_costs = not_fuel_var_cost)},
             conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
             )
             tr.group_options = group_options
@@ -50,6 +50,34 @@ class Generic_blocks:
             # if isinstance(self.block_collection, list):
                 # self.block_collection.append(tr) 
             return tr
+        
+        
+        
+        def create_el_boiler_with_constraint(
+            self,
+            nominal_value,
+            input_flow,
+            output_flow,
+            general_constaint_el_boiler_hw_flow,
+            efficiency,
+            not_fuel_var_cost,
+            group_options
+            ):
+            tr = solph.components.Transformer(
+            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
+            inputs = {input_flow: solph.Flow(), general_constaint_el_boiler_hw_flow:solph.Flow()},
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, variable_costs = not_fuel_var_cost)},
+            conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
+            )
+            tr.group_options = group_options
+            self.es.add(tr)
+            # if isinstance(self.block_collection, list):
+                # self.block_collection.append(tr) 
+            return tr
+        
+        
+        
+        
     
         def create_simple_transformer_with_fixed_load(
             self,
@@ -57,15 +85,14 @@ class Generic_blocks:
             input_flow,
             output_flow,
             efficiency,
-            variable_costs,
-            extra_variable_cost,
+            not_fuel_var_cost,
             group_options,
             fixed_el_load_data_rel
         ):
             tr = solph.components.Transformer(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
-            inputs = {input_flow: solph.Flow(variable_costs = extra_variable_cost )},
-            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, fix = fixed_el_load_data_rel, variable_costs = variable_costs)},
+            inputs = {input_flow: solph.Flow()},
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, fix = fixed_el_load_data_rel, variable_costs = not_fuel_var_cost)},
             conversion_factors = {input_flow: 1 / efficiency, output_flow: 1},
             )
             tr.group_options = group_options
@@ -392,9 +419,9 @@ class Generic_blocks:
             min_power_fraction, 
             input_flow,
             output_flow_el,
-            output_flow_T,
-            heat_to_el_T,
-            efficiency_T,
+            output_flow_heat,
+            heat_to_el,
+            efficiency,
             boiler_efficiency,
             not_fuel_var_cost,
             extra_variable_cost,
@@ -411,8 +438,8 @@ class Generic_blocks:
                                         maximum_startups = start_up_options['maximum_startups'],
                                         maximum_shutdowns = start_up_options['maximum_shutdowns']
                                         )),
-                            output_flow_T: solph.Flow()},
-            conversion_factors = {input_flow: (1 + heat_to_el_T) /(efficiency_T * boiler_efficiency), output_flow_el: 1, output_flow_T: heat_to_el_T},
+                            output_flow_heat: solph.Flow()},
+            conversion_factors = {input_flow: (1 + heat_to_el) /(efficiency * boiler_efficiency), output_flow_el: 1, output_flow_heat: heat_to_el},
             ) 
             tr.group_options = group_options
             self.es.add(tr)
@@ -464,12 +491,17 @@ class Generic_blocks:
             ccgt_el_part = solph.components.Transformer (
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {el_inner_bus: solph.Flow()},
-            outputs = {output_flow_el: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(
-                                        initial_status = start_up_options['initial_status'],
-                                        startup_costs =  start_up_options['start_up_cost'], 
-                                        shutdown_costs = start_up_options['shout_down_cost'],
-                                        maximum_startups = start_up_options['maximum_startups'],
-                                        maximum_shutdowns = start_up_options['maximum_shutdowns']), 
+            outputs = {output_flow_el: solph.Flow(
+                                        nominal_value = nominal_el_value,
+                                        min = min_power_fraction,
+                                        nonconvex = solph.NonConvex(
+                                            initial_status = start_up_options['initial_status'],
+                                            startup_costs =  start_up_options['start_up_cost'], 
+                                            shutdown_costs = start_up_options['shout_down_cost'],
+                                            maximum_startups = start_up_options['maximum_startups'],
+                                            maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                                                    ),
+                                                   
                                         variable_costs = not_fuel_var_cost + extra_variable_cost)},
                                         group_options = group_options
             )
@@ -579,13 +611,13 @@ class Generic_sources:
             self,
             nominal_value,
             output_flow,
-            variable_costs,
+            not_fuel_var_cost,
             group_options,
             fixed_el_load_data_rel
         ):
             tr = solph.components.Source(
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
-            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, fix = fixed_el_load_data_rel, variable_costs = variable_costs)},
+            outputs = {output_flow: solph.Flow(nominal_value = nominal_value, fix = fixed_el_load_data_rel, variable_costs = not_fuel_var_cost)},
             )
             tr.group_options = group_options
             self.es.add(tr)

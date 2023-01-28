@@ -7,7 +7,7 @@ import os
 import datetime as dt
 from enum import Enum
 from custom_modules.helpers import set_label
-from custom_modules.generic_blocks import Generic_blocks, Generic_sources
+from custom_modules.generic_blocks import Generic_blocks, Generic_sources, Generic_buses
 from custom_modules.helpers import *
 
 
@@ -23,6 +23,7 @@ class Specific_blocks:
             self.es = es
             self.g_block_creator = Generic_blocks(es)
             self.g_source_creator = Generic_sources(es)
+            self.g_bus_creator = Generic_buses(es)
             self.station_type = {'тэц':'тэц', 'кэс':'кэс', 'аэс':'аэс',
                                  'блок-станции':'блок-станции', 'виэ':'виэ'
                                  }
@@ -37,7 +38,53 @@ class Specific_blocks:
             # self.minimum_downtime_k = None
             
 
+        def add_general_el_boiler_hw_constraint(self, group_name, upper_el_boiler_hw_power):
+            if not hasattr(self, 'el_boiler_constraint_group'):
+                self.el_boiler_constraint_group = {}
+            
+            constraint_bus =  self.g_bus_creator.create_buses(set_label('эк-огр-поток', group_name))
 
+            self.el_boiler_constraint_group[group_name] = [
+                self.g_source_creator.create_source(
+                    nominal_value= upper_el_boiler_hw_power,
+                    variable_costs = 0,
+                    output_flow = constraint_bus,
+                    group_options = {
+                    'global_index': str(-999),
+                    'local_index': str(-999),
+                    'station_name': 'энергосистема',
+                    'station_type': None,
+                    'block_name': set_label('эк-огр-поток', group_name),
+                    'block_type': None,
+                    'heat_demand_type': None,
+                    'station_order': None,
+                    'block_order': None,
+                    'nominal_value': None
+                }
+                    ),
+                constraint_bus    
+            ]
+            
+            
+            # self.g_source_creator.create_source(
+            #     nominal_value = upper_el_boiler_hw_power / 0.99,
+            #     output_flow = self.general_constaint_flow,
+            #     variable_costs = 0,
+            #     group_options = {
+            #     'global_index': None,
+            #     'local_index': None,
+            #     'station_name': None,
+            #     'station_type': None,
+            #     'block_name': None,
+            #     'block_type': None,
+            #     'heat_demand_type': None,
+            #     'station_order': None,
+            #     'block_order': None,
+            #     'nominal_value': None
+            #     })
+
+
+     
         def get_block_collection(self):
             return self.block_collection
         
@@ -65,6 +112,32 @@ class Specific_blocks:
             'nominal_value': nominal_value
             })
                        
+                  
+        def get_el_boilers_with_constraint(self, global_index, local_index, station_name, constraint_group ,nominal_value, output_flow, not_fuel_var_cost):
+            block_type = self.block_type['эк']
+            [_, constraint_bus] = self.el_boiler_constraint_group[constraint_group]
+            return self.g_block_creator.create_el_boiler_with_constraint(
+            nominal_value = nominal_value,
+            input_flow = self.global_el_flow,
+            output_flow = output_flow,
+            general_constaint_el_boiler_hw_flow = constraint_bus,
+            efficiency = 0.99,
+            not_fuel_var_cost = not_fuel_var_cost,
+            group_options = {
+            'global_index': str(global_index),
+            'local_index': str(local_index),
+            'station_name': station_name,
+            'station_type': None,
+            'block_name': block_type,
+            'block_type': block_type,
+            'heat_demand_type': None,
+            'station_order': None,
+            'block_order': None,
+            'nominal_value': nominal_value
+            })
+                       
+               
+               
                
     
             
@@ -149,7 +222,7 @@ class Specific_blocks:
         def get_ocgt_29(self,global_index, local_index,station_name, not_fuel_var_cost,  extra_variable_cost = 0 , planning_outage = None):
             block_type = self.block_type['гту']
             return self.g_block_creator.create_offset_transformer(
-            nominal_value = 29.6,
+            nominal_value = 29.06,
             input_flow = self.global_natural_gas_flow,
             output_flow = self.global_el_flow,
             efficiency_min = 0.25,
@@ -169,7 +242,7 @@ class Specific_blocks:
             'heat_demand_type': None,
             'station_order': None,
             'block_order': None,
-            'nominal_value': 29.6
+            'nominal_value': 29.06
             })    
                         
             
@@ -313,6 +386,8 @@ class Specific_blocks:
                 'nominal_value': 180   
                 }   
             )
+            
+            
         def get_k_300(self,global_index, local_index, station_name, not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
             block_type = self.block_type['к']
             return self.g_block_creator.create_offset_transformer(
@@ -500,9 +575,9 @@ class Specific_blocks:
                 min_power_fraction = 0.40,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
-                output_flow_T = output_flow_T,
-                efficiency_T = 0.90,
-                heat_to_el_T = 0.65,
+                output_flow_heat = output_flow_T,
+                efficiency = 0.90,
+                heat_to_el = 0.65,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
                 boiler_efficiency = 1,
@@ -574,6 +649,7 @@ class Specific_blocks:
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
                 boiler_efficiency = 1,
+                start_up_options = self.start_up_options,
                 group_options = {
                 'global_index': str(global_index),
                 'local_index': str(local_index),
@@ -589,32 +665,28 @@ class Specific_blocks:
             )
             
             
-            
-            
-            
-            
-            
-            
+        # сделать отопительную нагрузку
         def get_ocgt_chp_121(
             self,
             global_index,
             local_index,
             station_name,
-            output_flow_T,
             output_flow_P,
             not_fuel_var_cost,
             extra_variable_cost = 0,
             planning_outage = None):
             block_type = self.block_type['гту-тэц']
-            return self.g_block_creator.create_ocgt_chp_steam(
+            return self.g_block_creator.create_chp_T_turbine_simple(
                 nominal_el_value = 122,
                 min_power_fraction = 0.35,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
-                output_flow_P = output_flow_P,
-                efficiency_P = 0.75,
+                output_flow_heat = output_flow_P,
+                efficiency = 0.75,
+                heat_to_el = 0.75,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
+                start_up_options = self.start_up_options,
                 boiler_efficiency = 1,
                 group_options = {
                 'global_index': str(global_index),
@@ -639,13 +711,13 @@ class Specific_blocks:
         def get_t_14_simple(self, global_index, local_index, station_name, output_flow_T,  not_fuel_var_cost, extra_variable_cost = 0,  planning_outage = None):
             block_type = self.block_type['т']
             return self.g_block_creator.create_chp_T_turbine_simple(
-                nominal_el_value = 16,
+                nominal_el_value = 14,
                 min_power_fraction = 0.35,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
-                output_flow_T = output_flow_T,
-                efficiency_T = 0.88,
-                heat_to_el_T = 1.9,
+                output_flow_heat = output_flow_T,
+                efficiency = 0.88,
+                heat_to_el = 1.9,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
                 start_up_options = self.start_up_options,
@@ -655,12 +727,12 @@ class Specific_blocks:
                 'local_index': str(local_index),
                 'station_name': station_name,
                 'station_type': None,
-                'block_name': 'Т-16',
+                'block_name': 'Т-14',
                 'block_type': block_type,
                 'heat_demand_type': None,
                 'station_order': None,
                 'block_order': None,
-                'nominal_value': 16   
+                'nominal_value': 14   
                 }    
             )
           
@@ -698,6 +770,35 @@ class Specific_blocks:
             )
             
             
+        def get_t_250_cond_mode(self,global_index, local_index,station_name, not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
+            block_type = self.block_type['к']
+            return self.g_block_creator.create_offset_transformer(
+                nominal_value = 300,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
+                efficiency_min = 0.39,
+                efficiency_max = 0.44,
+                min_power_fraction = 0.5,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 0.9,
+                start_up_options = self.start_up_options,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'T-250(конд.режим)',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 300   
+                }   
+            )
+            
+            
+            
         def get_t_250_simple(self, global_index, local_index, station_name, output_flow_T,  not_fuel_var_cost, extra_variable_cost = 0,  planning_outage = None):
             block_type = self.block_type['т']
             return self.g_block_creator.create_chp_T_turbine_simple(
@@ -705,9 +806,9 @@ class Specific_blocks:
                 min_power_fraction = 0.5,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
-                output_flow_T = output_flow_T,
-                efficiency_T = 0.91,
-                heat_to_el_T = 1.6767,
+                output_flow_heat = output_flow_T,
+                efficiency = 0.91,
+                heat_to_el = 1.6767,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
                 start_up_options = self.start_up_options,
@@ -725,6 +826,12 @@ class Specific_blocks:
                 'nominal_value': 250   
                 }    
             )
+            
+   
+            
+            
+            
+            
             
             
         def get_t_180_detail(self,global_index, local_index, station_name, output_flow_T,  not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
@@ -765,9 +872,9 @@ class Specific_blocks:
                 min_power_fraction = 0.5,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
-                output_flow_T = output_flow_T,
-                efficiency_T = 0.9,
-                heat_to_el_T = 1.9,
+                output_flow_heat = output_flow_T,
+                efficiency = 0.9,
+                heat_to_el = 1.9,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
                 start_up_options = self.start_up_options,
@@ -786,6 +893,36 @@ class Specific_blocks:
                 }    
             )
                        
+                 
+                    
+        def get_t_180_cond_mode(self,global_index, local_index,station_name, not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
+            block_type = self.block_type['к']
+            return self.g_block_creator.create_offset_transformer(
+                nominal_value = 210,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
+                efficiency_min = 0.39,
+                efficiency_max = 0.43,
+                min_power_fraction = 0.5,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 0.9,
+                start_up_options = self.start_up_options,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'T-180(конд.режим)',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 210   
+                }   
+            )
+            
+                 
                         
             
         def get_t_110_detail(self,global_index, local_index, station_name, output_flow_T,  not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
@@ -828,9 +965,9 @@ class Specific_blocks:
                 min_power_fraction = 0.35,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
-                output_flow_T = output_flow_T,
-                efficiency_T = 0.88,
-                heat_to_el_T = 1.85,
+                output_flow_heat = output_flow_T,
+                efficiency = 0.88,
+                heat_to_el = 1.85,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
                 start_up_options = self.start_up_options,
@@ -848,7 +985,37 @@ class Specific_blocks:
                 'nominal_value': 110   
                 }    
             )
-                  
+             
+             
+                     
+        def get_t_110_cond_mode(self,global_index, local_index,station_name, not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
+            block_type = self.block_type['к']
+            return self.g_block_creator.create_offset_transformer(
+                nominal_value = 120,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
+                efficiency_min = 0.39,
+                efficiency_max = 0.42,
+                min_power_fraction = 0.35,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 0.9,
+                start_up_options = self.start_up_options,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'T-110(конд.режим)',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 110   
+                }   
+            )
+                    
+                      
    
    
                        
@@ -892,9 +1059,9 @@ class Specific_blocks:
                 min_power_fraction = 0.5,
                 input_flow = self.global_natural_gas_flow,
                 output_flow_el = self.global_el_flow,
-                output_flow_T = output_flow_T,
-                efficiency_T = 0.88,
-                heat_to_el_T = 1.9,
+                output_flow_heat = output_flow_T,
+                efficiency = 0.88,
+                heat_to_el = 1.9,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
                 start_up_options = self.start_up_options,
@@ -912,6 +1079,36 @@ class Specific_blocks:
                 'nominal_value': 100   
                 }    
             )
+            
+            
+                                 
+        def get_t_100_cond_mode(self,global_index, local_index,station_name, not_fuel_var_cost, extra_variable_cost = 0, planning_outage = None):
+            block_type = self.block_type['к']
+            return self.g_block_creator.create_offset_transformer(
+                nominal_value = 120,
+                input_flow = self.global_natural_gas_flow,
+                output_flow = self.global_el_flow,
+                efficiency_min = 0.39,
+                efficiency_max = 0.42,
+                min_power_fraction = 0.4,
+                not_fuel_var_cost = not_fuel_var_cost,
+                extra_variable_cost = extra_variable_cost,
+                boiler_efficiency = 0.9,
+                start_up_options = self.start_up_options,
+                group_options = {
+                'global_index': str(global_index),
+                'local_index': str(local_index),
+                'station_name': station_name,
+                'station_type': None,
+                'block_name': 'T-100(конд.режим)',
+                'block_type': block_type,
+                'heat_demand_type': None,
+                'station_order': None,
+                'block_order': None,
+                'nominal_value': 120   
+                }   
+            )
+            
           
 ##################################################################################   
 # ТР - 16
@@ -1855,7 +2052,7 @@ class Turbine_T_factory:
         
  
         def get_t_14(self, global_index, local_index, station_name, output_flow_T,  not_fuel_var_cost, extra_variable_cost = 0,  planning_outage = None):
-            return self.block_factory.get_t_16_simple(global_index, local_index, station_name,
+            return self.block_factory.get_t_14_simple(global_index, local_index, station_name,
                             output_flow_T, not_fuel_var_cost, extra_variable_cost = 0,  planning_outage = None)
    
    

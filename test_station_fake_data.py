@@ -1,4 +1,5 @@
 
+import logging
 from oemof import solph
 from oemof.solph import views
 import pandas as pd
@@ -6,29 +7,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import datetime as dt
-from custom_modules.excel_operations import import_dataframe_to_excel, create_res_scheme, get_excel_reader
+from custom_modules.excel_operations import import_dataframe_to_excel, create_res_scheme, get_excel_reader, transform_dataframe_to_sql_style
 from custom_modules.specific_stations import Specific_stations
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
-from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, get_peak_load_by_energy_2020
+from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, get_peak_load_by_energy_2020, rename_station
 from custom_modules.result_proccessing import Custom_result_grouper, Custom_result_extractor
 from custom_modules.scenario_builder import Scenario_builder
 
+ 
+ 
+month = 'февраль'
+day_of_week = 'рабочий'
+year = 2022 
 
-# ++++1. Сделать эксель котельные ЖКХ
-# ++++2. Сделать эксель малые ТЭЦ
-# ++++3. Добавить очередь загрузки для одинаковых блоков
-# 4. Добавить 2 КЭС
-# 5. Добавить 2 ТЭЦ
-# 6. Добавить 2 ТЭЦ
-# 7. Добавить 2 ТЭЦ
-# 8. Добавить 2 ТЭЦ
-# +++++9. Добавить малые ТЭЦ
-# 10. Сделать словарь для входных данных эксель
-# ++++11. Увеличить стоимость вкл и выкл
-# ++++12. Фрейм включенной мощности
-# 13. Словарь электрических и тепловых нагрузок из эксель
-# 14. перенести профили диспечеров в эксель
-# 15. Добавить номера блоков и очередей
 
 
 
@@ -97,7 +88,7 @@ custom_es = Specific_stations(es, gas_bus, el_bus)
 
 shout_down_lst = 10 * [0] + 14 * [999999]
 custom_es.set_start_up_options(initial_status = 1, shout_down_cost = shout_down_lst ,
-                start_up_cost= 9999999, maximum_shutdowns = 1, maximum_startups = 100 )
+                start_up_cost= 10e8, maximum_shutdowns = 1, maximum_startups = 100 )
 
 ##################################################################################################
 # Настройка сценария
@@ -110,9 +101,10 @@ scen_builder.set_electricity_demand_abs(odu_power_febrary)
 scen_builder.set_turbine_T_modelling_type('simple')
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
 scen_builder.set_bel_npp_vver_1200_first_options(active_status= 1, min_power_fraction=1)
-scen_builder.set_bel_npp_vver_1200_second_options(active_status=1, min_power_fraction=1)
+scen_builder.set_bel_npp_vver_1200_second_options(active_status=1, min_power_fraction=0.85)
 scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
-
+# scen_builder.disable_all_exist_turb_by_station_name('Березовская ГРЭС', 'Минская ТЭЦ-5')
+# scen_builder.enable_gas_boiler_hw().add_inifinity_gas_boilers_hw_for_all_large_chp().set_gas_boilers_hw_variable_cost(99999)
 
 
 scen_builder.enable_gas_boiler_hw_by_station_name('Котельные Белэнерго')
@@ -356,20 +348,51 @@ hw_df = result_plotter.get_dataframe_by_commodity_type('гвс')
 # steam_df = result_plotter.get_dataframe_by_commodity_type('пар')
 el_demand_orig = result_plotter.get_dataframe_orig_electricity_demand(el_bus, custom_es.gobal_elictricity_sink)
 
-
-
+scale = 'млн'
+gas_volume = result_extractor.get_total_gas_consumption_value_m3(scale='млн')
+gas_consumption ='газ: ' + str(gas_volume) + ' '+ scale +' м3' 
+gas_consumption = ' ('+ gas_consumption +')'
+print(gas_consumption)
 
 maxY = 9000
-ax_el = el_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство электричества')
+ax_el = el_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство электричества' + gas_consumption)
 ax_el_demand = el_demand_orig.plot(kind="line", ax = ax_el ,color = 'black', ylim=(0, maxY), style='.-' , legend = 'reverse')
 ax_online_power = online_power_df.plot(kind="line", ax = ax_el ,color = 'red', ylim=(0, maxY), style='.-' , legend = 'reverse')
 # # .legend(fontsize=7, loc="upper right")
 ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'Производство гвс' )
 # ax_steam = steam_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство пара' )
+ 
+ 
+#  переименовать станции
+#  добавить столбец - ячейку потребления газа
+#  электрокотлы малых тэц
+#  подкорректировать включенную мощность
+
+ 
+ 
+ 
+# logging.info(f"{year}-{month}-{day_of_week}-газ: {gas_consumption}") 
 
 # create_res_scheme(custom_es.es, './results/1.png')
 
+# logging.info("")
+
+# logging.basicConfig(level=logging.INFO, filename="py_log.log",filemode="w")
+# logging.info("An INFO")
+# logging.debug("A DEBUG Message")
+# logging.warning("A WARNING")
+# logging.error("An ERROR")
+# logging.critical("A message of CRITICAL severity")
+
+
 plt.show()
+
+
+# df_el = rename_station({
+    
+# }, df_el)
+
+# df_el_sql_like = transform_dataframe_to_sql_style(el_df)
 
 
 # import_dataframe_to_excel(el_df, './results/', 'res.xlsx')

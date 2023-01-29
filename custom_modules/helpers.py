@@ -1,5 +1,5 @@
 import datetime as dt
-
+import pandas as pd
 
 
 months = {
@@ -54,6 +54,13 @@ def set_bus_group(group_name, bus_list):
     for bus in bus_list:
         bus.heat_demand_group_name = group_name
   
+  
+def rename_station(custom_es, df):
+    stations = custom_es.active_stations_data.keys()
+    old_names = block_types = list(df.columns)
+    new_names = [new_dict[old_name] for old_name in old_names]
+    res = pd.DataFrame(columns=[*new_names])
+    return res
   
 class Custom_counter:
 	def __init__(self):

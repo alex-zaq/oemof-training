@@ -39,13 +39,22 @@ class Custom_result_extractor:
             divider = 1_000_000
         else:
             raise Exception('Не выбраны единицы')
-        total_gas_consumption = round(total_gas_consumption_1000_m3 / divider, 3) 
+        total_gas_consumption = round(total_gas_consumption_1000_m3 / divider, 1) 
         return total_gas_consumption
+    
+    def get_dataframe_gas_consumption(self):
+        # results = solph.views.node(self.processed_results, self.custom_es.global_input_bus)["sequences"].dropna()      
+        # res = pd.DataFrame()
+        # res['Потребление газа'] = results[((self.custom_es.global_output_bus.label, self.gobal_elictricity_sink.label),'flow')]
+        # return res            
+        pass
+    
+            
 
     def get_total_gas_consumtion_by_block_type(self, block_type):
         'получить затраченный объем газа для указанного типа блока (млн. 1000 м3)'
         pass
-    
+
     def get_total_gas_energy_generation_part(self):
         'получить долю генерации энергии природного газа в энергосистеме'
         pass
@@ -61,8 +70,11 @@ class Custom_result_extractor:
 #                               генерация электроэнергии
 ###########################################################################################
     def get_dataframe_orig_electricity_demand(self):
-        'возвращает исходный профиль электрической нагрузки'        
-        pass
+        'возвращает исходный профиль электрической нагрузки'
+        results = solph.views.node(self.processed_results, self.custom_es.global_output_bus)["sequences"].dropna()      
+        res = pd.DataFrame()
+        res[self.gobal_elictricity_sink.label] = results[((self.custom_es.global_output_bus.label, self.gobal_elictricity_sink.label),'flow')]
+        return res              
     
     def get_total_electricity_generation_value(self):
         pass

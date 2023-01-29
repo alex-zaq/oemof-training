@@ -49,7 +49,7 @@ class Scenario_builder:
 ######################################################################################################   
 # Настройки БелАЭС
 ######################################################################################################   
-
+#  сделать fix load
     def set_bel_npp_vver_1200_first_options(self, active_status, min_power_fraction, usd_per_Mwth = -999):
         if active_status not in [0 , 1] or min_power_fraction < 0 or min_power_fraction > 1 :
             raise Exception('Недопустимые параметры')
@@ -132,8 +132,15 @@ class Scenario_builder:
         self.custom_es.small_chp_demand_reduced_part = part
         return self
     
-    def disable_all_exist_turb_by_station_name (self, station_name):
-        self.custom_es.station_all_turb_avail[station_name] = False
+       
+    
+    def disable_all_exist_turb_by_station_name (self, *station_list):
+        if station_list:
+            for station_name in station_list:
+                if station_name in self.custom_es.station_all_turb_avail.keys():
+                    self.custom_es.station_all_turb_avail[station_name] = False
+                else:
+                    raise Exception('Некорретное название станции')
         return self
     
     def disable_all_exist_turb(self):
@@ -176,12 +183,13 @@ class Scenario_builder:
     def enable_gas_boiler_hw(self):
         stations = self.custom_es.station_gas_hw_on.keys()
         for station in stations:
-            self.custom_es.station_gas_hw_on[station] = False
+            self.custom_es.station_gas_hw_on[station] = True
+        return self
             
     def enable_gas_boiler_steam(self):
         stations = self.custom_es.station_gas_steam_on.keys()
         for station in stations:
-            self.custom_es.station_gas_steam_on[station] = False
+            self.custom_es.station_gas_steam_on[station] = True
     
     
     def enable_gas_boilers_all_types(self):

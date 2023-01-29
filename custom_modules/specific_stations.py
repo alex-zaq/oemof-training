@@ -1299,7 +1299,6 @@ class Specific_stations:
             steam_el_boilers = steam_el_boilers if steam_el_boilers else None
             install_power = self.get_install_power_blocklist(el_turb)
             ###############################################################
-            logging.info(station_name +' '+ str(install_power))
             ###############################################################
             # el_turb = el_turb if not self.station_all_turb_retired[station_name] else None
             # hw_chp_turb = hw_chp_turb if not self.station_all_turb_retired[station_name] else None

@@ -1,0 +1,10 @@
+WARNING:pyomo.core.base.set:DEPRECATED: Using __getitem__ to return a set value from its (ordered)
+position is deprecated.  Please use at()  (deprecated in 6.1, will be
+removed in (or after) 7.0)
+(called from C:\Users\alex\AppData\Local\Programs\Python\Python310\lib\site-packages\oemof\solph\flows\_non_convex_flow.py:466)
+WARNING:pyomo.core.base.set:DEPRECATED: Using __getitem__ to return a set value from its (ordered)
+position is deprecated.  Please use at()  (deprecated in 6.1, will be
+removed in (or after) 7.0)
+(called from C:\Users\alex\AppData\Local\Programs\Python\Python310\lib\site-packages\oemof\solph\flows\_non_convex_flow.py:494)
+INFO:root:Optimization successful...
+INFO:root:2022-февраль-рабочий-газ:  (газ: 29.7 млн м3)

@@ -94,15 +94,15 @@ custom_es.set_start_up_options(initial_status = 1, shout_down_cost = shout_down_
 # Настройка сценария
 ##################################################################################################
 scen_builder = Scenario_builder(custom_es)
-scen_builder.add_constraint_for_el_boiler_group(el_boilers_hw_groups['электрокотлы Белэнерго'], 916)
+scen_builder.add_constraint_for_el_boiler_group(el_boilers_hw_groups['электрокотлы Белэнерго'], 900)
 # scen_builder.set_electricity_profile(elictricity_profile = main_power_profile_rel)
 # scen_builder.set_electricity_level(energy_level_in_billion_kWth = 39)
 scen_builder.set_electricity_demand_abs(odu_power_febrary)
 scen_builder.set_turbine_T_modelling_type('simple')
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
 scen_builder.set_bel_npp_vver_1200_first_options(active_status= 1, min_power_fraction=1)
-scen_builder.set_bel_npp_vver_1200_second_options(active_status=1, min_power_fraction=0.85)
-# scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
+scen_builder.set_bel_npp_vver_1200_second_options(active_status=1, min_power_fraction=1)
+scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
 # scen_builder.disable_all_exist_turb_by_station_name('Березовская ГРЭС', 'Минская ТЭЦ-5')
 # scen_builder.enable_gas_boiler_hw().add_inifinity_gas_boilers_hw_for_all_large_chp().set_gas_boilers_hw_variable_cost(99999)
 
@@ -362,15 +362,21 @@ ax_online_power = online_power_df.plot(kind="line", ax = ax_el ,color = 'red', y
 ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'Производство гвс' )
 # ax_steam = steam_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство пара' )
  
- 
+#  столбец месяца и года станции типов турбин названий станций типов станций, тип энергии
 #  переименовать станции
 #  добавить столбец - ячейку потребления газа
 #  добавить столбец исходного электрического спроса
 #  электрокотлы малых тэц
 #  подкорректировать включенную мощность
+#  добавить областные ограничения эк
+#  разрешить одновременную работу газ кот и эк
+# + столбец пар и гвс
+#  добавить обязательную работу для аэс
+#  сделать excel файл 2023 в двумя блоками
+# сделать расчеты для каждой комбинации и перенести в общий excel файл
 
- 
- 
+
+
  
 # logging.info(f"{year}-{month}-{day_of_week}-газ: {gas_consumption}") 
 

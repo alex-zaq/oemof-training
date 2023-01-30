@@ -102,7 +102,7 @@ scen_builder.set_turbine_T_modelling_type('simple')
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
 scen_builder.set_bel_npp_vver_1200_first_options(active_status= 1, min_power_fraction=1)
 scen_builder.set_bel_npp_vver_1200_second_options(active_status=1, min_power_fraction=0.85)
-scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
+# scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
 # scen_builder.disable_all_exist_turb_by_station_name('Березовская ГРЭС', 'Минская ТЭЦ-5')
 # scen_builder.enable_gas_boiler_hw().add_inifinity_gas_boilers_hw_for_all_large_chp().set_gas_boilers_hw_variable_cost(99999)
 
@@ -110,7 +110,7 @@ scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
 scen_builder.enable_gas_boiler_hw_by_station_name('Котельные Белэнерго')
 scen_builder.enable_gas_boiler_steam_by_station_name('Котельные Белэнерго')
 scen_builder.enable_gas_boiler_hw_by_station_name('Котельные ЖКХ')
-scen_builder.add_inifinity_el_boilers_hw_by_station('Минская ТЭЦ-4')
+# scen_builder.add_inifinity_el_boilers_hw_by_station('Минская ТЭЦ-4')
 scen_builder.disable_el_boiler_steam()
 # scen_builder.remove_renewables()
 # scen_builder.add_ocgt_100(1)
@@ -166,7 +166,7 @@ gomelskay_tec_2 = custom_es.add_Gomelskay_tec_2(heat_water_demand_data = heat_wa
 
 
 small_tec = custom_es.add_small_chp(fixed_el_load_data_rel= fixed_load_rel['Малые ТЭЦ'])
-block_station = custom_es.add_block_staion_natural_gas(fixed_el_load_data_rel = fixed_load_rel['Блок-станции'])
+block_station = custom_es.add_block_station_natural_gas(fixed_el_load_data_rel = fixed_load_rel['Блок-станции'])
 bel_npp = custom_es.add_Bel_npp()
 
 district_boilers_Belenergo = custom_es.add_district_boilers_Belenergo(heat_water_demand_data = heat_water_demand_abs['Котельные Белэнерго'],
@@ -365,6 +365,7 @@ ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'П
  
 #  переименовать станции
 #  добавить столбец - ячейку потребления газа
+#  добавить столбец исходного электрического спроса
 #  электрокотлы малых тэц
 #  подкорректировать включенную мощность
 

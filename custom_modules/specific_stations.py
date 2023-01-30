@@ -1260,7 +1260,7 @@ class Specific_stations:
                 if self.el_boiler_hw_infinity[station_name]:
                         hw_el_boilers = block_creator.get_el_boilers_with_constraint(global_id(), local_id(), station_name, el_boiler_group ,100_000, hw_bus, el_boilers_hw_var_cost)
                 else:
-                    hw_el_boilers = block_creator.get_el_boilers_with_constraint(global_id(), local_id(), station_name, el_boiler_group, 137 * 1.163, hw_bus, el_boilers_hw_var_cost)
+                    hw_el_boilers = block_creator.get_el_boilers_with_constraint(global_id(), local_id(), station_name, el_boiler_group, 137.6 * 1.163, hw_bus, el_boilers_hw_var_cost)
                 
                 
             if self.station_el_steam_on[station_name]:
@@ -2260,7 +2260,7 @@ class Specific_stations:
  
         
          # +            
-        def add_block_staion_natural_gas(self, fixed_el_load_data_rel):
+        def add_block_station_natural_gas(self, fixed_el_load_data_rel):
             station_name = 'Блок-станции'
             counter = Custom_counter()
             local_id = counter.next

@@ -94,14 +94,15 @@ custom_es.set_start_up_options(initial_status = 1, shout_down_cost = shout_down_
 # Настройка сценария
 ##################################################################################################
 scen_builder = Scenario_builder(custom_es)
-scen_builder.add_constraint_for_el_boiler_group(el_boilers_hw_groups['электрокотлы Белэнерго'], 900)
+# scen_builder.disable_all_exist_turb_by_station_name('Лукомольская ГРЭС', 'Березовская ГРЭС', 'Минская ТЭЦ-5')
+scen_builder.add_constraint_for_el_boiler_group(el_boilers_hw_groups['электрокотлы Белэнерго'], 916)
 # scen_builder.set_electricity_profile(elictricity_profile = main_power_profile_rel)
 # scen_builder.set_electricity_level(energy_level_in_billion_kWth = 39)
 scen_builder.set_electricity_demand_abs(odu_power_febrary)
-scen_builder.set_turbine_T_modelling_type('simple')
+scen_builder.set_turbine_T_modelling_type('detail')
 scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
-scen_builder.set_bel_npp_vver_1200_first_options(active_status= 1, min_power_fraction=1)
-scen_builder.set_bel_npp_vver_1200_second_options(active_status=1, min_power_fraction=1)
+scen_builder.set_bel_npp_vver_1200_first_options(active_status = 1, min_power_fraction=0.75, fix_load=False)
+scen_builder.set_bel_npp_vver_1200_second_options(active_status = 1, min_power_fraction=0.75, fix_load=False)
 scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
 # scen_builder.disable_all_exist_turb_by_station_name('Березовская ГРЭС', 'Минская ТЭЦ-5')
 # scen_builder.enable_gas_boiler_hw().add_inifinity_gas_boilers_hw_for_all_large_chp().set_gas_boilers_hw_variable_cost(99999)
@@ -197,30 +198,30 @@ el_boilers_power = result_extractor.get_install_el_boilers_power('гвс')
 print('Мощность электрокотлов-гвс: ', el_boilers_power)
 
 
-result_plotter.set_block_station_plot_1({
-    bel_npp: ['ввэр'],
-    # new_npp: ['ввэр'],
-    block_station: ['блок-станции-газ'],
-    small_tec: ['малые тэц', 'эк', 'кот'],
+# result_plotter.set_block_station_plot_1({
+#     bel_npp: ['ввэр'],
+#     # new_npp: ['ввэр'],
+#     block_station: ['блок-станции-газ'],
+#     small_tec: ['малые тэц', 'эк', 'кот'],
 
-    novopockay_tec: ['р','пт', 'эк' ,'кот'],
-    minskay_tec_3: ['пт','т', 'пгу-тэц' ,'эк', 'кот'],
-    svetlogorskay_tec: ['р','пт', 'т', 'эк', 'кот'],
-    mogilevskya_tec_2: ['р', 'пт', 'гту', 'эк', 'кот'],
-    bobryskay_tec_2: ['пт','гту','эк','кот'],
-    mozyrskay_tec_2: ['пт','эк','кот'],
-    grodnenskay_tec_2: ['р','пт','гту-тэц','эк', 'кот'],
-    gomelskay_tec_2: ['т','эк','кот'],
-    minskay_tec_4: ['пт','т','эк', 'кот'],
+#     novopockay_tec: ['р','пт', 'эк' ,'кот'],
+#     minskay_tec_3: ['пт','т', 'пгу-тэц' ,'эк', 'кот'],
+#     svetlogorskay_tec: ['р','пт', 'т', 'эк', 'кот'],
+#     mogilevskya_tec_2: ['р', 'пт', 'гту', 'эк', 'кот'],
+#     bobryskay_tec_2: ['пт','гту','эк','кот'],
+#     mozyrskay_tec_2: ['пт','эк','кот'],
+#     grodnenskay_tec_2: ['р','пт','гту-тэц','эк', 'кот'],
+#     gomelskay_tec_2: ['т','эк','кот'],
+#     minskay_tec_4: ['пт','т','эк', 'кот'],
 
-    lukomolskay_gres: ['пгу-кэс','к','эк', 'кот'],
-    berezovskay_gres: ['пгу-кэс','к', 'гту','эк', 'кот'],
-    minskay_tec_5: ['пгу-кэс', 'к'],
-    # new_ocgt: ['гту'],
-    renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
-    district_boilers_Belenergo: ['эк', 'кот'],
-    # district_boilers: ['эк','кот']
-})
+#     lukomolskay_gres: ['пгу-кэс','к','эк', 'кот'],
+#     berezovskay_gres: ['пгу-кэс','к', 'гту','эк', 'кот'],
+#     minskay_tec_5: ['пгу-кэс', 'к'],
+#     # new_ocgt: ['гту'],
+#     renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
+#     district_boilers_Belenergo: ['эк', 'кот'],
+#     # district_boilers: ['эк','кот']
+# })
 
 ##################################################################################################
 # result_plotter.set_station_plot_3(
@@ -250,56 +251,56 @@ result_plotter.set_block_station_plot_1({
 ##################################################################################################
 
 
-# result_plotter.set_station_type_plot_4(
-# {
-#     'аэс':[bel_npp],
-#     'блок-станции': [block_station],
-#     'тэц': [small_tec, 
-#             novopockay_tec,
-#             minskay_tec_3,
-#             svetlogorskay_tec,
-#             mogilevskya_tec_2,
-#             bobryskay_tec_2,
-#             mozyrskay_tec_2,
-#             grodnenskay_tec_2,
-#             gomelskay_tec_2,
-#             minskay_tec_4],
+result_plotter.set_station_type_plot_4(
+{
+    'аэс':[bel_npp],
+    'блок-станции': [block_station],
+    'тэц': [small_tec, 
+            novopockay_tec,
+            minskay_tec_3,
+            svetlogorskay_tec,
+            mogilevskya_tec_2,
+            bobryskay_tec_2,
+            mozyrskay_tec_2,
+            grodnenskay_tec_2,
+            gomelskay_tec_2,
+            minskay_tec_4],
     
-#     'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
-#     'виэ': [renewables],
-#     'котельные Белэнерго': [district_boilers_Belenergo]
-#     # 'фейки': [fake_el_source]
-# })
+    'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
+    'виэ': [renewables],
+    'котельные Белэнерго': [district_boilers_Belenergo]
+    # 'фейки': [fake_el_source]
+})
 ##################################################################################################
 
-# result_plotter.set_block_type_station_type_plot_6(
-# {
-#     'аэс':[bel_npp],
-#     'блок-станции': [block_station],
-#     'тэц': [small_tec, 
-#             novopockay_tec,
-#             minskay_tec_3,
-#             svetlogorskay_tec,
-#             mogilevskya_tec_2,
-#             bobryskay_tec_2,
-#             mozyrskay_tec_2,
-#             grodnenskay_tec_2,
-#             gomelskay_tec_2,
-#             minskay_tec_4],
+result_plotter.set_block_type_station_type_plot_6(
+{
+    'аэс':[bel_npp],
+    'блок-станции': [block_station],
+    'тэц': [small_tec, 
+            novopockay_tec,
+            minskay_tec_3,
+            svetlogorskay_tec,
+            mogilevskya_tec_2,
+            bobryskay_tec_2,
+            mozyrskay_tec_2,
+            grodnenskay_tec_2,
+            gomelskay_tec_2,
+            minskay_tec_4],
     
-#     'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
-#     'виэ': [renewables],
-#     'котельные Белэнерго': [district_boilers_Belenergo]
-# },
+    'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
+    'виэ': [renewables],
+    'котельные Белэнерго': [district_boilers_Belenergo]
+},
 
-# {
-#     'аэс':['ввэр'],
-#     'блок-станции': ['блок-станции-газ'],
-#     'тэц':['малые тэц','пгу-тэц','гту-тэц','р','пт','т','гту','эк','кот'],
-#     'кэс':['пгу-кэс','к', 'гту', 'эк'],
-#     'виэ': ['виэ-вода','виэ-ветер','виэ-солнце'],
-#     'котельные Белэнерго': ['эк','кот']
-# })
+{
+    'аэс':['ввэр'],
+    'блок-станции': ['блок-станции-газ'],
+    'тэц':['малые тэц','пгу-тэц','гту-тэц','р','пт','т','гту','эк','кот'],
+    'кэс':['пгу-кэс','к', 'гту', 'эк'],
+    'виэ': ['виэ-вода','виэ-ветер','виэ-солнце'],
+    'котельные Белэнерго': ['эк','кот']
+})
 
 
 ##################################################################################################
@@ -367,11 +368,12 @@ ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'П
 #  добавить столбец - ячейку потребления газа
 #  добавить столбец исходного электрического спроса
 #  электрокотлы малых тэц
+#  расход газ для блок-станций
 #  подкорректировать включенную мощность
 #  добавить областные ограничения эк
 #  разрешить одновременную работу газ кот и эк
 # + столбец пар и гвс
-#  добавить обязательную работу для аэс
+# (сделано)  добавить обязательную работу для аэс
 #  сделать excel файл 2023 в двумя блоками
 # сделать расчеты для каждой комбинации и перенести в общий excel файл
 

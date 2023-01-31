@@ -171,6 +171,8 @@ class Specific_stations:
                 'СЭС' : 0,
                 'ГЭС' : 0,
                 'Блок-станции' : 0,
+                'Белорусская АЭС' : 0,
+                'Новая АЭС': 0,
                 'Котельные Белэнерго' : 0,
                 'Котельные ЖКХ' : 0,
                 'Аккумуляторы': 0
@@ -366,7 +368,9 @@ class Specific_stations:
                 'блок_1_мин': 0.75,
                 'блок_2_мин': 0.75,
                 'блок_1_затраты': -999,
-                'блок_2_затраты': -999
+                'блок_2_затраты': -999,
+                'блок_1_фикс': False, 
+                'блок_2_фикс': False,
                 
             }
 
@@ -379,7 +383,10 @@ class Specific_stations:
                 'ритм-200_мин': 0.65,
                 'ввэр_тои_затраты': -999,
                 'ввэр-600_затраты': -999,
-                'ритм-200_затраты': -999
+                'ритм-200_затраты': -999,
+                'ввэр_тои_фикс': False, 
+                'ввэр_600_фикс': False,
+                'ритм_200_фикс': False,
             }
                 
                 
@@ -1081,13 +1088,13 @@ class Specific_stations:
                     raise Exception('Недопустимые параметры')
                 if self.station_hw_chp_demand_prohibited[station_name]:     # только промышленная тепловая нагрузка
                     [pt_t_60_el_1, pt_p_60_1] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
-                    [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
+                    [pt_t_60_el_2, pt_p_60_2] = block_creator.get_pt_60_p(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.02)
                     [ccgt_chp_222_cond] = block_creator.get_ccgt_сhp_222_cond(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0.01)
                     el_turb = [pt_t_60_el_1, pt_t_60_el_2, ccgt_chp_222_cond]
                     steam_turb = [pt_p_60_1, pt_p_60_2]
                 elif self.station_steam_chp_demand_prohibited[station_name]: # только отопительная тепловая нагрузка
                     [pt_t_60_el_1, pt_t_60_1] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
-                    [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
+                    [pt_t_60_el_2, pt_t_60_2] = block_creator.get_pt_60_t(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.02)
                     [ccgt_chp_222_el, ccgt_chp_222_hw] = block_creator.get_ccgt_сhp_222_detail(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.01)
                     t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0)
                     el_turb = [pt_t_60_el_1, pt_t_60_el_2, ccgt_chp_222_el, t_100_1]
@@ -2497,9 +2504,8 @@ class Specific_stations:
         def add_Bel_npp(self):
             station_name = 'Белорусская АЭС'
             ###############################################################
-            create_buses = self.bus_creator.create_buses
             block_creator = self.block_creator
-            create_sink_abs = self.sink_creator.create_sink_absolute_demand
+            not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
             counter = Custom_counter()
             local_id = counter.next
             global_id = self.inc_global_id
@@ -2518,11 +2524,25 @@ class Specific_stations:
  
             vver_1200_1 = None
             if options['блок_1']:
-                vver_1200_1 = block_creator.get_vver_1200(global_id(), local_id(), station_name, options['блок_1_мин'], options[ 'блок_1_затраты'])
+                vver_1200_1 = block_creator.get_vver_1200(
+                    global_id(),
+                    local_id(),
+                    station_name,
+                    options['блок_1_мин'],
+                    options['блок_1_затраты'],
+                    options['блок_1_фикс']
+                    )
 
             vver_1200_2 = None
             if options['блок_2']:
-                vver_1200_2 = block_creator.get_vver_1200(global_id(), local_id(), station_name,options['блок_1_мин'], options[ 'блок_2_затраты'])
+                vver_1200_2 = block_creator.get_vver_1200(
+                    global_id(),
+                    local_id(),
+                    station_name,
+                    options['блок_2_мин'],
+                    options['блок_2_затраты'],
+                    options['блок_2_фикс']
+                    )
 
 
             ###############################################################
@@ -2767,23 +2787,39 @@ class Specific_stations:
             local_id = counter.next
             global_id = self.inc_global_id
             options = self.new_npp_scenario_options
-
-  
-                        
-                        
+            # not_fuel_var_cost = self.station_not_fuel_var_cost[station_name]
+ 
                         
             vver_toi_1 = None
             if options['ввэр_тои']:
-                vver_toi_1 = block_creator.get_vver_toi(global_id(), local_id(), station_name, options['ввэр_тои_мин'], options['ввэр_тои_затраты'])            
+                vver_toi_1 = block_creator.get_vver_toi(
+                    global_id(),
+                    local_id(),
+                    station_name,
+                    options['ввэр_тои_мин'],
+                    options['ввэр_тои_затраты'],
+                    options['ввэр_тои_фикс'])            
 
             vver_600_1 = None
             if options['ввэр-600']:
-                vver_600_1 = block_creator.get_vver_600(global_id(), local_id(), station_name, options['ввэр-600_мин'], options['ввэр-600_затраты'])
+                vver_600_1 = block_creator.get_vver_600(
+                    global_id(),
+                    local_id(),
+                    station_name,
+                    options['ввэр-600_мин'],
+                    options['ввэр_600_затраты'],
+                    options['ввэр-600_фикс'])
             
             ritm_200_lst = []
             if options['ритм-200']:
                 for _ in range(1, options['ритм-200'] + 1):
-                    ritm_200_1 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, options['ритм-200_мин'], options['ритм-200_затраты'])
+                    ritm_200_1 = block_creator.get_ritm_200(
+                        global_id(),
+                        local_id(),
+                        station_name,
+                        options['ритм-200_мин'],
+                        options['ритм-200_затраты'],
+                        options['ритм-200_фикс'])
                     ritm_200_lst.append(ritm_200_1)
             
             el_turb = []

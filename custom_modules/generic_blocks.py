@@ -190,24 +190,30 @@ class Generic_blocks:
             min_power_fraction,
             output_flow,
             not_fuel_var_cost,
-            extra_variable_cost,
+            # extra_variable_cost,
             start_up_options,
+            strict_load,
             group_options):
-            npp_block = solph.components.Source(
-            label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
-            outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(
-                                        initial_status = start_up_options['initial_status'],
-                                        startup_costs =  start_up_options['start_up_cost'], 
-                                        shutdown_costs = start_up_options['shout_down_cost'],
-                                        maximum_startups = start_up_options['maximum_startups'],
-                                        maximum_shutdowns = start_up_options['maximum_shutdowns']
-                                        ), variable_costs = not_fuel_var_cost + extra_variable_cost,)},
-            group_options = group_options
-            )
+            
+            if not strict_load:
+                npp_block = solph.components.Source(
+                label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
+                outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, min = min_power_fraction, nonconvex = solph.NonConvex(
+                                            initial_status = start_up_options['initial_status'],
+                                            startup_costs =  start_up_options['start_up_cost'], 
+                                            shutdown_costs = start_up_options['shout_down_cost'],
+                                            maximum_startups = start_up_options['maximum_startups'],
+                                            maximum_shutdowns = start_up_options['maximum_shutdowns']
+                                            ), variable_costs = not_fuel_var_cost,)},
+                )
+            elif strict_load:
+                npp_block = solph.components.Source(
+                label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']), 
+                outputs = {output_flow: solph.Flow(nominal_value = nominal_el_value, fix = min_power_fraction, variable_costs = not_fuel_var_cost)}
+                )
+                
             npp_block.group_options = group_options
             self.es.add(npp_block)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(npp_block) 
             return npp_block
 
         def create_chp_PT_turbine(

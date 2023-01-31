@@ -50,20 +50,22 @@ class Scenario_builder:
 # Настройки БелАЭС
 ######################################################################################################   
 #  сделать fix load
-    def set_bel_npp_vver_1200_first_options(self, active_status, min_power_fraction, usd_per_Mwth = -999):
+    def set_bel_npp_vver_1200_first_options(self, active_status, min_power_fraction, fix_load = False ,usd_per_Mwth = -999):
         if active_status not in [0 , 1] or min_power_fraction < 0 or min_power_fraction > 1 :
             raise Exception('Недопустимые параметры')
         self.custom_es.bel_npp_options['блок_1'] = bool(active_status)
         self.custom_es.bel_npp_options['блок_1_мин'] = min_power_fraction
         self.custom_es.bel_npp_options['блок_1_затраты'] = usd_per_Mwth
+        self.custom_es.bel_npp_options['блок_1_фикс'] = fix_load
             
     
-    def set_bel_npp_vver_1200_second_options(self, active_status, min_power_fraction, usd_per_Mwth = -999):
+    def set_bel_npp_vver_1200_second_options(self, active_status, min_power_fraction, fix_load = False, usd_per_Mwth = -999):
         if active_status not in [0 , 1] or min_power_fraction < 0 or min_power_fraction > 1 :
             raise Exception('Недопустимые параметры')
         self.custom_es.bel_npp_options['блок_2'] = bool(active_status)
         self.custom_es.bel_npp_options['блок_2_мин'] = min_power_fraction
         self.custom_es.bel_npp_options['блок_2_затраты'] = usd_per_Mwth
+        self.custom_es.bel_npp_options['блок_2_фикс'] = fix_load
             
     
 ######################################################################################################   
@@ -303,25 +305,28 @@ class Scenario_builder:
         self.custom_es.new_ocgt_count_options['гту-125'] = count
         return self
     
-    def add_vver_toi_1255(self, min_power_fraction, usd_per_Mwth = -9999 ):
+    def add_vver_toi_1255(self, min_power_fraction, fix_load = False, usd_per_Mwth = -9999 ):
         'добавить ввэр-тои с устновкой себестоимости и возможностью маневренирования'
         self.custom_es.new_npp_scenario_options['ввэр_тои'] = True
         self.custom_es.new_npp_scenario_options['ввэр_тои_мин'] = min_power_fraction
         self.custom_es.new_npp_scenario_options['ввэр_тои_затраты'] = usd_per_Mwth
+        self.custom_es.new_npp_scenario_options['ввэр_тои_фикс'] = fix_load
         return self
     
-    def add_vver_600(self, min_power_fraction, usd_per_Mwth = -9999):
+    def add_vver_600(self, min_power_fraction, fix_load = False, usd_per_Mwth = -9999):
         'добавить ввэр-600 с устновкой себестоимости и возможностью маневренирования'
         self.custom_es.new_npp_scenario_options['ввэр-600'] = True
         self.custom_es.new_npp_scenario_options['ввэр_600_мин'] = min_power_fraction
         self.custom_es.new_npp_scenario_options['ввэр_600_затраты'] = usd_per_Mwth
+        self.custom_es.new_npp_scenario_options['ввэр_600_фикс'] = fix_load
         return self
 
-    def add_ritm_200(self, min_power_fraction, usd_per_Mwth = -9999 ):
+    def add_ritm_200(self, min_power_fraction, fix_load = False, usd_per_Mwth = -9999 ):
         'добавить ритм-200 с устновкой себестоимости и возможностью маневренирования'
         self.custom_es.new_npp_scenario_options['ритм-200'] = True
         self.custom_es.new_npp_scenario_options['ритм-200_мин'] = min_power_fraction
         self.custom_es.new_npp_scenario_options['ритм-200_затраты'] = usd_per_Mwth
+        self.custom_es.new_npp_scenario_options['ритм-200_фикс'] = fix_load
         return self
     
     def add_storage(self):

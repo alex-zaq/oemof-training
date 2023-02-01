@@ -1864,14 +1864,14 @@ class Specific_blocks:
             
 
 
-
+                # (e+t/((e+t)/eff) = eff(el))
         def get_block_station_natural_gas(self, global_index, local_index, nominal_value, station_name, fixed_el_load_data_rel, not_fuel_var_cost):
             block_type = self.block_type['блок-станции-газ']
             return self.g_block_creator.create_simple_transformer_with_fixed_load(
             nominal_value = nominal_value,
             input_flow = self.global_natural_gas_flow ,
             output_flow = self.global_el_flow,
-            efficiency = 0.45,
+            efficiency = 0.4055,
             not_fuel_var_cost = not_fuel_var_cost,
             fixed_el_load_data_rel = fixed_el_load_data_rel,
             group_options = {

@@ -24,17 +24,18 @@ class Specific_stations:
             self.__block_collection = []
             self.global_input_bus = global_input_bus
             self.global_output_bus = global_output_bus
-            self.gobal_elictricity_sink = None
+            self.global_elictricity_sink = None
             self.global_gas_source = None
+            self.model_block_list = []
+            
             # плохо
-            self.block_creator = Specific_blocks(es, global_input_bus, global_output_bus, 9999)
+            self.block_creator = Specific_blocks(es, global_input_bus, global_output_bus, 9999, self.model_block_list)
             self.turbine_T_factory = Turbine_T_factory(self.block_creator, 'simple')
             # self.ccgt_chp_factory =  CCGT_chp_factory(self.block_creator, 'simple')
-            self.sink_creator = Generic_sinks(es)
+            self.sink_creator = Generic_sinks(es, self.model_block_list)
             self.bus_creator = Generic_buses(es)
             self.active_stations_data = {}
             
-
 
 
             self.station_el_hw_on = {
@@ -419,9 +420,9 @@ class Specific_stations:
                 'initial_status': initial_status,
             }
             
-            self.block_creator = Specific_blocks(self.es, self.global_input_bus, self.global_output_bus, self.start_up_options)
+            self.block_creator = Specific_blocks(self.es, self.global_input_bus, self.global_output_bus, self.start_up_options, self.model_block_list)
             # self.turbine_T_factory = Turbine_T_factory(self.block_creator, 'detail')
-            
+                                    
             
         def set_turbine_T_factory(self, modelling_type):
             if modelling_type not in ['simple','detail']:
@@ -437,7 +438,7 @@ class Specific_stations:
         def set_electricity_level(self, level_in_billion_kWth):
             if self.profile.empty:
                 raise Exception('Не установлен профиль электрической нагрузки')
-            self.gobal_elictricity_sink = self.sink_creator.create_sink_fraction_demand(
+            self.global_elictricity_sink = self.sink_creator.create_sink_fraction_demand(
                 'электричество_потребитель',
                 self.global_output_bus,
                 demand_profile = self.profile,
@@ -448,7 +449,7 @@ class Specific_stations:
         def set_electricity_abs(self, demand_absolute_data):
             # if not self.profile.empty:
             #     raise Exception('Недопустимые параметры')
-            self.gobal_elictricity_sink = self.sink_creator.create_sink_absolute_demand(
+            self.global_elictricity_sink = self.sink_creator.create_sink_absolute_demand(
                 'электричество_потребитель',
                 self.global_output_bus,
                 demand_absolute_data = demand_absolute_data 
@@ -517,12 +518,6 @@ class Specific_stations:
                el_block = self.active_stations_data[station_name]['источники']['пар-источники']['пар-эк-источник']
                power += el_block.group_options['nominal_value'] if el_block else 0
             return power
-            
-            
-            
-            
-            
-            
             
             
 			
@@ -693,6 +688,28 @@ class Specific_stations:
             res = []
             for station_name, _ in self.active_stations_data.items():
                 res += self.get_heat_water_blocks_by_station(station_name)
+            return res
+                
+                
+        def get_el_boilers_by_commodity(self, commodite_type):
+            stations  = self.active_stations_data.keys()
+            res = []
+            
+            entry_level = 'источники'
+            if commodite_type == 'гвс':
+                first_level = 'гвс-источники'
+                second_level = 'гвс-эк-источник'
+            elif commodite_type == 'пар':
+                first_level = 'пар-источники'
+                second_level = 'пар-эк-источник'
+            else:
+                raise Exception('Недопустимые параметры')
+
+            for station in stations:
+                el_boiler = self.active_stations_data[station][entry_level][first_level][second_level]
+                if el_boiler:
+                    res.append(el_boiler)
+
             return res
                 
         
@@ -997,7 +1014,7 @@ class Specific_stations:
             hw_el_boilers = hw_gas_boilers = None
 
             if self.station_el_hw_on[station_name]:
-                hw_el_boilers = block_creator.get_el_boilers_with_constraint(global_id(), local_id(), station_name, el_boiler_group ,hw_el_boilers_power, hw_bus, el_boilers_hw_var_cost)
+                hw_el_boilers = block_creator.get_el_boilers_with_constraint(global_id(), local_id(), station_name, el_boiler_group, hw_el_boilers_power, hw_bus, el_boilers_hw_var_cost)
 
             if self.station_gas_hw_on[station_name]:
                 hw_gas_boilers = block_creator.get_gas_boilers(global_id(), local_id(), station_name, hw_gas_boilers_power , hw_bus, gas_boilers_hw_var_cost)
@@ -1102,11 +1119,12 @@ class Specific_stations:
                 else:                                                        # все тепловые нагрузки
                     [pt_t_60_el_1, pt_p_60_1, pt_t_60_1] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.01)
                     [pt_t_60_el_2, pt_p_60_2, pt_t_60_2] = block_creator.get_pt_60(global_id(), local_id(), station_name, steam_bus, hw_bus, not_fuel_var_cost, 0.02)
-                    [ccgt_chp_222_el, ccgt_chp_222_hw] = block_creator.get_ccgt_сhp_222_detail(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
+                    # [ccgt_chp_222_el, ccgt_chp_222_hw] = block_creator.get_ccgt_сhp_222_detail(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
+                    ccgt_chp_222 = block_creator.get_ccgt_сhp_222_simple(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0.01)
                     t_100_1 = turbine_T_factory.get_t_100(global_id(), local_id(), station_name, hw_bus, not_fuel_var_cost, 0)
-                    el_turb = [pt_t_60_el_1, pt_t_60_el_2, ccgt_chp_222_el, t_100_1]
+                    el_turb = [pt_t_60_el_1, pt_t_60_el_2, ccgt_chp_222, t_100_1]
                     steam_turb = [pt_p_60_1, pt_p_60_2]
-                    hw_turb = [pt_t_60_1, pt_t_60_2, ccgt_chp_222_hw, t_100_1]
+                    hw_turb = [pt_t_60_1, pt_t_60_2, t_100_1, ccgt_chp_222]
 
 
 
@@ -2413,14 +2431,15 @@ class Specific_stations:
             block_creator = self.block_creator
             create_sink_abs = self.sink_creator.create_sink_absolute_demand
             create_buses = self.bus_creator.create_buses
+            el_boiler_group = self.el_boiler_groups['электрокотлы Белэнерго']
+
             hw_name = 'гвс'
             hw_bus = create_buses(set_label(station_name, hw_name))
             el_boilers_hw_var_cost = self.el_boiler_hw_var_cost[station_name]
             gas_boilers_hw_var_cost = self.gas_boiler_hw_var_cost[station_name]
 
 
-            heat_to_power = 1.9
-            
+            heat_to_power = (34.4 * 1.163) / 20
             max_active_year_power = 470
             nominal_el_value = max_active_year_power
 
@@ -2441,9 +2460,9 @@ class Specific_stations:
 
             if self.station_el_hw_on[station_name]:
                 if self.el_boiler_hw_infinity[station_name]:
-                        hw_el_boilers = block_creator.get_el_boilers(global_id(), local_id(), station_name, 100_000, hw_bus, el_boilers_hw_var_cost)
+                        hw_el_boilers = block_creator.get_el_boilers_with_constraint(global_id(), local_id(), station_name, el_boiler_group, 100_000, hw_bus, el_boilers_hw_var_cost)
                 else:
-                    hw_el_boilers = block_creator.get_el_boilers(global_id(), local_id(), station_name, 34.4 * 1.163, hw_bus, el_boilers_hw_var_cost)
+                    hw_el_boilers = block_creator.get_el_boilers_with_constraint(global_id(), local_id(), station_name, el_boiler_group, 34.4 * 1.163, hw_bus, el_boilers_hw_var_cost)
  
             
             if self.station_gas_hw_on[station_name]:

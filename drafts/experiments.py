@@ -7,6 +7,9 @@ import matplotlib as plt
 
 
 
+a = {'a':1, 'b':2}
+
+
 # gas_volume = 25.53
 
 # fig = plt.figure()

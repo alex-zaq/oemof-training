@@ -10,6 +10,127 @@ from custom_modules.helpers import convert_Mwth_to_1000_m3
 
 
 
+class Custom_excel_result_converter:
+    
+    def __init__(self, case_info, custom_es, custom_result_plotter, custom_result_extractor):
+        self.case_info = case_info
+        self.custom_es = custom_es
+        self.result_extractor = custom_result_extractor
+        self.result_plotter = custom_result_plotter
+        
+        
+    def get_sql_style_dataframe(self):
+        el_bus = self.custom_es.global_input_bus
+        gas_bus = self.custom_es.global_input_bus
+        el_sink = self.custom_es.global_elictricity_sink
+        
+        gas_total_consumption_df = self.result_extractor.get_dataframe_total_gas_consumption()
+        el_boiler_hw_consumption_df = self.result_extractor.get_dataframe_el_boilers_total_consumption('гвс')
+        full_el_generation_df = self.result_extractor.get_total_electricity_generation_value()
+        orig_el_demand_df = self.result_extractor.get_dataframe_orig_electricity_demand()
+        online_power_df = self.result_extractor.get_dataframe_online_power()
+
+
+        additional_info = {
+            'потребление газа': gas_total_consumption_df,
+            'потребление электрокотлов': el_boiler_hw_consumption_df,
+            'полная выработка': full_el_generation_df,
+            'исходный спрос': orig_el_demand_df,
+            'включенная мощность':  online_power_df
+        }
+
+
+        if self.result_plotter.select_plot_type != 0:
+            raise Exception('Недопустимые параметры')
+        
+        gen_by_block = self.result_plotter.get_dataframe_by_commodity_type('электроэнергия')
+
+
+
+
+
+        block_info_all= list(gen_by_block.columns)
+        time_stamp = list(gen_by_block.index)
+
+        # block_count = len(block_info_all.index)
+        # sql_like_df = pd.DataFrame(columns = ['timestamp', 'station_name', 'station_type', 'block_name', 'block_type', 'active_power'])
+        # numbers_1 = [ '0' + str(i) + '_' for i in range(0,10)]
+        # numbers_2 = [ str(i)+'_' for i in range(10, block_count + 1)]
+        # numbers = numbers_1 + numbers_2
+
+        # key = '|'.join([info['station_name'], info['station_type'], el_block.label, info['block_type']]) 
+
+        i = 0
+        # k = 0
+        month = self.case_info['month']
+        sql_like_df = pd.DataFrame()
+        for block_info in block_info_all:
+            number_block = '0'+ str(i) if i < 10 else str(i)
+            for j, hour in enumerate(time_stamp):
+                info = block_info.split('|')
+                number_station = '0'+ str(info[4]) if int(info[4]) < 10 else str(info[4])
+                power = gen_by_block[block_info][j]
+                sql_like_df = sql_like_df.append({'timestamp': hour,
+                                                   'month': month,
+                                                  'station_name': number_station + '_' + info[0],
+                                                  'station_type':info[1],
+                                                  'block_name': number_block + '_' +info[2],
+                                                  'block_type':info[3],
+                                                  'active_power':power }, ignore_index = True)
+            i = i + 1
+
+
+        number_station = int(number_station) + 1        
+        for add_info in additional_info.keys():
+            number_block = '0'+ str(i) if i < 10 else str(i)
+            for j, hour in enumerate(time_stamp):
+                sql_like_df = sql_like_df.append({
+                                        'timestamp': hour,
+                                         'month': month,
+                                        'station_name': str(number_station) + '_' + add_info,
+                                        'station_type':'-',
+                                        'block_name': number_block+'_'+add_info,
+                                        'block_type': '-',
+                                        'active_power': additional_info[add_info][j]}, ignore_index = True)
+            i = i + 1
+            number_station = number_station + 1
+        
+
+
+        return sql_like_df
+
+                # sql_like_df = sql_like_df.append({ 'blocks_type':block_type, 'timestamp': hour, 'power':power  }, ignore_index = True)
+
+
+
+        # return sql_like_df
+            
+        
+        #  столбец месяца и года станции типов турбин названий станций типов станций, тип энергии
+        #  +столбец потребления электрокотлов
+        #  переименовать станции
+        #  +полной потребление
+        #  +добавить столбец - профиль потребления газа млн м3
+        #  +добавить столбец исходного электрического спроса
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Custom_result_extractor:
     def __init__(self, custom_es, processed_results):
         self.custom_es = custom_es
@@ -42,13 +163,24 @@ class Custom_result_extractor:
         total_gas_consumption = round(total_gas_consumption_1000_m3 / divider, 1) 
         return total_gas_consumption
     
-    def get_dataframe_gas_consumption(self):
-        # results = solph.views.node(self.processed_results, self.custom_es.global_input_bus)["sequences"].dropna()      
-        # res = pd.DataFrame()
-        # res['Потребление газа'] = results[((self.custom_es.global_output_bus.label, self.gobal_elictricity_sink.label),'flow')]
-        # return res            
-        pass
+    def get_dataframe_block_gas_consumption(self):
+        all_blocks = self.custom_es.model_block_list
+        gas_bus = self.custom_es.global_input_bus
+        res = pd.DataFrame()
+        results = solph.views.node(self.processed_results, gas_bus.label)["sequences"].dropna() 
+        
+        for block in all_blocks:
+            inputs = [input for input in block.inputs]
+            if gas_bus in inputs:
+                res[block.label] = results[((gas_bus.label, block.label), 'flow')]
+        return res
     
+    
+    def get_dataframe_total_gas_consumption(self):
+        all_gas_blocks = self.get_dataframe_block_gas_consumption()
+        res = all_gas_blocks.sum(axis=1)
+        return res
+
             
 
     def get_total_gas_consumtion_by_block_type(self, block_type):
@@ -73,11 +205,22 @@ class Custom_result_extractor:
         'возвращает исходный профиль электрической нагрузки'
         results = solph.views.node(self.processed_results, self.custom_es.global_output_bus)["sequences"].dropna()      
         res = pd.DataFrame()
-        res[self.gobal_elictricity_sink.label] = results[((self.custom_es.global_output_bus.label, self.gobal_elictricity_sink.label),'flow')]
+        res[self.custom_es.global_elictricity_sink.label] = results[((self.custom_es.global_output_bus, self.custom_es.global_elictricity_sink),'flow')]
+        res = res.squeeze()
         return res              
     
     def get_total_electricity_generation_value(self):
-        pass
+        all_el_block = self.custom_es.get_all_el_blocks()
+        el_bus = self.custom_es.global_output_bus 
+        results = solph.views.node(self.processed_results, el_bus)["sequences"].dropna()  
+        res = pd.DataFrame()
+        
+        for el_block in all_el_block:
+            res[el_block.label] = results[((el_block, el_bus), 'flow')]
+                
+        res = res.sum(axis=1)
+        return res
+    
     
     def get_chp_el_energy_by_station(self, station_name):
         'получить электроэнергию выработанную на тепловом потреблении для указанной станции'
@@ -139,13 +282,32 @@ class Custom_result_extractor:
     def get_max_el_boilers_load_value(self):
         pass
     
-    def get_dataframe_el_boilers_consumption(self, commodite_type):
+    def get_dataframe_el_boilers_station_consumption(self, commodite_type):
         'получить датафрейм потребления всех электрокотлов (ГВС или ПАР)'
-        pass
+        el_boilers = self.custom_es.get_el_boilers_by_commodity(commodite_type)
+        el_bus = self.custom_es.global_output_bus 
+        results = solph.views.node(self.processed_results, el_bus)["sequences"].dropna()    
+        print(results.keys())
+        
+        # for key in results.keys():
+        #     print(key)
+        #     print(results[key])
+        
+        
+        res = pd.DataFrame()
+        for el_boiler in el_boilers:
+            inputs = [input for input in el_boiler.inputs]
+            if el_bus in inputs:
+                res[el_boiler.label] = results[((el_bus, el_boiler), 'flow')]
+            # res[el_boiler.label] = results[((el_boiler.label, el_bus.label), 'flow')]
+        return res
+        
+        
     
-    def get_dataframe_el_boilers_consumption_by_station(self, station_name, commodite_type):
-        'получить датафрейм потребления электрокотлов указ. типа (гвс или пар) для указанной станции'
-        pass
+    def get_dataframe_el_boilers_total_consumption(self, commodite_type):
+        el_boilers_commodity = self.get_dataframe_el_boilers_station_consumption(commodite_type)
+        res = el_boilers_commodity.sum(axis=1)
+        return res
     
     def get_total_el_boilers_consumption_value(self, commodite_type):
         'получить  потребление всех электрокотлов указ. типа (гвс или пар)'
@@ -179,6 +341,7 @@ class Custom_result_extractor:
         blocks_df = blocks_df.sum(axis=1)
         blocks_df = pd.DataFrame(blocks_df)
         blocks_df.columns = ['Включенная мощность']
+        blocks_df = blocks_df.squeeze()
         return blocks_df  
     
     def get_dataframe_online_power_by_station(self, station_name):
@@ -234,7 +397,9 @@ class Custom_result_grouper:
     def get_dataframe_by_commodity_type(self, commodity_type):
         'общий метод расчета результирующего датарфрейма' 
         '(commodite_type = электроэнергия, гвс, пар)'
-        if self.select_plot_type == 1:
+        if self.select_plot_type == 0:
+            res = self.__get_dataframe_for_excel(commodity_type)
+        elif self.select_plot_type == 1:
             res = self.__get_dataframe_block_station_plot_1(commodity_type)
         elif self.select_plot_type == 2:
             res = self.__get_dataframe_block_station_type_plot_2(commodity_type)
@@ -272,6 +437,72 @@ class Custom_result_grouper:
         elif commodity_type == 'пар':
             return self.custom_es.get_all_steam_blocks()
             
+        
+    def __get_dataframe_for_excel(self, commodity_type):
+        def __comparator_for_excel(b1, b2):
+            b1_station_order = b1.group_options['station_order']
+            b2_station_order = b2.group_options['station_order']
+            if b1_station_order == b2_station_order:
+                b1_block_type_order = b1.group_options['block_type_order']
+                b2_block_type_order = b2.group_options['block_type_order']
+                if b1_block_type_order == b2_block_type_order:
+                    b1_power = b1.group_options['nominal_value']
+                    b2_power = b2.group_options['nominal_value']
+                    if b1_power == b2_power:
+                        return 0
+                    elif b1_power > b2_power:
+                        return -1
+                    elif b1_power < b2_power:
+                        return 1
+                elif b1_block_type_order > b2_block_type_order:
+                    return 1
+                elif b1_block_type_order < b2_block_type_order:
+                    return -1
+            elif b1_station_order > b2_station_order:
+                return 1
+            elif b1_station_order < b2_station_order:
+                return -1
+        def get_dataframe_for_excel_by_commodity(sorted_blocks, commodite_type):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.get_global_output_flow()
+                results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                res = pd.DataFrame()
+                for el_block in sorted_blocks:
+                     info = el_block.group_options
+                     key = '|'.join([info['station_name'], info['station_type'], 
+                            el_block.label, info['block_type'], str(info['station_order'])])
+                     res[key] = results[((el_block.label, output_bus.label), 'flow')]
+                res[res < 0] = 0     
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res    
+            elif commodity_type in ['гвс', 'пар']:
+                i = 0
+                length = len(sorted_blocks)
+                res = pd.DataFrame()
+                bus_getter = self.custom_es.get_heat_water_bus_by_station if commodite_type == 'гвс' else self.custom_es.get_steam_bus_by_station
+                while i < length:
+                    current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                    current_station_name_inner = current_station_name_outer
+                    current_energy_bus = bus_getter(current_station_name_inner) 
+                    hw_proccessed_results = solph.views.node(self.processed_results, current_energy_bus.label)["sequences"].dropna()
+                    while current_station_name_inner == current_station_name_outer and i < length:
+                        res[sorted_blocks[i].label] = hw_proccessed_results[((sorted_blocks[i].label, current_energy_bus.label), 'flow')]
+                        i = i + 1
+                        if i < length:
+                           current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                        else:
+                            break
+                res[res < 0] = 0   
+                res = res.loc[:, (res > 0.1).any(axis=0)]
+                return res
+        
+        
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_for_excel))
+        res = get_dataframe_for_excel_by_commodity(sorted_blocks, commodity_type)
+        return res   
+        
+        
         
         
     def __get_dataframe_block_station_plot_1(self, commodity_type):
@@ -331,23 +562,7 @@ class Custom_result_grouper:
         
         
         blocks = self.__get_block_by_commodity_type(commodity_type)
-        # for block in blocks:
-        #     print(block.group_options['station_name'],
-        #           block.group_options['station_order'],
-        #           block.group_options['block_type'],
-        #           block.group_options['block_type_order'],
-        #           block.group_options['nominal_value'])
-        # print('----------------------------------------------')
         sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_station_plot_1))
-        # sorted(blocks, key = __comparator_block_station_plot_1)
-        # blocks.sort(key = __comparator_block_station_plot_1 )
-        # for block in blocks:
-        #     print(block.group_options['station_name'],
-        #           block.group_options['station_order'],
-        #           block.group_options['block_type'],
-        #           block.group_options['block_type_order'],
-        #           block.group_options['nominal_value'])
-        # blocks.sort(key = __comparator_block_station_plot_1)
         res = get_dataframe_plot_1_by_commodity(sorted_blocks, commodity_type)
         return res      
     
@@ -831,6 +1046,12 @@ class Custom_result_grouper:
         sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_type_station_type_plot_6))          
         res = get_dataframe_plot_6_by_commodity(sorted_blocks, commodity_type)
         return res
+    
+    
+    def set_result_for_excel(self, blocks, station):
+        self.custom_es.set_station_type_with_order(station)
+        self.custom_es.set_block_type_in_station_order(blocks)
+        self.select_plot_type = 0
     
         
     def set_block_station_plot_1(self, data):

@@ -26,8 +26,8 @@ class Generic_buses:
 
 class Generic_blocks:
 
-        def __init__(self, es) -> None:
-            # self.block_collection = block_collection
+        def __init__(self, es, model_blocks_list) -> None:
+            self.model_blocks_list = model_blocks_list
             self.es = es
 
         def create_simple_transformer(
@@ -47,8 +47,8 @@ class Generic_blocks:
             )
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(tr) 
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(tr) 
             return tr
         
         
@@ -71,8 +71,8 @@ class Generic_blocks:
             )
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(tr) 
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(tr) 
             return tr
         
         
@@ -97,8 +97,8 @@ class Generic_blocks:
             )
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(tr) 
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(tr) 
             return tr
     
     
@@ -130,8 +130,8 @@ class Generic_blocks:
             )
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(tr) 
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(tr) 
             return tr
 
         def create_offset_transformer(
@@ -180,8 +180,8 @@ class Generic_blocks:
             # print(tr.max_up_down())
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(tr) 
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(tr) 
             return tr
 
         def create_NPP_block(
@@ -214,6 +214,8 @@ class Generic_blocks:
                 
             npp_block.group_options = group_options
             self.es.add(npp_block)
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(npp_block)
             return npp_block
 
         def create_chp_PT_turbine(
@@ -275,10 +277,10 @@ class Generic_blocks:
             )
             main_output_tr.group_options = deepcopy(group_options)
             self.es.add(P_mode_tr, T_mode_tr, main_output_tr)
-            # if isinstance(self.block_collection, list):
-            #     self.block_collection.append(P_mode_tr)
-            #     self.block_collection.append(T_mode_tr)
-            #     self.block_collection.append(main_output_tr)
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(P_mode_tr)
+                self.model_blocks_list.append(T_mode_tr)
+                self.model_blocks_list.append(main_output_tr)
             return [main_output_tr, P_mode_tr, T_mode_tr]
    
         def create_chp_PT_turbine_full_P_mode(
@@ -317,8 +319,8 @@ class Generic_blocks:
             )
             pt_full_P_mode.group_options = group_options
             self.es.add(pt_full_P_mode)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(pt_full_P_mode)
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(pt_full_P_mode)
             return pt_full_P_mode
 
         def create_chp_PT_turbine_full_T_mode(
@@ -354,8 +356,8 @@ class Generic_blocks:
             )
             pt_full_T_mode.group_options = group_options
             self.es.add(pt_full_T_mode)
-            # if isinstance(self.block_collection, list):
-                #  self.block_collection.append(pt_full_T_mode)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(pt_full_T_mode)
             return pt_full_T_mode
 
         def create_chp_T_turbine_detail(
@@ -414,8 +416,8 @@ class Generic_blocks:
             )
             T_turbine.group_options = group_options
             self.es.add(T_turbine)
-            # if isinstance(self.block_collection, list):
-                #  self.block_collection.append(T_turbine)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(T_turbine)
             return T_turbine
         
         
@@ -437,7 +439,7 @@ class Generic_blocks:
             label= set_label(group_options['station_name'], group_options['block_name'], group_options['local_index']),
             inputs = {input_flow: solph.Flow()},
             outputs = {output_flow_el: solph.Flow( nominal_value = nominal_el_value, min = min_power_fraction, variable_costs = not_fuel_var_cost + extra_variable_cost,
-                                    nonconvex = solph.NonConvex(                      
+                                        nonconvex = solph.NonConvex(                      
                                         initial_status = start_up_options['initial_status'],
                                         startup_costs =  start_up_options['start_up_cost'], 
                                         shutdown_costs = start_up_options['shout_down_cost'],
@@ -449,6 +451,8 @@ class Generic_blocks:
             ) 
             tr.group_options = group_options
             self.es.add(tr)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(tr)
             return tr
         
         
@@ -513,6 +517,10 @@ class Generic_blocks:
             )
             ccgt_el_part.group_options = deepcopy(group_options)
             self.es.add(ccgt_inner_condensing, ccgt_el_part, ccgt_hw_part)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(ccgt_inner_condensing)
+                 self.model_blocks_list.append(ccgt_hw_part)
+                 self.model_blocks_list.append(ccgt_el_part)
             return [ccgt_el_part, ccgt_hw_part]
             
         
@@ -538,8 +546,8 @@ class Generic_blocks:
             ) 
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                #  self.block_collection.append(tr)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(tr)
             return tr
 
         def create_back_pressure_turbine(
@@ -571,8 +579,8 @@ class Generic_blocks:
             ) 
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                #  self.block_collection.append(tr)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(tr)
             return tr
 
  
@@ -581,25 +589,27 @@ class Generic_blocks:
         
 class Generic_sinks:
 
-        def __init__(self, es) -> None:
-            # self.block_collection = block_collection
+        def __init__(self, es, model_blocks_list) -> None:
+            self.model_blocks_list = model_blocks_list
             self.es = es		
 
         def create_sink_absolute_demand(self, label, input_flow, demand_absolute_data):
             sink = solph.components.Sink(label=label, inputs = {input_flow: solph.Flow(nominal_value=1, fix = demand_absolute_data)})
             self.es.add(sink)
-            # self.block_collection.append(sink)
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(sink)
             return sink	
         def create_sink_fraction_demand(self, label, input_flow, demand_profile, peak_load):
             sink = solph.components.Sink(label=label, inputs = {input_flow: solph.Flow(nominal_value = peak_load, fix = demand_profile)})
             self.es.add(sink)
-            # self.block_collection.append(sink)
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(sink)
             return sink
 
 class Generic_sources:
 
-        def __init__(self, es) -> None:
-            # self.block_collection = block_collection
+        def __init__(self, es, model_blocks_list) -> None:
+            self.model_blocks_list = model_blocks_list
             self.es = es
         
         def create_source(self, nominal_value, output_flow, variable_costs, group_options):
@@ -609,8 +619,8 @@ class Generic_sources:
             )
             source.group_options = group_options
             self.es.add(source)
-            # if isinstance(self.block_collection, list):
-                #  self.block_collection.append(source)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(source)
             return source
         
         def create_source_with_fixed_load(
@@ -627,8 +637,8 @@ class Generic_sources:
             )
             tr.group_options = group_options
             self.es.add(tr)
-            # if isinstance(self.block_collection, list):
-                # self.block_collection.append(tr) 
+            if isinstance(self.model_blocks_list, list):
+                self.model_blocks_list.append(tr) 
             return tr
     
 
@@ -637,8 +647,8 @@ class Generic_sources:
             label= label, 
             outputs = {output_flow: solph.Flow(variable_costs = variable_costs)} )
             self.es.add(source)
-            # if isinstance(self.block_collection, list):
-                #  self.block_collection.append(source)
+            if isinstance(self.model_blocks_list, list):
+                 self.model_blocks_list.append(source)
             return source
             
 

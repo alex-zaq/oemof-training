@@ -11,14 +11,15 @@ from custom_modules.excel_operations import import_dataframe_to_excel, create_re
 from custom_modules.specific_stations import Specific_stations
 from custom_modules.generic_blocks import Generic_buses, Generic_sinks, Generic_sources
 from custom_modules.helpers import set_natural_gas_price, get_time_slice, find_first_monday, months, get_peak_load_by_energy_2020, rename_station
-from custom_modules.result_proccessing import Custom_result_grouper, Custom_result_extractor
+from custom_modules.result_proccessing import Custom_result_grouper, Custom_result_extractor, Custom_excel_result_converter
 from custom_modules.scenario_builder import Scenario_builder
 
  
  
-month = 'февраль'
-day_of_week = 'рабочий'
-year = 2022 
+case_info = dict( 
+    month = 'февраль',
+    day_of_week = 'рабочий',
+    year = 2022 )
 
 
 
@@ -86,23 +87,25 @@ el_boilers_hw_groups = {
 [el_bus, gas_bus] = Generic_buses(es).create_buses('электричество_поток','природный_газ_поток')
 custom_es = Specific_stations(es, gas_bus, el_bus)
 
-shout_down_lst = 10 * [0] + 14 * [999999]
+shout_down_lst = 10 * [0] + 14 * [10e10]
 custom_es.set_start_up_options(initial_status = 1, shout_down_cost = shout_down_lst ,
-                start_up_cost= 10e8, maximum_shutdowns = 1, maximum_startups = 100 )
+                start_up_cost= 10e10, maximum_shutdowns = 1, maximum_startups = 100 )
 
 ##################################################################################################
 # Настройка сценария
 ##################################################################################################
 scen_builder = Scenario_builder(custom_es)
-# scen_builder.disable_all_exist_turb_by_station_name('Лукомольская ГРЭС', 'Березовская ГРЭС', 'Минская ТЭЦ-5')
+scen_builder.disable_all_exist_turb_by_station_name('Лукомольская ГРЭС', 'Березовская ГРЭС', 'Минская ТЭЦ-5')
 scen_builder.add_constraint_for_el_boiler_group(el_boilers_hw_groups['электрокотлы Белэнерго'], 916)
 # scen_builder.set_electricity_profile(elictricity_profile = main_power_profile_rel)
 # scen_builder.set_electricity_level(energy_level_in_billion_kWth = 39)
 scen_builder.set_electricity_demand_abs(odu_power_febrary)
 scen_builder.set_turbine_T_modelling_type('detail')
-scen_builder.set_natural_gas_price(usd_per_1000_m3 = 10)
-scen_builder.set_bel_npp_vver_1200_first_options(active_status = 1, min_power_fraction=0.75, fix_load=False)
-scen_builder.set_bel_npp_vver_1200_second_options(active_status = 1, min_power_fraction=0.75, fix_load=False)
+scen_builder.set_natural_gas_price(usd_per_1000_m3 = 180)
+# scen_builder.set_bel_npp_vver_1200_first_options(active_status = 1, min_power_fraction=0.75, fix_load=False)
+# scen_builder.set_bel_npp_vver_1200_second_options(active_status = 1, min_power_fraction=0.75, fix_load=False)
+scen_builder.set_bel_npp_vver_1200_first_options(active_status = 1, min_power_fraction= 1, fix_load= True)
+scen_builder.set_bel_npp_vver_1200_second_options(active_status = 1, min_power_fraction= 1, fix_load= True)
 scen_builder.add_inifinity_el_boilers_hw_for_all_large_chp()
 # scen_builder.disable_all_exist_turb_by_station_name('Березовская ГРЭС', 'Минская ТЭЦ-5')
 # scen_builder.enable_gas_boiler_hw().add_inifinity_gas_boilers_hw_for_all_large_chp().set_gas_boilers_hw_variable_cost(99999)
@@ -182,6 +185,7 @@ district_boilers_Belenergo = custom_es.add_district_boilers_Belenergo(heat_water
 el_boilers_hw = custom_es.get_install_el_boilers_hw_power()
 custom_es.print_el_boilers_hw_by_station()
 
+# res = custom_es.get_el_boilers_by_commodity('гвс')
 ##################################################################################################
 # Выполнение расчета 
 ##################################################################################################
@@ -190,38 +194,115 @@ model.solve(solver="cplex")
 results = solph.processing.results(model)
 result_plotter = Custom_result_grouper(custom_es, results)
 result_extractor = Custom_result_extractor(custom_es, results)
+excel_result_converter = Custom_excel_result_converter(case_info, custom_es ,result_plotter, result_extractor)
 ##################################################################################################
 # Настройка группировки результатов
 ##################################################################################################
+
+# res = result_extractor.get_dataframe_block_gas_consumption()
+
+# res2  = result_extractor.get_dataframe_total_gas_consumption()
+
+
+# res  = result_extractor.get_dataframe_el_boilers_station_consumption('гвс')
+# res2  = result_extractor.get_dataframe_el_boilers_consumption_by_station('гвс')
+
+
+# res  = result_extractor.get_total_electricity_generation_value()
+
 
 el_boilers_power = result_extractor.get_install_el_boilers_power('гвс')
 print('Мощность электрокотлов-гвс: ', el_boilers_power)
 
 
-# result_plotter.set_block_station_plot_1({
-#     bel_npp: ['ввэр'],
-#     # new_npp: ['ввэр'],
-#     block_station: ['блок-станции-газ'],
-#     small_tec: ['малые тэц', 'эк', 'кот'],
+result_plotter.set_result_for_excel({
+    bel_npp: ['ввэр'],
+    # new_npp: ['ввэр'],
+    block_station: ['блок-станции-газ'],
+    small_tec: ['малые тэц', 'эк', 'кот'],
 
-#     novopockay_tec: ['р','пт', 'эк' ,'кот'],
-#     minskay_tec_3: ['пт','т', 'пгу-тэц' ,'эк', 'кот'],
-#     svetlogorskay_tec: ['р','пт', 'т', 'эк', 'кот'],
-#     mogilevskya_tec_2: ['р', 'пт', 'гту', 'эк', 'кот'],
-#     bobryskay_tec_2: ['пт','гту','эк','кот'],
-#     mozyrskay_tec_2: ['пт','эк','кот'],
-#     grodnenskay_tec_2: ['р','пт','гту-тэц','эк', 'кот'],
-#     gomelskay_tec_2: ['т','эк','кот'],
-#     minskay_tec_4: ['пт','т','эк', 'кот'],
+    novopockay_tec: ['р','пт', 'эк' ,'кот'],
+    minskay_tec_3: ['пт','т', 'пгу-тэц' ,'эк', 'кот'],
+    svetlogorskay_tec: ['р','пт', 'т', 'эк', 'кот'],
+    mogilevskya_tec_2: ['р', 'пт', 'гту', 'эк', 'кот'],
+    bobryskay_tec_2: ['пт','гту','эк','кот'],
+    mozyrskay_tec_2: ['пт','эк','кот'],
+    grodnenskay_tec_2: ['р','пт','гту-тэц','эк', 'кот'],
+    gomelskay_tec_2: ['т','эк','кот'],
+    minskay_tec_4: ['пт','т','эк', 'кот'],
 
-#     lukomolskay_gres: ['пгу-кэс','к','эк', 'кот'],
-#     berezovskay_gres: ['пгу-кэс','к', 'гту','эк', 'кот'],
-#     minskay_tec_5: ['пгу-кэс', 'к'],
-#     # new_ocgt: ['гту'],
-#     renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
-#     district_boilers_Belenergo: ['эк', 'кот'],
-#     # district_boilers: ['эк','кот']
-# })
+    lukomolskay_gres: ['пгу-кэс','к','эк', 'кот'],
+    berezovskay_gres: ['пгу-кэс','к', 'гту','эк', 'кот'],
+    minskay_tec_5: ['пгу-кэс', 'к'],
+    renewables: ['виэ-вода','виэ-ветер','виэ-солнце'],
+    district_boilers_Belenergo: ['эк', 'кот'],
+    # district_boilers: ['эк','кот']
+},
+                                        
+{
+    'аэс':[bel_npp],
+    'блок-станции': [block_station],
+    'тэц': [small_tec, 
+            novopockay_tec,
+            minskay_tec_3,
+            svetlogorskay_tec,
+            mogilevskya_tec_2,
+            bobryskay_tec_2,
+            mozyrskay_tec_2,
+            grodnenskay_tec_2,
+            gomelskay_tec_2,
+            minskay_tec_4],
+    
+    'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
+    'виэ': [renewables],
+    'котельные Белэнерго': [district_boilers_Belenergo]
+})
+
+
+results_for_excel_df = excel_result_converter.get_sql_style_dataframe()
+import_dataframe_to_excel(results_for_excel_df, './results/', 'res_detail_2.xlsx')
+
+
+
+# test_df = result_plotter.get_dataframe_by_commodity_type('электроэнергия')
+
+##################################################################################################
+
+# result_plotter.set_station_plot_3(
+#   [ bel_npp,
+#     block_station,
+#     small_tec,
+#     novopockay_tec,
+#     minskay_tec_3,
+#     svetlogorskay_tec,
+#     mogilevskya_tec_2,
+#     bobryskay_tec_2,
+#     mozyrskay_tec_2,
+#     grodnenskay_tec_2,
+#     gomelskay_tec_2,
+#     minskay_tec_4,
+#     lukomolskay_gres,
+#     berezovskay_gres,
+#     minskay_tec_5,
+#     renewables,
+#     district_boilers_Belenergo
+#     # district_boilers,
+#     # fake_el_source
+#     ]
+    
+
+    
+    
+# )
+
+
+
+
+
+
+
+
+
 
 ##################################################################################################
 # result_plotter.set_station_plot_3(
@@ -251,56 +332,56 @@ print('Мощность электрокотлов-гвс: ', el_boilers_power)
 ##################################################################################################
 
 
-result_plotter.set_station_type_plot_4(
-{
-    'аэс':[bel_npp],
-    'блок-станции': [block_station],
-    'тэц': [small_tec, 
-            novopockay_tec,
-            minskay_tec_3,
-            svetlogorskay_tec,
-            mogilevskya_tec_2,
-            bobryskay_tec_2,
-            mozyrskay_tec_2,
-            grodnenskay_tec_2,
-            gomelskay_tec_2,
-            minskay_tec_4],
+# result_plotter.set_station_type_plot_4(
+# {
+#     'аэс':[bel_npp],
+#     'блок-станции': [block_station],
+#     'тэц': [small_tec, 
+#             novopockay_tec,
+#             minskay_tec_3,
+#             svetlogorskay_tec,
+#             mogilevskya_tec_2,
+#             bobryskay_tec_2,
+#             mozyrskay_tec_2,
+#             grodnenskay_tec_2,
+#             gomelskay_tec_2,
+#             minskay_tec_4],
     
-    'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
-    'виэ': [renewables],
-    'котельные Белэнерго': [district_boilers_Belenergo]
-    # 'фейки': [fake_el_source]
-})
+#     'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
+#     'виэ': [renewables],
+#     'котельные Белэнерго': [district_boilers_Belenergo]
+#     # 'фейки': [fake_el_source]
+# })
 ##################################################################################################
 
-result_plotter.set_block_type_station_type_plot_6(
-{
-    'аэс':[bel_npp],
-    'блок-станции': [block_station],
-    'тэц': [small_tec, 
-            novopockay_tec,
-            minskay_tec_3,
-            svetlogorskay_tec,
-            mogilevskya_tec_2,
-            bobryskay_tec_2,
-            mozyrskay_tec_2,
-            grodnenskay_tec_2,
-            gomelskay_tec_2,
-            minskay_tec_4],
+# result_plotter.set_block_type_station_type_plot_6(
+# {
+#     'аэс':[bel_npp],
+#     'блок-станции': [block_station],
+#     'тэц': [small_tec, 
+#             novopockay_tec,
+#             minskay_tec_3,
+#             svetlogorskay_tec,
+#             mogilevskya_tec_2,
+#             bobryskay_tec_2,
+#             mozyrskay_tec_2,
+#             grodnenskay_tec_2,
+#             gomelskay_tec_2,
+#             minskay_tec_4],
     
-    'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
-    'виэ': [renewables],
-    'котельные Белэнерго': [district_boilers_Belenergo]
-},
+#     'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
+#     'виэ': [renewables],
+#     'котельные Белэнерго': [district_boilers_Belenergo]
+# },
 
-{
-    'аэс':['ввэр'],
-    'блок-станции': ['блок-станции-газ'],
-    'тэц':['малые тэц','пгу-тэц','гту-тэц','р','пт','т','гту','эк','кот'],
-    'кэс':['пгу-кэс','к', 'гту', 'эк'],
-    'виэ': ['виэ-вода','виэ-ветер','виэ-солнце'],
-    'котельные Белэнерго': ['эк','кот']
-})
+# {
+#     'аэс':['ввэр'],
+#     'блок-станции': ['блок-станции-газ'],
+#     'тэц':['малые тэц','пгу-тэц','гту-тэц','р','пт','т','гту','эк','кот'],
+#     'кэс':['пгу-кэс','к', 'гту', 'эк'],
+#     'виэ': ['виэ-вода','виэ-ветер','виэ-солнце'],
+#     'котельные Белэнерго': ['эк','кот']
+# })
 
 
 ##################################################################################################
@@ -341,42 +422,45 @@ result_plotter.set_block_type_station_type_plot_6(
 
 
 
-online_power_df = result_extractor.get_dataframe_online_power()
+# online_power_df = result_extractor.get_dataframe_online_power()
 
-el_df = result_plotter.get_dataframe_by_commodity_type('электроэнергия')
-# print(el_df['Минская ТЭЦ-4'])
-hw_df = result_plotter.get_dataframe_by_commodity_type('гвс')
-# steam_df = result_plotter.get_dataframe_by_commodity_type('пар')
-el_demand_orig = result_plotter.get_dataframe_orig_electricity_demand(el_bus, custom_es.gobal_elictricity_sink)
+# el_df = result_plotter.get_dataframe_by_commodity_type('электроэнергия')
+# hw_df = result_plotter.get_dataframe_by_commodity_type('гвс')
+# # steam_df = result_plotter.get_dataframe_by_commodity_type('пар')
+# el_demand_orig = result_plotter.get_dataframe_orig_electricity_demand(el_bus, custom_es.global_elictricity_sink)
 
-scale = 'млн'
-gas_volume = result_extractor.get_total_gas_consumption_value_m3(scale='млн')
-gas_consumption ='газ: ' + str(gas_volume) + ' '+ scale +' м3' 
-gas_consumption = ' ('+ gas_consumption +')'
-print(gas_consumption)
+# scale = 'млн'
+# gas_volume = result_extractor.get_total_gas_consumption_value_m3(scale='млн')
+# gas_consumption ='газ: ' + str(gas_volume) + ' '+ scale +' м3' 
+# gas_consumption = ' ('+ gas_consumption +')'
+# print(gas_consumption)
 
-maxY = 9000
-ax_el = el_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство электричества' + gas_consumption)
-ax_el_demand = el_demand_orig.plot(kind="line", ax = ax_el ,color = 'black', ylim=(0, maxY), style='.-' , legend = 'reverse')
-ax_online_power = online_power_df.plot(kind="line", ax = ax_el ,color = 'red', ylim=(0, maxY), style='.-' , legend = 'reverse')
-# # .legend(fontsize=7, loc="upper right")
-ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'Производство гвс' )
+# maxY = 9000
+# ax_el = el_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство электричества' + gas_consumption)
+# ax_el_demand = el_demand_orig.plot(kind="line", ax = ax_el ,color = 'black', ylim=(0, maxY), style='.-' , legend = 'reverse')
+# ax_online_power = online_power_df.plot(kind="line", ax = ax_el ,color = 'red', ylim=(0, maxY), style='.-' , legend = 'reverse')
+# # # .legend(fontsize=7, loc="upper right")
+# ax_hw = hw_df.plot(kind="area", ylim=(0, maxY),  legend = 'reverse', title = 'Производство гвс' )
 # ax_steam = steam_df.plot(kind="area", ylim=(0, maxY), legend = 'reverse', title = 'Производство пара' )
  
 #  столбец месяца и года станции типов турбин названий станций типов станций, тип энергии
+#  столбей потребления электрокотлов
 #  переименовать станции
-#  добавить столбец - ячейку потребления газа
+#  добавить столбец - профиль потребления газа млн м3
 #  добавить столбец исходного электрического спроса
-#  электрокотлы малых тэц
-#  (сделано)расход газ для блок-станций
-#  подкорректировать включенную мощность
-#  добавить областные ограничения эк
-#  разрешить одновременную работу газ кот и эк
-# + столбец пар и гвс
-# (сделано)  добавить обязательную работу для аэс
 #  сделать excel файл 2023 в двумя блоками
-# сделать расчеты для каждой комбинации и перенести в общий excel файл
 
+#  !сделать расчеты для каждой комбинации и перенести в общий excel файл
+
+
+
+#  (сделано)электрокотлы малых тэц
+#  (сделано)расход газ для блок-станций
+# (сделано)  добавить обязательную работу для аэс
+#  (?)столбец пар и гвс
+#  (?)подкорректировать включенную мощность
+#  (?)добавить областные ограничения эк
+#  (?)разрешить одновременную работу газ кот и эк
 
 
  

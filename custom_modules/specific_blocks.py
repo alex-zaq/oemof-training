@@ -15,14 +15,14 @@ class Specific_blocks:
 
 
 
-        def __init__(self, es, global_natural_gas_flow, global_el_flow, start_up_options):
-            # self.block_collection = block_collection
+        def __init__(self, es, global_natural_gas_flow, global_el_flow, start_up_options, model_blocks_list):
+            self.model_blocks_list = model_blocks_list
             self.start_up_options = start_up_options
             self.global_natural_gas_flow = global_natural_gas_flow
             self.global_el_flow = global_el_flow
             self.es = es
-            self.g_block_creator = Generic_blocks(es)
-            self.g_source_creator = Generic_sources(es)
+            self.g_block_creator = Generic_blocks(es, self.model_blocks_list)
+            self.g_source_creator = Generic_sources(es, self.model_blocks_list)
             self.g_bus_creator = Generic_buses(es)
             self.station_type = {'тэц':'тэц', 'кэс':'кэс', 'аэс':'аэс',
                                  'блок-станции':'блок-станции', 'виэ':'виэ'
@@ -86,7 +86,7 @@ class Specific_blocks:
 
      
         def get_block_collection(self):
-            return self.block_collection
+            return self.model_blocks_list
         
         
  
@@ -580,6 +580,7 @@ class Specific_blocks:
                 heat_to_el = 0.65,
                 not_fuel_var_cost = not_fuel_var_cost,
                 extra_variable_cost = extra_variable_cost,
+                start_up_options = self.start_up_options,
                 boiler_efficiency = 1,
                 group_options = {
                 'global_index': str(global_index),
@@ -1843,7 +1844,7 @@ class Specific_blocks:
             input_flow = self.global_natural_gas_flow,
             output_flow_el = self.global_el_flow,
             output_flow_T = output_flow_T,
-            heat_to_el_T = 1.9,
+            heat_to_el_T = 2,
             efficiency_T= 0.9,
             not_fuel_var_cost = not_fuel_var_cost,
             boiler_efficiency= 0.9,
@@ -1871,7 +1872,7 @@ class Specific_blocks:
             nominal_value = nominal_value,
             input_flow = self.global_natural_gas_flow ,
             output_flow = self.global_el_flow,
-            efficiency = 0.4055,
+            efficiency = ( 1 + 0.8) / ( (1 + 0.8 ) / 0.73),
             not_fuel_var_cost = not_fuel_var_cost,
             fixed_el_load_data_rel = fixed_el_load_data_rel,
             group_options = {

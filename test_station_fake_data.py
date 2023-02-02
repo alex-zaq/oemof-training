@@ -256,7 +256,18 @@ result_plotter.set_result_for_excel({
     'кэс':[minskay_tec_5, lukomolskay_gres, berezovskay_gres],
     'виэ': [renewables],
     'котельные Белэнерго': [district_boilers_Belenergo]
-})
+},
+
+{
+    'аэс':['ввэр'],
+    'блок-станции': ['блок-станции-газ'],
+    'тэц':['малые тэц','пгу-тэц','гту-тэц','р','пт','т','гту','эк','кот'],
+    'кэс':['пгу-кэс','к', 'гту', 'эк'],
+    'виэ': ['виэ-вода','виэ-ветер','виэ-солнце'],
+    'котельные Белэнерго': ['эк','кот']
+}
+
+)
 
 
 results_for_excel_df = excel_result_converter.get_sql_style_dataframe()

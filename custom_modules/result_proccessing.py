@@ -58,7 +58,10 @@ class Custom_excel_result_converter:
         # numbers_2 = [ str(i)+'_' for i in range(10, block_count + 1)]
         # numbers = numbers_1 + numbers_2
 
-        # key = '|'.join([info['station_name'], info['station_type'], el_block.label, info['block_type']]) 
+        # [info['station_name'], info['station_type'], 
+        #                     el_block.label, info['block_type'], str(info['station_order']), str(info['station_type_order']), str(info['block_type_order'])]
+
+
 
         i = 0
         # k = 0
@@ -69,31 +72,42 @@ class Custom_excel_result_converter:
             for j, hour in enumerate(time_stamp):
                 info = block_info.split('|')
                 number_station = '0'+ str(info[4]) if int(info[4]) < 10 else str(info[4])
+                number_station_type = '0'+ str(info[5]) if int(info[5]) < 10 else str(info[5])
+                # number_block_type = '0'+ str(info[6]) if int(info[6]) < 10 else str(info[6])
                 power = gen_by_block[block_info][j]
                 sql_like_df = sql_like_df.append({'timestamp': hour,
                                                    'month': month,
                                                   'station_name': number_station + '_' + info[0],
-                                                  'station_type':info[1],
+                                                  'station_type': number_station_type + '_' + info[1],
                                                   'block_name': number_block + '_' +info[2],
-                                                  'block_type':info[3],
+                                                  'block_type': info[3],
+                                                  'loading level': power/float(info[6]),
                                                   'active_power':power }, ignore_index = True)
             i = i + 1
 
 
-        number_station = int(number_station) + 1        
+        number_station = int(number_station) + 1       
+        number_station_type = int(number_station_type) + 1 
+        # number_block_type = int(number_block_type) + 1 
         for add_info in additional_info.keys():
             number_block = '0'+ str(i) if i < 10 else str(i)
+            number_station = '0'+ str(number_station) if number_station < 10 else str(number_station)
+            number_station_type = '0'+ str(number_station_type) if number_station_type < 10 else str(number_station_type)
+            # number_block_type = '0'+ str(number_block_type) if number_block_type < 10 else str(number_block_type)
             for j, hour in enumerate(time_stamp):
                 sql_like_df = sql_like_df.append({
                                         'timestamp': hour,
                                          'month': month,
-                                        'station_name': str(number_station) + '_' + add_info,
-                                        'station_type':'-',
+                                        'station_name': number_station + '_' + add_info,
+                                        'station_type': number_station_type + '_' + add_info,
                                         'block_name': number_block+'_'+add_info,
-                                        'block_type': '-',
+                                        'block_type': add_info,
+                                        'loading level': '-',
                                         'active_power': additional_info[add_info][j]}, ignore_index = True)
             i = i + 1
-            number_station = number_station + 1
+            number_station = int(number_station) + 1
+            number_station_type = int(number_station_type) + 1
+            # number_block_type = int(number_block_type) + 1
         
 
 
@@ -470,7 +484,7 @@ class Custom_result_grouper:
                 for el_block in sorted_blocks:
                      info = el_block.group_options
                      key = '|'.join([info['station_name'], info['station_type'], 
-                            el_block.label, info['block_type'], str(info['station_order'])])
+                            el_block.label, info['block_type'], str(info['station_order']), str(info['station_type_order']), str(info['nominal_value'])])
                      res[key] = results[((el_block.label, output_bus.label), 'flow')]
                 res[res < 0] = 0     
                 res = res.loc[:, (res > 0.1).any(axis=0)]
@@ -1048,8 +1062,8 @@ class Custom_result_grouper:
         return res
     
     
-    def set_result_for_excel(self, blocks, station):
-        self.custom_es.set_station_type_with_order(station)
+    def set_result_for_excel(self, blocks, stations, station_type):
+        self.custom_es.set_station_type_with_order(stations)
         self.custom_es.set_block_type_in_station_order(blocks)
         self.select_plot_type = 0
     
@@ -1059,9 +1073,9 @@ class Custom_result_grouper:
         self.select_plot_type = 1
        
     
-    def set_block_station_type_plot_2(self, data_station_type, data_bloc_type_station_order):
+    def set_block_station_type_plot_2(self, data_station_type, data_block_type_station_order):
         self.custom_es.set_station_type_with_order(data_station_type)
-        self.custom_es.set_block_type_in_station_type(data_bloc_type_station_order)
+        self.custom_es.set_block_type_in_station_type(data_block_type_station_order)
         self.select_plot_type = 2
     
         

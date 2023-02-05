@@ -145,7 +145,7 @@ scen_builder.disable_el_boiler_steam()
 # scen_builder.reduce_small_chp_demand_by_part(0)
 # scen_builder.add_inifinity_el_boilers_hw_by_station('Малые ТЭЦ').set_el_boilers_hw_var_cost_by_station('Малые ТЭЦ', 2)
 # scen_builder.set_bel_npp_vver_1200_first_options(active_status=0, min_power_fraction=0.75, usd_per_Mwth= -999)
-
+# добавить усановленную мощность виэ
 
 # scen_builder.add_inifinity_el_boilers_hw_small_chp()
 # scen_builder.add_inifinity_gas_boilers_hw_small_chp()

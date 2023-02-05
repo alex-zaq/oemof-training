@@ -110,9 +110,9 @@ class Scenario_builder:
 ######################################################################################################   
 # Удаление существующих источников
 ######################################################################################################   
-    def remove_siemens(self):
+    def remove_large_siemens(self):
         'удалить из энергосистемы энергоисточники siemens'
-        self.custom_es.allow_siemens = False
+        self.custom_es.allow_large_siemens = False
         return self
     
     def reduce_block_station_power_to_minimum(self):

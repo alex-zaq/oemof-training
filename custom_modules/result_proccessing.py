@@ -31,6 +31,14 @@ class Custom_excel_result_converter:
         online_power_df = self.result_extractor.get_dataframe_online_power()
 
 
+        meta_info_exctractor = Meta_info_exctractor(self.custom_es, self.result_plotter.processed_results)
+
+
+        block_type_in_station_type = meta_info_exctractor.get_block_type_in_station_type_dict('электроэнергия')
+        block_type_in_station = meta_info_exctractor.get_block_type_in_station_dict('электроэнергия')
+        gen_by_block = self.result_plotter.get_dataframe_by_commodity_type('электроэнергия')
+
+
         additional_info = {
             'потребление газа': gas_total_consumption_df,
             'потребление электрокотлов': el_boiler_hw_consumption_df,
@@ -42,29 +50,11 @@ class Custom_excel_result_converter:
 
         if self.result_plotter.select_plot_type != 0:
             raise Exception('Недопустимые параметры')
-        
-        gen_by_block = self.result_plotter.get_dataframe_by_commodity_type('электроэнергия')
-
-
-
-
-
-        block_info_all= list(gen_by_block.columns)
-        time_stamp = list(gen_by_block.index)
-
-        # block_count = len(block_info_all.index)
-        # sql_like_df = pd.DataFrame(columns = ['timestamp', 'station_name', 'station_type', 'block_name', 'block_type', 'active_power'])
-        # numbers_1 = [ '0' + str(i) + '_' for i in range(0,10)]
-        # numbers_2 = [ str(i)+'_' for i in range(10, block_count + 1)]
-        # numbers = numbers_1 + numbers_2
-
-        # [info['station_name'], info['station_type'], 
-        #                     el_block.label, info['block_type'], str(info['station_order']), str(info['station_type_order']), str(info['block_type_order'])]
-
 
 
         i = 0
-        # k = 0
+        block_info_all= list(gen_by_block.columns)
+        time_stamp = list(gen_by_block.index)
         month = self.case_info['month']
         sql_like_df = pd.DataFrame()
         for block_info in block_info_all:
@@ -73,14 +63,18 @@ class Custom_excel_result_converter:
                 info = block_info.split('|')
                 number_station = '0'+ str(info[4]) if int(info[4]) < 10 else str(info[4])
                 number_station_type = '0'+ str(info[5]) if int(info[5]) < 10 else str(info[5])
-                # number_block_type = '0'+ str(info[6]) if int(info[6]) < 10 else str(info[6])
+                b_type_in_st_type_num = block_type_in_station_type[info[2]]
+                b_type_in_st_type_num = '0'+ str(b_type_in_st_type_num) if int(b_type_in_st_type_num) < 10 else str(b_type_in_st_type_num)
+                b_type_in_st_num = block_type_in_station[info[2]]
+                b_type_in_st_num = '0'+ str(b_type_in_st_num) if int(b_type_in_st_num) < 10 else str(b_type_in_st_num)
                 power = gen_by_block[block_info][j]
                 sql_like_df = sql_like_df.append({'timestamp': hour,
                                                    'month': month,
                                                   'station_name': number_station + '_' + info[0],
-                                                  'station_type': number_station_type + '_' + info[1],
+                                                  'station_type': number_station_type + '_' + info[1].upper(),
                                                   'block_name': number_block + '_' +info[2],
-                                                  'block_type': info[3],
+                                                  'block_type_in_station_type': b_type_in_st_type_num + '_' + info[3].upper(),
+                                                  'block_type_in_station': b_type_in_st_num + '_' + info[3].upper() +'_'+info[0],
                                                   'loading level': power/float(info[6]),
                                                   'active_power':power }, ignore_index = True)
             i = i + 1
@@ -88,12 +82,15 @@ class Custom_excel_result_converter:
 
         number_station = int(number_station) + 1       
         number_station_type = int(number_station_type) + 1 
+        b_type_in_st_type_num = int(b_type_in_st_type_num) + 1
+        b_type_in_st_num = int(b_type_in_st_num) + 1
         # number_block_type = int(number_block_type) + 1 
         for add_info in additional_info.keys():
             number_block = '0'+ str(i) if i < 10 else str(i)
             number_station = '0'+ str(number_station) if number_station < 10 else str(number_station)
             number_station_type = '0'+ str(number_station_type) if number_station_type < 10 else str(number_station_type)
-            # number_block_type = '0'+ str(number_block_type) if number_block_type < 10 else str(number_block_type)
+            b_type_in_st_type_num = '0'+ str(b_type_in_st_type_num) if int(b_type_in_st_type_num) < 10 else str(b_type_in_st_type_num)
+            b_type_in_st_num = '0'+ str(b_type_in_st_num) if int(b_type_in_st_num) < 10 else str(b_type_in_st_num)
             for j, hour in enumerate(time_stamp):
                 sql_like_df = sql_like_df.append({
                                         'timestamp': hour,
@@ -101,13 +98,15 @@ class Custom_excel_result_converter:
                                         'station_name': number_station + '_' + add_info,
                                         'station_type': number_station_type + '_' + add_info,
                                         'block_name': number_block+'_'+add_info,
-                                        'block_type': add_info,
+                                        'block_type_in_station_type': b_type_in_st_type_num + '_' + add_info,
+                                        'block_type_in_station': b_type_in_st_num + '_' + add_info,
                                         'loading level': '-',
                                         'active_power': additional_info[add_info][j]}, ignore_index = True)
             i = i + 1
             number_station = int(number_station) + 1
             number_station_type = int(number_station_type) + 1
-            # number_block_type = int(number_block_type) + 1
+            b_type_in_st_type_num = int(b_type_in_st_type_num) + 1
+            b_type_in_st_num = int(b_type_in_st_num) + 1
         
 
 
@@ -133,6 +132,139 @@ class Custom_excel_result_converter:
 
 
 
+  
+class Meta_info_exctractor:
+      
+      def __init__(self, custom_es, processed_results):
+          self.custom_es = custom_es
+          self.processed_results = processed_results
+
+      def __get_block_by_commodity_type(self, commodity_type):
+        if commodity_type == 'электроэнергия':
+            data = self.custom_es.get_all_el_blocks()
+            return data
+        elif commodity_type == 'гвс':
+            return  self.custom_es.get_all_heat_water_blocks()
+        elif commodity_type == 'пар':
+            return self.custom_es.get_all_steam_blocks()
+            
+
+      def get_block_type_in_station_type_dict(self, commodity_type):
+        def __comparator_block_type_station_type(b1, b2):
+            b1_station_type_order = b1.group_options['station_type_order']
+            b2_station_type_order = b2.group_options['station_type_order']
+            if b1_station_type_order == b2_station_type_order:
+                b1_block_type_order = b1.group_options['block_type_order_station_type_excel']
+                b2_block_type_order = b2.group_options['block_type_order_station_type_excel']
+                if b1_block_type_order == b2_block_type_order:
+                    return 0
+                elif b1_block_type_order > b2_block_type_order:
+                    return 1
+                elif b1_block_type_order < b2_block_type_order:
+                    return -1
+            elif b1_station_type_order > b2_station_type_order:
+                return 1
+            elif  b1_station_type_order < b2_station_type_order:
+                return -1        
+        def get_dict_with_order(sorted_blocks):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.get_global_output_flow()
+                # results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                length = len(sorted_blocks)
+                i = 0
+                res = {}
+                block_type_number = -1
+                while i < length:
+                    current_station_type_outer = sorted_blocks[i].group_options['station_type']
+                    current_station_type_inner = current_station_type_outer
+
+                    while current_station_type_inner == current_station_type_outer and i < length:
+                        block_type_number = block_type_number + 1 
+                        current_block_type_outer = sorted_blocks[i].group_options['block_type']
+                        current_block_type_inner = current_block_type_outer
+                        # data_to_union[(current_station_type_inner, current_block_type_inner)] = {}
+
+                        while current_block_type_inner == current_block_type_outer and i < length and current_station_type_inner == current_station_type_outer:
+                           
+                            # data = results[((sorted_blocks[i].label, output_bus.label), 'flow')]
+                            # data_to_union[(current_station_type_inner, current_block_type_inner)][sorted_blocks[i].label] = block_type_number
+                            res[sorted_blocks[i].label] = block_type_number
+                            i = i + 1
+                            if i < length:
+                                current_block_type_inner = sorted_blocks[i].group_options['block_type']
+                                current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                                # current_station_name_inner = current_station_name_outer
+                            else:
+                                break
+                        if i < length:
+                                current_station_type_inner = sorted_blocks[i].group_options['station_type']
+                        else:
+                            break
+                return res
+            # elif  commodity_type in ['гвс', 'пар']:
+            #     res = { block.label:i for i, block in enumerate(sorted_blocks)}
+            #     return res
+            
+        
+
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_type_station_type))          
+        res = get_dict_with_order(sorted_blocks)
+        return res
+
+
+      def get_block_type_in_station_dict(self, commodity_type):
+        def __comparator_block_type_station(b1, b2):
+            b1_station_order = b1.group_options['station_order']
+            b2_station_order = b2.group_options['station_order']
+            if b1_station_order == b2_station_order:
+                b1_block_type_order = b1.group_options['block_type_order']
+                b2_block_type_order = b2.group_options['block_type_order']
+                if b1_block_type_order == b2_block_type_order:
+                    return 0
+                elif b1_block_type_order > b2_block_type_order:
+                    return 1
+                elif b1_block_type_order < b2_block_type_order:
+                    return -1
+            elif b1_station_order > b2_station_order:
+                return 1
+            elif b1_station_order < b2_station_order:
+                return -1       
+        def get_dict_with_order(sorted_blocks):
+            if commodity_type == 'электроэнергия':
+                output_bus = self.custom_es.get_global_output_flow()
+                # results = solph.views.node(self.processed_results, output_bus.label)["sequences"].dropna()      
+                length = len(sorted_blocks)
+                i = 0
+                res = {}
+                block_number_station = -1
+                while i < length:
+                    current_station_name_outer = sorted_blocks[i].group_options['station_name']
+                    current_station_name_inner = current_station_name_outer
+
+                    while current_station_name_inner == current_station_name_outer and i < length:
+                        block_number_station = block_number_station + 1
+                        current_block_type_outer = sorted_blocks[i].group_options['block_type']
+                        current_block_type_inner = current_block_type_outer
+                        # data_to_union[(current_station_name_inner, current_block_type_inner)] = {}
+
+                        while current_block_type_inner == current_block_type_outer and i < length and current_station_name_inner == current_station_name_outer:
+                           
+                            # data = results[((sorted_blocks[i].label, output_bus.label), 'flow')]
+                            res[sorted_blocks[i].label] = block_number_station
+                            i = i + 1
+                            if i < length:
+                                current_block_type_inner = sorted_blocks[i].group_options['block_type']
+                                current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                                # current_station_name_inner = current_station_name_outer
+                            else:
+                                break
+                        # i = i + 1
+                        if i < length:
+                                current_station_name_inner = sorted_blocks[i].group_options['station_name']
+                        else:
+                            break
+                return res  
 
 
 
@@ -140,6 +272,11 @@ class Custom_excel_result_converter:
 
 
 
+    
+        blocks = self.__get_block_by_commodity_type(commodity_type)
+        sorted_blocks = sorted(blocks, key = cmp_to_key(__comparator_block_type_station))          
+        res = get_dict_with_order(sorted_blocks)
+        return res
 
 
 
@@ -301,12 +438,6 @@ class Custom_result_extractor:
         el_boilers = self.custom_es.get_el_boilers_by_commodity(commodite_type)
         el_bus = self.custom_es.global_output_bus 
         results = solph.views.node(self.processed_results, el_bus)["sequences"].dropna()    
-        print(results.keys())
-        
-        # for key in results.keys():
-        #     print(key)
-        #     print(results[key])
-        
         
         res = pd.DataFrame()
         for el_boiler in el_boilers:
@@ -1062,40 +1193,50 @@ class Custom_result_grouper:
         return res
     
     
-    def set_result_for_excel(self, blocks, stations, station_type):
+    
+    def set_result_for_excel(self, blocks, stations, block_type_station_type):
         self.custom_es.set_station_type_with_order(stations)
         self.custom_es.set_block_type_in_station_order(blocks)
+        self.custom_es.set_block_type_in_station_type_for_excel_output(block_type_station_type)
         self.select_plot_type = 0
     
         
     def set_block_station_plot_1(self, data):
+        'блок в пределах станции'
         self.custom_es.set_block_type_in_station_order(data)
         self.select_plot_type = 1
        
     
     def set_block_station_type_plot_2(self, data_station_type, data_block_type_station_order):
+        'блок в пределах типа станций'
         self.custom_es.set_station_type_with_order(data_station_type)
         self.custom_es.set_block_type_in_station_type(data_block_type_station_order)
         self.select_plot_type = 2
     
         
     def set_station_plot_3(self, data):
+        'по станциям'
         self.custom_es.set_station_order(data)
         self.select_plot_type = 3
         
     def set_station_type_plot_4(self, data):
+        'по типам станций'
         self.custom_es.set_station_type_with_order(data)
         self.select_plot_type = 4
         
             
     def set_block_type_station_plot_5(self, data):
+        'тип блока в пределах станции'
         # self.custom_es.set_station_order(data_station_order)
         # self.custom_es.set_block_type_in_station_order(data_block_type_in_station)
         self.custom_es.set_block_type_in_station_order(data)
         self.select_plot_type = 5
         
     def set_block_type_station_type_plot_6(self, data_station_type, data_block_type_in_station_type):
+        'типа блока в пределах типа станции'
         self.custom_es.set_station_type_with_order(data_station_type)
         self.custom_es.set_block_type_in_station_type(data_block_type_in_station_type)
         self.select_plot_type = 6
+  
+  
   

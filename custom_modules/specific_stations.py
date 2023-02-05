@@ -391,7 +391,7 @@ class Specific_stations:
             }
                 
                 
-            self.allow_siemens = True                           # разрешить энергоисточники siemens
+            self.allow_large_siemens = True                           # разрешить энергоисточники siemens
             self.allow_renewables = True                        # разрешить виэ
             self.reduce_block_station_power = False             # запретить блок-станции без техн. ограничений
             self.apply_BelEnergo_retirement_until_2025 = False  # применить план вывода Белэнерго до 2025 года
@@ -604,7 +604,17 @@ class Specific_stations:
                     blocks = self.get_all_block_by_station_type_block_type(station_type, block_type)
                     for block in blocks:
                         block.group_options['block_type_order'] = order
-                            
+                        
+        def set_block_type_in_station_type_for_excel_output(self, data):
+            'устанавливает порядок отображения типов блоков в пределах типа станции для вывода в excel'
+            station_types = data.keys()
+            for station_type in station_types:
+                order_dict = { block_type: order for order,block_type in enumerate(data[station_type])}
+                for block_type, order in order_dict.items():
+                    blocks = self.get_all_block_by_station_type_block_type(station_type, block_type)
+                    for block in blocks:
+                        block.group_options['block_type_order_station_type_excel'] = order
+                           
         
 
  ##############################################################################
@@ -815,7 +825,7 @@ class Specific_stations:
             if self.station_all_turb_avail[station_name]:
                 tk_330_1 = block_creator.get_tk_330(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
                 el_turb = [tk_330_1]
-                if self.allow_siemens:
+                if self.allow_large_siemens:
                     ccgt_399_1 = block_creator.get_ccgt_399(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
                     el_turb.append(ccgt_399_1)
 
@@ -902,7 +912,7 @@ class Specific_stations:
                 ocgt_25_3 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, not_fuel_var_cost, 0.02)
                 ocgt_25_4 = block_creator.get_ocgt_25(global_id(), local_id(), station_name, not_fuel_var_cost, 0.02)
                 el_turb = [k_160_1, k_160_2, k_175_1, ocgt_25_1, ocgt_25_2, ocgt_25_3, ocgt_25_4]
-                if self.allow_siemens:
+                if self.allow_large_siemens:
                     ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, not_fuel_var_cost, 0.002)
                     ocgt_29_1 = block_creator.get_ocgt_29(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
                     ocgt_29_2 = block_creator.get_ocgt_29(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
@@ -1001,7 +1011,7 @@ class Specific_stations:
                 k_300_7 = block_creator.get_k_300(global_id(), local_id(), station_name, not_fuel_var_cost, 0.007)
                 k_300_8 = block_creator.get_k_300(global_id(), local_id(), station_name, not_fuel_var_cost, 0.008)
                 el_turb = [k_315_1, k_315_2, k_315_3, k_310_4, k_300_5, k_300_6, k_300_7, k_300_8]
-                if self.allow_siemens:
+                if self.allow_large_siemens:
                     ccgt_427_1 = block_creator.get_ccgt_427(global_id(), local_id(), station_name, not_fuel_var_cost, 0.001)
                     el_turb.append(ccgt_427_1)
             ###############################################################
@@ -1693,10 +1703,10 @@ class Specific_stations:
                     steam_turb = [pt_p_65_1, pt_p_50_1, pt_p_135_1]
                     hw_turb = [pt_t_65_1, pt_t_50_1, pt_t_135_1]
 
-            small_ocgt = None
-            if self.allow_siemens:
-                small_ocgt = block_creator.get_ocgt_small_2_3(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
-                el_turb.append(small_ocgt)
+            # small_ocgt = None
+            # if self.allow_large_siemens:
+            small_ocgt = block_creator.get_ocgt_small_2_3(global_id(), local_id(), station_name, not_fuel_var_cost, 0)
+            el_turb.append(small_ocgt)
 
 
             hw_el_boilers = steam_el_boilers = hw_gas_boilers = steam_gas_boilers = None
@@ -1833,9 +1843,9 @@ class Specific_stations:
                     el_turb = [pt_t_60_el_1, pt_t_60_el_2, pt_t_60_el_3]
                     steam_turb = [pt_p_60_1, pt_p_60_2, pt_p_60_3]
                     hw_turb = [pt_t_60_1, pt_t_60_2, pt_t_60_3]
-                if self.allow_siemens:
-                    small_ocgt = block_creator.get_ocgt_small_2_6(global_id(), local_id(), station_name, 0)
-                    el_turb.append(small_ocgt)
+                # if self.allow_large_siemens:
+                small_ocgt = block_creator.get_ocgt_small_2_6(global_id(), local_id(), station_name, 0)
+                el_turb.append(small_ocgt)
 
 
             hw_el_boilers = steam_el_boilers = hw_gas_boilers = steam_gas_boilers = None
@@ -1967,9 +1977,9 @@ class Specific_stations:
                     el_turb = [pt_t_70_el_1, pt_t_70_el_2, p_50_1]
                     steam_turb = [pt_p_70_1, pt_p_70_2, p_50_1]
                     hw_turb = [pt_t_70_1, pt_t_70_2]
-                if self.allow_siemens:
-                    ocgt_chp = block_creator.get_ocgt_chp_121(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
-                    el_turb.append(ocgt_chp)
+                # if self.allow_large_siemens:
+                ocgt_chp = block_creator.get_ocgt_chp_121(global_id(), local_id(), station_name, steam_bus, not_fuel_var_cost, 0)
+                el_turb.append(ocgt_chp)
 
 
 

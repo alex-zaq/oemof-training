@@ -27,7 +27,7 @@ class Specific_blocks:
             self.station_type = {'тэц':'тэц', 'кэс':'кэс', 'аэс':'аэс',
                                  'блок-станции':'блок-станции', 'виэ':'виэ'
                                  }
-            self.block_type = {'р':'р', 'т':'т', 'пт':'пт', 'к':'к',
+            self.block_type = {'р':'р', 'т':'т', 'пт':'пт', 'к':'к', 'гпа':'гпа',
                                'пгу-кэс':'пгу-кэс', 'пгу-тэц':'пгу-тэц',
                                'гту':'гту','гту-тэц':'гту-тэц', 'эк':'эк',
                                'кот':'кот', 'ввэр':'ввэр', 'ммр':'ммр','блок-станции-газ':'блок-станции-газ',
@@ -1867,7 +1867,8 @@ class Specific_blocks:
 
                 # (e+t/((e+t)/eff) = eff(el))
         def get_block_station_natural_gas(self, global_index, local_index, nominal_value, station_name, fixed_el_load_data_rel, not_fuel_var_cost):
-            block_type = self.block_type['блок-станции-газ']
+            # block_type = self.block_type['блок-станции-газ']
+            block_type = self.block_type['гпа']
             return self.g_block_creator.create_simple_transformer_with_fixed_load(
             nominal_value = nominal_value,
             input_flow = self.global_natural_gas_flow ,
@@ -1880,7 +1881,7 @@ class Specific_blocks:
             'local_index': str(local_index),
             'station_name': station_name,
             'station_type': None,
-            'block_name': block_type,
+            'block_name': 'ГПА',
             'block_type': block_type,
             'heat_demand_type': None,
             'station_order': None,

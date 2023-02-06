@@ -328,6 +328,17 @@ class Scenario_builder:
         self.custom_es.new_npp_scenario_options['ритм-200_затраты'] = usd_per_Mwth
         self.custom_es.new_npp_scenario_options['ритм-200_фикс'] = fix_load
         return self
+
+
+    def set_renewables_install_power(self, wind = None, solar = None, hydro = None):
+        'изменение установленной мощности ВИЭ по видом'
+        if wind is not None:
+            self.custom_es.renewables_install_power['ВЭС'] = wind
+        if solar is not None:
+            self.custom_es.renewables_install_power['CЭС'] = solar
+        if hydro is not None:
+            self.custom_es.renewables_install_power['ГЭС'] = hydro
+
     
     def add_storage(self):
         'добавить аккумулятор'

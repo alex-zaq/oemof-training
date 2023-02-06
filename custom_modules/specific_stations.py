@@ -390,6 +390,13 @@ class Specific_stations:
                 'ритм_200_фикс': False,
             }
                 
+            
+            self.renewables_install_power = {
+                'ГЭС' : 95.3,
+                'ВЭС' : 125.8,
+                'СЭС' : 160.7
+            }    
+                
                 
             self.allow_large_siemens = True                           # разрешить энергоисточники siemens
             self.allow_renewables = True                        # разрешить виэ
@@ -2367,7 +2374,7 @@ class Specific_stations:
                 hydro_renewables = self.block_creator.get_hydro_renewables(
                     global_index = global_id(),
                     local_index = local_id(),
-                    nominal_value = 95.3,
+                    nominal_value = self.renewables_install_power['ГЭС'],
                     station_name = station_name,
                     fixed_el_load_data_rel= fixed_hydro_rel,
                     not_fuel_var_cost = not_fuel_var_cost_hydro
@@ -2376,7 +2383,7 @@ class Specific_stations:
                 wind_renewables = self.block_creator.get_wind_renewables(
                     global_index = global_id(),
                     local_index = local_id(),
-                    nominal_value = 125.8,
+                    nominal_value = self.renewables_install_power['ВЭС'],
                     station_name = station_name,
                     fixed_el_load_data_rel= fixed_wind_rel,
                     not_fuel_var_cost = not_fuel_var_cost_wind
@@ -2385,7 +2392,7 @@ class Specific_stations:
                 solar_renewables = self.block_creator.get_solar_renewables(
                     global_index = global_id(),
                     local_index = local_id(),
-                    nominal_value = 160.7,
+                    nominal_value = self.renewables_install_power['СЭС'],
                     station_name = station_name,
                     fixed_el_load_data_rel= fixed_solar_rel,
                     not_fuel_var_cost = not_fuel_var_cost_solar
